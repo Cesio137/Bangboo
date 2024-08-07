@@ -2,6 +2,8 @@ import { Command, Event, Responder, type ResponderInteraction } from "#base";
 import { log, onError } from "#settings";
 import { CustomItents, CustomPartials, spaceBuilder, toNull } from "@magicyan/discord";
 import ck from "chalk";
+import { Player } from "discord-player";
+import { YoutubeiExtractor } from "discord-player-youtubei";
 import { Client, type ClientOptions, version as djsVersion } from "discord.js";
 import glob from "fast-glob";
 import path from "node:path";
@@ -95,6 +97,9 @@ function createClient(token: string, options: BootstrapAppOptions): Client {
     }));
 
     options.beforeLoad?.(client);
+    client.player = new Player(client as never);
+    client.player.extractors.loadDefault((ext) => ext !== "YouTubeExtractor");
+    client.player.extractors.register(YoutubeiExtractor, {});
 
     client.on("ready", async (client) => {
         const messages: string[] = [];
