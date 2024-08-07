@@ -128,3 +128,27 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# Folders
+/build
+/dist
+/discloud
+/deprecated
+/node_modules
+
+# Files
+/.env
+/.env.dev
+/.env.development
+/.vscode
+/package-lock.json
+
+# Config files
+/firebase.json
+
+# Extensions
+*.zip
+*.sqlite
+*.exe
+*.db
+*.development.json
