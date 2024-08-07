@@ -1,3 +1,3 @@
 import { bootstrapApp } from "#base";
 
-await bootstrapApp({ workdir: import.meta.dirname });
+export const client = await bootstrapApp({ workdir: import.meta.dirname });
