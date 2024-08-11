@@ -18,7 +18,7 @@ for (const [name, id] of Object.entries(settings.emojis.static)) {
     };
     Object.assign(icon, { [name]: data });
 }
-/*for (const [name, id] of Object.entries(settings.emojis.animated)) {
+for (const [name, id] of Object.entries(settings.emojis.animated)) {
     const data = {
         id,
         animated: false,
@@ -27,6 +27,6 @@ for (const [name, id] of Object.entries(settings.emojis.static)) {
         },
     };
     Object.assign(icon, { [name]: data });
-}*/
+}
 
 export { icon };

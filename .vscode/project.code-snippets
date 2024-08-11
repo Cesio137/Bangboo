@@ -1,0 +1,186 @@
+{
+	"Slash Command": {
+		"prefix": "new.command",
+		"scope":"typescript",
+		"body": [
+			"new Command({",
+			"    name: \"$1\",",
+			"    description: \"$2\",",
+			"    type: ApplicationCommandType.ChatInput,",
+			"    async run(interaction){",
+			"        $3",
+			"    }",
+			"});"
+		],
+		"description": "Create a new Slash Command"
+	},
+	"Slash Command with options": {
+		"prefix": "new.command.options",
+		"scope":"typescript",
+		"body": [
+			"new Command({",
+			"    name: \"$1\",",
+			"    description: \"$2\",",
+			"    type: ApplicationCommandType.ChatInput,",
+			"    options: [",
+			"        {",
+			"            name: \"$3\",",
+			"            description: \"$4\",",
+			"            type: ApplicationCommandOptionType.$5",
+			"        }",
+			"    ],",
+			"    async run(interaction){",
+			"        const { options } = interaction;",
+			"        ",
+			"    }",
+			"});"
+		],
+		"description": "Create a new Slash Command with options"
+	},
+	"Slash Command option": {
+		"prefix": "new.option",
+		"scope":"typescript",
+		"body": [
+			"{",
+			"    name: \"$1\",",
+			"    description: \"$2\",",
+			"    type: ApplicationCommandOptionType.$3,",
+			"}",
+		],
+		"description": "Create a new Slash Command with options"
+	},
+	"User Context Command": {
+		"prefix": "new.command.user",
+		"scope":"typescript",
+		"body": [
+			"new Command({",
+			"    name: \"$1\",",
+			"    type: ApplicationCommandType.User,",
+			"    async run(interaction){",
+			"        ",
+			"    }",
+			"});"
+		],
+		"description": "Create a new User Context Command"
+	},
+	"Message Context Command": {
+		"prefix": "new.command.message",
+		"scope":"typescript",
+		"body": [
+			"new Command({",
+			"    name: \"$1\",",
+			"    type: ApplicationCommandType.Message,",
+			"    async run(interaction){",
+			"        ",
+			"    }",
+			"});"
+		],
+		"description": "Create a new Message Context Command"
+	},
+	"Responder": {
+		"prefix": "new.responder",
+		"scope":"typescript",
+		"body": [
+			"new Responder({",
+			"    customId: \"example/component/button\",",
+			"    type: ResponderType.$1, cache: \"cached\",",
+			"    async run(interaction) {",
+			"        ",
+			"    },",
+			"});"
+		],
+		"description": "Create a new responder"
+	},
+	"Responder Params": {
+		"prefix": "new.Responder.params",
+		"scope":"typescript",
+		"body": [
+			"new Responder({",
+			"    customId: \"users/:userId/:action\",",
+			"    type: ResponderType.ActionRow, cache: \"cached\",",
+			"    async run(interaction, { userId, action }) {",
+			"        ",
+			"    },",
+			"});"
+		],
+		"description": "Create a new responder with params"
+	},
+	"Event": {
+		"prefix": "new.event",
+		"scope":"typescript",
+		"body": [
+			"import { Event } from \"#base\";",
+			"",
+			"new Event({",
+			"    name: \"$1\",",
+			"    event: \"$2\",",
+			"    $3",
+			"});"
+		],
+		"description": "Create a new event"
+	},
+	"Create Row With Buttons": {
+		"prefix": "createrow.buttons",
+		"scope":"typescript",
+		"body": [
+			"createRow(",
+			"    new ButtonBuilder({",
+			"        customId: \"$1\"," ,
+			"        label: \"$2\", ",
+			"        style: ButtonStyle.Success",
+			"    })",
+			");"
+		],
+		"description": "Create a new row with buttons"
+	},
+	"Create Row With String Select": {
+		"prefix": "createrow.stringselect",
+		"scope":"typescript",
+		"body": [
+			"createRow(",
+			"    new StringSelectMenuBuilder({",
+			"        customId: \"$1\",",
+			"        placeholder: \"$2\",",
+			"        options: [",
+			"            { label: \"\", value: \"\", description: \"\" },",
+			"            { label: \"\", value: \"\", description: \"\" },",
+			"            { label: \"\", value: \"\", description: \"\" }",
+			"        ]",
+			"    })",
+			");"
+		],
+		"description": "Create a new row with string select"
+	},
+	"Extract slash interaction props": {
+		"prefix": "const.interaction.slash",
+		"scope":"typescript",
+		"body": [
+			"const { options, member, guild } = interaction;"
+		],
+		"description": "Extract slash interaction properties"
+	},
+	"Extract modal interaction props": {
+		"prefix": "const.interaction.modal",
+		"scope":"typescript",
+		"body": [
+			"const { fields, member, guild } = interaction;"
+		],
+		"description": "Extract modal interaction properties"
+	},
+	"Extract button interaction props": {
+		"prefix": "const.interaction.button",
+		"scope":"typescript",
+		"body": [
+			"const { member, guild } = interaction;"
+		],
+		"description": "Extract button interaction properties"
+	},
+	"Extract select interaction props": {
+		"prefix": "const.interaction.select",
+		"scope":"typescript",
+		"body": [
+			"const { values, member, guild } = interaction;"
+		],
+		"description": "Extract select interaction properties"
+	}
+}

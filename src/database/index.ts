@@ -1,4 +1,4 @@
-import mongoose, { InferSchemaType, model } from "mongoose";
+/*import mongoose, { InferSchemaType, model } from "mongoose";
 import { guildSchema } from "./schemas/guild.js";
 import { memberSchema } from "./schemas/member.js";
 import { log } from "#settings";
@@ -18,4 +18,4 @@ export const db = {
 };
 
 export type GuildSchema = InferSchemaType<typeof guildSchema>;
-export type MemberSchema = InferSchemaType<typeof memberSchema>;
+export type MemberSchema = InferSchemaType<typeof memberSchema>;*/
