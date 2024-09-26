@@ -6,7 +6,7 @@ import {
     SafetySetting,
 } from "@google/generative-ai";
 
-const gemAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const geminiAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const threshold = HarmBlockThreshold.BLOCK_NONE;
 const safetySettings: SafetySetting[] = [
     { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold },
@@ -16,12 +16,12 @@ const safetySettings: SafetySetting[] = [
 ];
 
 export const gemini = {
-    text: gemAI.getGenerativeModel({ model: "gemini-1.5-flash", safetySettings }),
+    text: geminiAI.getGenerativeModel({ model: "gemini-1.5-flash", safetySettings }),
     getText(response: EnhancedGenerateContentResponse) {
         try {
             return { success: true, text: response.text() };
-        } catch (error) {
-            return { success: false, error };
+        } catch (err) {
+            return { success: false, err };
         }
     },
 };

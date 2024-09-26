@@ -7,7 +7,6 @@ type IconInfo = { id: string; animated: boolean; toString(): string };
 type Icon = Record<EmojiKey, IconInfo>;
 
 const icon: Icon = Object.create({});
-formatEmoji("sda", false);
 for (const [name, id] of Object.entries(settings.emojis.static)) {
     const data = {
         id,
@@ -21,9 +20,9 @@ for (const [name, id] of Object.entries(settings.emojis.static)) {
 for (const [name, id] of Object.entries(settings.emojis.animated)) {
     const data = {
         id,
-        animated: false,
+        animated: true,
         toString() {
-            return formatEmoji(id, false);
+            return formatEmoji(id, true);
         },
     };
     Object.assign(icon, { [name]: data });
