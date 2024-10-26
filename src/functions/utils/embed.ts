@@ -20,7 +20,7 @@ export const res: Res = Object.create(
                         if (options && "embeds" in options && Array.isArray(options.embeds)) {
                             options.embeds.unshift(embed);
                         }
-                        const defaults = { fetchReply: true, ephemeral: true, embeds: [embed] };
+                        const defaults = { fetchReply: true, ephemeral: false, embeds: [embed] };
                         return Object.assign(defaults, options);
                     },
                 },
