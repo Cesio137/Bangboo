@@ -1,10 +1,6 @@
 import { Command } from "#base";
 import { res } from "#functions";
-import {
-    ApplicationCommandOptionType,
-    ApplicationCommandType,
-    Events,
-} from "discord.js";
+import { ApplicationCommandOptionType, ApplicationCommandType, Events } from "discord.js";
 
 new Command({
     name: "trigger",
@@ -21,6 +17,10 @@ new Command({
                     name: Events.GuildMemberAdd,
                     value: Events.GuildMemberAdd,
                 },
+                {
+                    name: Events.GuildMemberRemove,
+                    value: Events.GuildMemberRemove,
+                },
             ],
         },
     ],
@@ -36,15 +36,7 @@ new Command({
             interaction.reply(res.danger("Error trying to get a valid user."));
             return;
         }
-        switch (event) {
-            case Events.GuildMemberAdd:
-                client.emit(Events.GuildMemberAdd, member);
-                break;
-        }
-        interaction.reply(
-            res.green(
-                `Event ${event} triggered for member ${member.displayName}`
-            )
-        );
+        client.emit(event, member);
+        interaction.reply(res.green(`Event ${event} triggered for member ${member.displayName}`));
     },
 });
