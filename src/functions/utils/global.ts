@@ -54,7 +54,7 @@ export async function globalMessage(event: Events, member: GuildMember | Partial
         context.font = `bold ${--usernameFontSize}px Roboto Condensed`;
     } while (context.measureText(username).width > canvas.width - 400);
     context.textBaseline = "middle";
-    context.fillText(username, 300, 110 + 30);
+    context.fillText(username, 300, 110 + (usernameFontSize / 2));
 
     let displayNameFontSize = 32;
     context.fillStyle = "#FFFFFF";
@@ -62,7 +62,7 @@ export async function globalMessage(event: Events, member: GuildMember | Partial
         context.font = `regular ${--displayNameFontSize}px Lato`;
     } while (context.measureText(`@${displayName}`).width > canvas.width - 400);
     context.textBaseline = "middle";
-    context.fillText(`@${displayName}`, 300, 170 + 16);
+    context.fillText(`@${displayName}`, 300, 170 + (displayNameFontSize / 2));
 
     const buffer = await canvas.encode("png");
     const attachment = new AttachmentBuilder(buffer, { name: "card.png" });
