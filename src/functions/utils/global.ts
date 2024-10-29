@@ -9,7 +9,7 @@ import {
 import { join } from "path";
 
 export async function globalMessage(event: Events, member: GuildMember | PartialGuildMember) {
-    const canvas = new Canvas(800, 200);
+    const canvas = new Canvas(1024, 260);
     const context = canvas.getContext("2d");
 
     const background = await loadImage(
@@ -20,9 +20,9 @@ export async function globalMessage(event: Events, member: GuildMember | Partial
 
     const avatar = await loadImage(member.displayAvatarURL({ size: 256 }));
     context.beginPath();
-    context.arc(64 + 32, 64 + 36, 64, 0, Math.PI * 2);
+    context.arc(90 + 68, 90 + 41, 90, 0, Math.PI * 2);
     context.clip();
-    context.drawImage(avatar, 32, 36, 128, 128);
+    context.drawImage(avatar, 68, 41, 180, 180);
     context.restore();
 
     const actionIconPath = join(
@@ -30,22 +30,39 @@ export async function globalMessage(event: Events, member: GuildMember | Partial
         `assets/icons/static/${event === Events.GuildMemberAdd ? "add" : "minus"}.svg`
     );
     const actionIcon = await loadImage(actionIconPath);
-    context.drawImage(actionIcon, 180, 74 - 16);
+    context.drawImage(actionIcon, 205, 179);
 
-    const actionText = event === Events.GuildMemberAdd ? "JOINED TO SERVER" : "LEFT THE SERVER";
-    context.fillStyle = "#FFFFFF";
-    context.font = "extrabold 24px Montserrat";
-    context.textBaseline = "middle";
-    context.fillText(actionText, 180, 117);
+    const { displayName, user, joinedTimestamp } = member;
+    const { username } = user;
 
-    const { displayName } = member;
-    let fontSize = 48;
+    if (event === Events.GuildMemberAdd) {
+        const accountAge = Date.now() - user.createdTimestamp;
+        const joinAge = Date.now() - (joinedTimestamp || 0);
+        const timeLimit = 60 * 1000;
+        const welcomeText =
+            joinAge < timeLimit && accountAge > timeLimit ? "FIRST TIME" : "WELCOME BACK";
+        context.fillStyle = "#FFFFFF";
+        context.font = "semibold 16px Poppins";
+        context.textBaseline = "middle";
+        const xPos = welcomeText === "FIRST TIME" ? 556 : 533;
+        context.fillText(welcomeText, xPos, 66 + 8);
+    }
+
+    let usernameFontSize = 60;
     context.fillStyle = "#FFFFFF";
     do {
-        context.font = `${--fontSize}px Heavitas`;
-    } while (context.measureText(displayName).width > canvas.width - 240);
+        context.font = `bold ${--usernameFontSize}px Roboto Condensed`;
+    } while (context.measureText(username).width > canvas.width - 400);
     context.textBaseline = "middle";
-    context.fillText(displayName, 220, 78);
+    context.fillText(username, 300, 110 + 30);
+
+    let displayNameFontSize = 32;
+    context.fillStyle = "#FFFFFF";
+    do {
+        context.font = `regular ${--displayNameFontSize}px Lato`;
+    } while (context.measureText(`@${displayName}`).width > canvas.width - 400);
+    context.textBaseline = "middle";
+    context.fillText(`@${displayName}`, 300, 170 + 16);
 
     const buffer = await canvas.encode("png");
     const attachment = new AttachmentBuilder(buffer, { name: "card.png" });

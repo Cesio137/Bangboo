@@ -1,5 +1,5 @@
 import { Command } from "#base";
-import { res } from "#functions";
+import { globalMessage, res } from "#functions";
 import { ApplicationCommandOptionType, ApplicationCommandType, Events } from "discord.js";
 
 new Command({
@@ -25,7 +25,7 @@ new Command({
         },
     ],
     async run(interaction) {
-        const { client, options, user, guild } = interaction;
+        const { options, user, guild } = interaction;
         const event = options.getString("event");
         if (!event) {
             interaction.reply(res.danger("Error trying to get event name."));
@@ -36,7 +36,9 @@ new Command({
             interaction.reply(res.danger("Error trying to get a valid user."));
             return;
         }
-        client.emit(event, member);
+        const events =
+            event === Events.GuildMemberAdd ? Events.GuildMemberAdd : Events.GuildMemberRemove;
+        globalMessage(events, member);
         interaction.reply(res.green(`Event ${event} triggered for member ${member.displayName}`));
     },
 });
