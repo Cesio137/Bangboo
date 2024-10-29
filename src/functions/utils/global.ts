@@ -51,7 +51,7 @@ export async function globalMessage(event: Events, member: GuildMember | Partial
     let usernameFontSize = 60;
     context.fillStyle = "#FFFFFF";
     do {
-        context.font = `bold ${--usernameFontSize}px Roboto Condensed`;
+        context.font = `bold ${--usernameFontSize}px Rubik`;
     } while (context.measureText(username).width > canvas.width - 400);
     context.textBaseline = "middle";
     context.fillText(username, 300, 110 + (usernameFontSize / 2));
