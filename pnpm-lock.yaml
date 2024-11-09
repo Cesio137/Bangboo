@@ -15,8 +15,8 @@ importers:
         specifier: ^0.21.0
         version: 0.21.0
       '@magicyan/discord':
-        specifier: ^1.2.0
-        version: 1.2.0(discord.js@14.16.3)
+        specifier: ^1.2.2
+        version: 1.2.2(discord.js@14.16.3)
       '@magicyan/discord-ui':
         specifier: ^0.2.0
         version: 0.2.0(discord.js@14.16.3)
@@ -55,8 +55,8 @@ importers:
         version: 3.23.8
     devDependencies:
       '@types/node':
-        specifier: ^22.8.7
-        version: 22.8.7
+        specifier: ^22.9.0
+        version: 22.9.0
       tsx:
         specifier: 4.19.2
         version: 4.19.2
@@ -268,16 +268,16 @@ packages:
     resolution: {integrity: sha512-7XhUbtnlkSEZK15kN3t+tzIMxsbKm/dSkKBFalj+20NvPKe1kBY7mR2P7vuijEn+f06z5+A8bVGKO0v39cr6Wg==}
     engines: {node: '>=18.0.0'}
 
-  '@magicyan/core@1.0.19':
-    resolution: {integrity: sha512-xSd4itJFtGoMswJ/3mMYNVM/WzbyfTJNWV/VeQR9sGKx66qPkK5A+6fQH12MfcWy1QiVeQtoB4HwVwo6jErr7Q==}
+  '@magicyan/core@1.0.20':
+    resolution: {integrity: sha512-iQxZtXAcMGpBO2g4esOZdZp2nsqoKJ/wLezCCxfCJyLr407LYKdUFW21LudqU5eo005l8RJLde2UCEFHng1XFA==}
 
   '@magicyan/discord-ui@0.2.0':
     resolution: {integrity: sha512-cYwQrPjjnGqVrJyWslpLcrNLkou0vFHnCWLh88Zo/C7DI/yYHGoONuC+sQO3Y/vZDUePUZJ1DhmrhOlChyxKWw==}
     peerDependencies:
       discord.js: ^14.15.2
 
-  '@magicyan/discord@1.2.0':
-    resolution: {integrity: sha512-8U4GXI3xBW1nqigUG9ufAXPkIR3TJ7wZ4mM6jY0mUaqRor01H3EEAkODrG+z6HIlOH37XezFhGixoYopTR8gPw==}
+  '@magicyan/discord@1.2.2':
+    resolution: {integrity: sha512-g1iJVDNVjWedVdhFbYf0Kzqv9ssIEK/z6tBUc0eiB0jVV3I2ZsCiCFzA2W4NqPWWBA7FZP9RxTraESQgKwcMyw==}
     peerDependencies:
       discord.js: ^14.16.3
 
@@ -369,8 +369,8 @@ packages:
   '@types/node@10.17.60':
     resolution: {integrity: sha512-F0KIgDJfy2nA3zMLmWGKxcH2ZVEtCZXHHdOQs2gSaQ27+lNeEfGxzkIw90aXswATX7AZ33tahPbzy6KAfUreVw==}
 
-  '@types/node@22.8.7':
-    resolution: {integrity: sha512-LidcG+2UeYIWcMuMUpBKOnryBWG/rnmOHQR5apjn8myTQcx3rinFRn7DcIFhMnS0PPFSC6OafdIKEad0lj6U0Q==}
+  '@types/node@22.9.0':
+    resolution: {integrity: sha512-vuyHg81vvWA1Z1ELfvLko2c8f34gyA0zaic0+Rllc5lbCnbSyuvb2Oxpm6TAUAC/2xZN3QGqxBNggD1nNR2AfQ==}
 
   '@types/ws@8.5.12':
     resolution: {integrity: sha512-3tPRkv1EtkDpzlgyKyI8pGsGZAGPEaXeu0DOj5DI25Ja91bdAYddYHbADRYVrZMRbfW+1l5YwXVDKohDJNQxkQ==}
@@ -1009,15 +1009,15 @@ snapshots:
 
   '@google/generative-ai@0.21.0': {}
 
-  '@magicyan/core@1.0.19': {}
+  '@magicyan/core@1.0.20': {}
 
   '@magicyan/discord-ui@0.2.0(discord.js@14.16.3)':
     dependencies:
       discord.js: 14.16.3
 
-  '@magicyan/discord@1.2.0(discord.js@14.16.3)':
+  '@magicyan/discord@1.2.2(discord.js@14.16.3)':
     dependencies:
-      '@magicyan/core': 1.0.19
+      '@magicyan/core': 1.0.20
       discord.js: 14.16.3
 
   '@napi-rs/canvas-android-arm64@0.1.60':
@@ -1084,13 +1084,13 @@ snapshots:
 
   '@types/node@10.17.60': {}
 
-  '@types/node@22.8.7':
+  '@types/node@22.9.0':
     dependencies:
       undici-types: 6.19.8
 
   '@types/ws@8.5.12':
     dependencies:
-      '@types/node': 22.8.7
+      '@types/node': 22.9.0
 
   '@vladfrangu/async_event_emitter@2.4.6': {}
 

@@ -1,10 +1,9 @@
+import { CacheType, Client, type ClientOptions, version as djsVersion, PermissionResolvable } from "discord.js";
 import { Command, Event, Responder, ResponderType, type ResponderInteraction } from "#base";
+import { CustomItents, CustomPartials, spaceBuilder } from "@magicyan/discord";
 import { log, onError } from "#settings";
-import { CustomItents, CustomPartials, spaceBuilder, toNull } from "@magicyan/discord";
-import ck from "chalk";
-import { CacheType, Client, type ClientOptions, version as djsVersion } from "discord.js";
 import glob from "fast-glob";
-import path from "node:path";
+import ck from "chalk";
 import { Player } from "discord-player";
 import { YoutubeiExtractor } from "discord-player-youtubei";
 
@@ -15,6 +14,8 @@ interface BootstrapAppOptions extends Partial<ClientOptions> {
 	commands?: {
 		/** Register commands in guilds */
 		guilds?: string[]
+		/** Globally sets default permissions for commands if they are not set */
+		defaultMemberPermissions?: PermissionResolvable[]
 	},
     /** Responders options */
 	responders?: {
@@ -33,7 +34,7 @@ interface BootstrapAppOptions extends Partial<ClientOptions> {
     /** Run when client is ready */
     whenReady?(client: Client<true>): void;
 }
-export async function bootstrapApp<O extends BootstrapAppOptions>(options: O){
+export async function bootstrapApp<O extends BootstrapAppOptions>(options: O): Promise<Client> {
     if (options.responders){
         Responder.setup({
             onNotFound: options.responders.onNotFound
@@ -51,21 +52,18 @@ export async function bootstrapApp<O extends BootstrapAppOptions>(options: O){
 
     Event.register(client);
     client.login();
+    return client;
 }
 type LoadDirsOptions = Pick<BootstrapAppOptions, "workdir" | "directories" | "loadLogs">;
 async function loadDirectories(options: LoadDirsOptions) {
     const { workdir, directories=[], loadLogs=true } = options;
-    const foldername = path.basename(workdir);
     const pattern: string = "**/*.{ts,js,tsx,jsx}";
     const patterns: string[] = [
-        `!./${foldername}/discord/base/*`,
-        `./${foldername}/discord/${pattern}`,
-        directories.map(dir => path.join(foldername, dir))
-        .map(p => p.replaceAll("\\", "/"))
-        .map(p => `./${p}/${pattern}`)
+        `!./discord/base/*`, `./discord/${pattern}`,
+        directories.map(p => p.replaceAll("\\", "/")).map(p => `./${p}/${pattern}`)
     ].flat();
     
-    const paths: string[] = await glob(patterns, { absolute: true });
+    const paths: string[] = await glob(patterns, { absolute: true, cwd: workdir });
     await Promise.all(paths.map(path => import(`file://${path}`)));
 
     if (loadLogs??true){
@@ -81,8 +79,6 @@ function createClient(token: string, options: BootstrapAppOptions): Client {
     client.token=token;
 
     if (options.beforeLoad) options.beforeLoad(client);
-
-    options.beforeLoad?.(client);
     client.player = new Player(client as never);
     client.player.extractors.loadDefault((ext) => ext !== "YouTubeExtractor");
     client.player.extractors.register(YoutubeiExtractor, {});
@@ -90,15 +86,17 @@ function createClient(token: string, options: BootstrapAppOptions): Client {
     client.on("ready", async (client) => {
         const messages: string[] = [];
         const addMessage = (text: string) => messages.push(text);
-        await client.guilds.fetch().catch(toNull);
+        await client.guilds.fetch().catch(() => null);
+
+        const defaultMemberPermissions = options.commands?.defaultMemberPermissions;
 
         if (options.commands?.guilds){
             const guilds = client.guilds.cache.filter(
                 ({ id }) => options?.commands?.guilds?.includes(id)
             );
-            await Command.register(addMessage, client, guilds);
+            await Command.register({ addMessage, client, defaultMemberPermissions, guilds });
         } else {
-            await Command.register(addMessage, client);
+            await Command.register({ addMessage, client, defaultMemberPermissions });
         }
         log.log(ck.greenBright(`➝ Online as ${ck.hex("#57F287").underline(client.user.username)}`));
         for(const message of messages) log.log(ck.green(` ${message}`));
