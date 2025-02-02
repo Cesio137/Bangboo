@@ -1,2 +1,2 @@
-export * from "./discordui.js";
-export * from "./gemini.js";
+export * from "./discordui.js"
+export * from "./gemini.js"

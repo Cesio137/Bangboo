@@ -41,17 +41,16 @@
   "explorer.fileNesting.enabled": true,
   "explorer.fileNesting.patterns": {
     ".env": ".env*",
+    "settings.json": "emojis.json, emojis.dev.json",
     "package.json": "*lock.json, *.lock, *lock.yaml, *.lockb, tsconfig.json, .eslintrc.json, .gitignore, .discloudignore, biome.json, .nvmrc"
   },
   "typescript.suggest.autoImports": true,
   "window.title": "${rootName}${separator}",
   "files.autoSave": "afterDelay",
+  "typescript.experimental.expandableHover": true,
   "files.readonlyInclude": {
     "node_modules/**": true,
     "build/**": true,
-    "src/discord/base/**": true,
-    "src/settings/global.ts": true,
-    "src/settings/error.ts": true,
-    "src/settings/index.ts": true,
+    //"src/discord/base/**": true
   },
 }

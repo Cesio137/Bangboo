@@ -1,12 +1,15 @@
-import { Command } from "#base";
+import { createCommand } from "#base";
 import { createQueueMetadata, icon, res } from "#functions";
 import { settings } from "#settings";
 import { brBuilder, createEmbed } from "@magicyan/discord";
 import { multimenu } from "@magicyan/discord-ui";
 import { QueryType, SearchQueryType } from "discord-player";
-import { ApplicationCommandOptionType, ApplicationCommandType } from "discord.js";
+import {
+    ApplicationCommandOptionType,
+    ApplicationCommandType,
+} from "discord.js";
 
-new Command({
+createCommand({
     name: "player",
     description: "Commands to control your podcasts and OST queue!",
     type: ApplicationCommandType.ChatInput,
@@ -26,7 +29,10 @@ new Command({
                     name: "engine",
                     description: "Search engine(optional).",
                     type: ApplicationCommandOptionType.String,
-                    choices: Object.values(QueryType).map((type) => ({ name: type, value: type })),
+                    choices: Object.values(QueryType).map((type) => ({
+                        name: type,
+                        value: type,
+                    })),
                 },
             ],
         },
@@ -67,11 +73,15 @@ new Command({
         const { options, member, guild, channel, client } = interaction;
         if (!member.voice.channel)
             return interaction.reply(
-                res.danger(`${icon.close} You are not connected to a voice channel!`)
+                res.danger(
+                    `${icon.close} You are not connected to a voice channel!`
+                )
             );
         if (!channel)
             return interaction.reply(
-                res.danger(`${icon.close} It is not possible to use this command on this channel.`)
+                res.danger(
+                    `${icon.close} It is not possible to use this command on this channel.`
+                )
             );
 
         await interaction.deferReply();
@@ -82,13 +92,19 @@ new Command({
             );
 
         const voiceChannel = member.voice.channel;
-        const queueMetadata = createQueueMetadata({ channel, client, guild, voiceChannel });
+        const queueMetadata = createQueueMetadata({
+            channel,
+            client,
+            guild,
+            voiceChannel,
+        });
 
         switch (options.getSubcommand(true)) {
             case "add":
                 try {
                     const query = options.getString("search", true);
-                    const searchEngine = options.getString("engine") ?? QueryType.YOUTUBE;
+                    const searchEngine =
+                        options.getString("engine") ?? QueryType.YOUTUBE;
 
                     const { track, searchResult } = await client.player.play(
                         voiceChannel as never,
@@ -105,12 +121,18 @@ new Command({
                         const { tracks, title, url } = searchResult.playlist;
                         display.push(
                             `Added ${tracks.length} tracks from playlist [${title}](${url}).`,
-                            ...tracks.map((track) => `${track.title}`).slice(0, 8),
+                            ...tracks
+                                .map((track) => `${track.title}`)
+                                .slice(0, 8),
                             "..."
                         );
                     } else {
                         display.push(
-                            `${queue?.size ? "Added to queue. " : "Playing now! "} ${track.title}`
+                            `${
+                                queue?.size
+                                    ? "Added to queue. "
+                                    : "Playing now! "
+                            } ${track.title}`
                         );
                     }
                     return interaction.editReply(
@@ -118,14 +140,18 @@ new Command({
                     );
                 } catch (e) {
                     return interaction.editReply(
-                        res.danger(`${icon.close} Error when trying to play the track.\n${e}`)
+                        res.danger(
+                            `${icon.close} Error when trying to play the track.\n${e}`
+                        )
                     );
                 }
                 return;
             case "pause":
                 if (queue?.node.isPaused())
                     return interaction.editReply(
-                        res.danger(`${icon.close} The current track is already paused!`)
+                        res.danger(
+                            `${icon.close} The current track is already paused!`
+                        )
                     );
                 queue?.node.pause();
                 return interaction.editReply(
@@ -134,7 +160,9 @@ new Command({
             case "resume":
                 if (!queue?.node.isPaused())
                     return interaction.editReply(
-                        res.danger(`${icon.close} The current track is not paused!`)
+                        res.danger(
+                            `${icon.close} The current track is not paused!`
+                        )
                     );
                 queue.node.resume();
                 return interaction.editReply(
@@ -156,7 +184,9 @@ new Command({
                 return interaction.editReply(
                     res.success(
                         `${icon.check} ${skipAmount} ${
-                            skipAmount > 1 ? "tracks have been skipped!" : "track has been skipped!"
+                            skipAmount > 1
+                                ? "tracks have been skipped!"
+                                : "track has been skipped!"
                         } `
                     )
                 );
@@ -168,7 +198,9 @@ new Command({
                             "# Current queue",
                             `Amount: ${queue!.tracks.size}`,
                             "",
-                            `Current track: ${queue!.currentTrack?.title ?? "Nothing"}`
+                            `Current track: ${
+                                queue!.currentTrack?.title ?? "Nothing"
+                            }`
                         ),
                     }),
                     items: queue!.tracks.map((track) => ({
@@ -180,7 +212,8 @@ new Command({
                         ),
                         thumbnail: track.thumbnail,
                     })),
-                    render: (embeds, components) => interaction.editReply({ embeds, components }),
+                    render: (embeds, components) =>
+                        interaction.editReply({ embeds, components }),
                 });
                 return;
         }

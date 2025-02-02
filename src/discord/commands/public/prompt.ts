@@ -1,14 +1,13 @@
-import { Command } from "#base";
-import { ApplicationCommandOptionType, ApplicationCommandType } from "discord.js";
+import { createCommand } from "#base";
+import { icon } from "#functions";
+import { settings } from "#settings";
 import { gemini } from "#tools";
 import { createEmbed } from "@magicyan/discord";
-import { settings } from "#settings";
-import { icon } from "#functions";
+import { ApplicationCommandOptionType, ApplicationCommandType } from "discord.js";
 
-new Command({
+createCommand({
     name: "prompt",
     description: "Choose a IA and interact with it!",
-    dmPermission: false,
     type: ApplicationCommandType.ChatInput,
     options: [
         {
@@ -17,7 +16,7 @@ new Command({
             type: ApplicationCommandOptionType.String,
         },
     ],
-    async run(interaction) {
+    async run(interaction){
         const { options } = interaction;
 
         interaction.deferReply();
@@ -57,7 +56,7 @@ new Command({
                 description: texts.shift(),
             });
 
-            await interaction.followUp({ ephemeral, embeds: [embed] });
+            await interaction.followUp({ ephemeral: true, embeds: [embed] });
         }
-    },
+    }
 });
