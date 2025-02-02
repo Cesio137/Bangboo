@@ -16,7 +16,7 @@ const safetySettings: SafetySetting[] = [
 ];
 
 export const gemini = {
-    text: geminiAI.getGenerativeModel({ model: "gemini-1.5-flash", safetySettings }),
+    text: geminiAI.getGenerativeModel({ model: "gemini-2.0-flash-exp", safetySettings }),
     getText(response: EnhancedGenerateContentResponse) {
         try {
             return { success: true, text: response.text() };
