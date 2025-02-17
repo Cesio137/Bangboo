@@ -7,9 +7,7 @@ import { baseResponderHandler } from "./base.responder.js";
 import { baseStorage } from "./base.storage.js";
 import glob from "fast-glob";
 import ck from "chalk";
-import { Player } from "discord-player";
-import { YoutubeiExtractor } from "discord-player-youtubei";
-import { DefaultExtractors } from "@discord-player/extractor";
+import { baseLoadDiscordPlayerExtractors } from "./base.player.js";
 
 interface BootstrapOptions extends Partial<ClientOptions> {
     meta: ImportMeta;
@@ -74,10 +72,7 @@ function createClient(token: string, options: BootstrapOptions) {
         failIfNotExists: options.failIfNotExists ?? false
     }));
 
-
-    client.player = new Player(client as never);
-    client.player.extractors.loadMulti(DefaultExtractors);
-    client.player.extractors.register(YoutubeiExtractor, {});
+    baseLoadDiscordPlayerExtractors(client);
 
     client.token=token;
     client.on("ready", async (client) => {
