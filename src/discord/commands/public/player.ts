@@ -71,25 +71,26 @@ createCommand({
     ],
     async run(interaction) {
         const { options, member, guild, channel, client } = interaction;
-        if (!member.voice.channel)
-            return interaction.reply(
-                res.danger(
-                    `${icon.close} You are not connected to a voice channel!`
-                )
+        if (!member.voice.channel) {
+            interaction.reply(
+                res.danger(`${icon.close} You are not connected to a voice channel!`)
             );
-        if (!channel)
-            return interaction.reply(
-                res.danger(
-                    `${icon.close} It is not possible to use this command on this channel.`
-                )
+            return;
+        }
+
+        if (!channel) {
+            interaction.reply(
+                res.danger(`${icon.close} It is not possible to use this command on this channel.`)
             );
+            return;
+        }
 
         await interaction.deferReply();
         const queue = client.player.queues.cache.get(guild.id);
-        if (options.getSubcommand(true) !== "add" && !queue)
-            return interaction.editReply(
-                res.danger(`${icon.close} There is no track on the queue!`)
-            );
+        if (options.getSubcommand(true) !== "add" && !queue) {
+            interaction.editReply(res.danger(`${icon.close} There is no track on the queue!`));
+            return;
+        }
 
         const voiceChannel = member.voice.channel;
         const queueMetadata = createQueueMetadata({
@@ -103,8 +104,7 @@ createCommand({
             case "add":
                 try {
                     const query = options.getString("search", true);
-                    const searchEngine =
-                        options.getString("engine") ?? QueryType.YOUTUBE;
+                    const searchEngine = options.getString("engine") ?? QueryType.YOUTUBE;
 
                     const { track, searchResult } = await client.player.play(
                         voiceChannel as never,
@@ -121,75 +121,63 @@ createCommand({
                         const { tracks, title, url } = searchResult.playlist;
                         display.push(
                             `Added ${tracks.length} tracks from playlist [${title}](${url}).`,
-                            ...tracks
-                                .map((track) => `${track.title}`)
-                                .slice(0, 8),
+                            ...tracks.map((track) => `${track.title}`).slice(0, 8),
                             "..."
                         );
                     } else {
                         display.push(
-                            `${
-                                queue?.size
-                                    ? "Added to queue. "
-                                    : "Playing now! "
-                            } ${track.title}`
+                            `${queue?.size ? "Added to queue. " : "Playing now! "} ${track.title}`
                         );
                     }
-                    return interaction.editReply(
-                        res.success(`${icon.check} ${brBuilder(display)}`)
-                    );
+                    interaction.editReply(res.success(`${icon.check} ${brBuilder(display)}`));
                 } catch (e) {
-                    return interaction.editReply(
-                        res.danger(
-                            `${icon.close} Error when trying to play the track.\n${e}`
-                        )
+                    interaction.editReply(
+                        res.danger(`${icon.close} Error when trying to play the track.\n${e}`)
                     );
                 }
-                return;
+                break;
             case "pause":
-                if (queue?.node.isPaused())
-                    return interaction.editReply(
-                        res.danger(
-                            `${icon.close} The current track is already paused!`
-                        )
+                if (queue?.node.isPaused()) {
+                    interaction.editReply(
+                        res.danger(`${icon.close} The current track is already paused!`)
                     );
+                    break;
+                }
                 queue?.node.pause();
-                return interaction.editReply(
-                    res.success(`${icon.check} Current track has been paused!`)
-                );
+                interaction.editReply(res.success(`${icon.check} Current track has been paused!`));
+                break;
             case "resume":
-                if (!queue?.node.isPaused())
-                    return interaction.editReply(
-                        res.danger(
-                            `${icon.close} The current track is not paused!`
-                        )
+                if (!queue?.node.isPaused()) {
+                    interaction.editReply(
+                        res.danger(`${icon.close} The current track is not paused!`)
                     );
+                    break;
+                }
                 queue.node.resume();
-                return interaction.editReply(
-                    res.success(`${icon.check} Current track has been resumed!`)
-                );
+                interaction.editReply(res.success(`${icon.check} Current track has been resumed!`));
+                break;
             case "stop":
                 queue?.node.stop();
-                return interaction.editReply(
+                interaction.editReply(
                     res.success(
                         `${icon.check} Current track has been stopped and track list has been cleaned!`
                     )
                 );
+                break;
             case "skip":
                 const amount = options.getInteger("amount") ?? 1;
                 const skipAmount = Math.min(queue!.size, amount);
                 for (let i = 0; i < skipAmount; i++) {
                     queue?.node.skip();
                 }
-                return interaction.editReply(
+                interaction.editReply(
                     res.success(
                         `${icon.check} ${skipAmount} ${
-                            skipAmount > 1
-                                ? "tracks have been skipped!"
-                                : "track has been skipped!"
+                            skipAmount > 1 ? "tracks have been skipped!" : "track has been skipped!"
                         } `
                     )
                 );
+                break;
             case "queue":
                 multimenu({
                     embed: createEmbed({
@@ -198,9 +186,7 @@ createCommand({
                             "# Current queue",
                             `Amount: ${queue!.tracks.size}`,
                             "",
-                            `Current track: ${
-                                queue!.currentTrack?.title ?? "Nothing"
-                            }`
+                            `Current track: ${queue!.currentTrack?.title ?? "Nothing"}`
                         ),
                     }),
                     items: queue!.tracks.map((track) => ({
@@ -212,10 +198,9 @@ createCommand({
                         ),
                         thumbnail: track.thumbnail,
                     })),
-                    render: (embeds, components) =>
-                        interaction.editReply({ embeds, components }),
+                    render: (embeds, components) => interaction.editReply({ embeds, components }),
                 });
-                return;
+                break;
         }
         return;
     },

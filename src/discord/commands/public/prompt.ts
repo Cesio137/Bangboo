@@ -50,10 +50,12 @@ createCommand({
         await interaction.editReply({ embeds: [embed] });
         if (texts.length < 1) return;
 
-        while (text.length >= 1) {
+        while (text.length > 0) {
+            const description = texts.shift();
+            if (typeof description === "undefined") break;
             const embed = createEmbed({
                 color: settings.colors.success,
-                description: texts.shift(),
+                description,
             });
 
             await interaction.followUp({ ephemeral: true, embeds: [embed] });
