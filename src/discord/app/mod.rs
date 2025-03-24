@@ -1,10 +1,13 @@
 pub mod commands;
 pub mod creators;
 
+use ctrlc;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::{error::Error, sync::Arc};
+use colored::Colorize;
 use tokio::sync::Mutex;
 use twilight_cache_inmemory::{DefaultInMemoryCache, ResourceType};
-use twilight_gateway::{Event, EventTypeFlags, Intents, Shard, ShardId, StreamExt as _};
+use twilight_gateway::{CloseFrame, Event, EventTypeFlags, Intents, Shard, ShardId, StreamExt as _};
 use twilight_http::Client as HttpClient;
 use twilight_model::application::interaction::InteractionData::ApplicationCommand;
 use crate::discord::app::commands::AppCommands;
@@ -34,9 +37,21 @@ impl App {
             .build();
 
         let commands = Arc::new(Mutex::new(AppCommands::new()));
+
+        let running = Arc::new(AtomicBool::new(true)); // Define uma flag para controlar o loop
+        let running_sigint = running.clone();
+        let _ = ctrlc::set_handler(move || {
+            println!("\n👋 bye!");
+            running_sigint.store(false, Ordering::SeqCst); // Atualiza a flag para encerrar o loop
+        });
         
+
         // Process each event as they come in.
         while let Some(item) = shard.next_event(EventTypeFlags::all()).await {
+            if !running.load(Ordering::SeqCst) { 
+                shard.close(CloseFrame::NORMAL);
+                break; 
+            }
             let Ok(event) = item else {
                 tracing::warn!(source = ?item.unwrap_err(), "error receiving event");
 
@@ -49,6 +64,9 @@ impl App {
             match event {
                 Event::Ready(ready) => {
                     commands.lock().await.register_slash_commands(Arc::clone(&client), ready.application.id).await;
+                    println!("\n{} {}", "➡ Online as".green(), ready.user.name.bright_green());
+
+                    println!("{} {} {}", "⤿".bright_green(), commands.lock().await.len().to_string().green(), "command(s) successfully registered globally!".green())
                 },
                 _ => {
                     tokio::spawn(App::handle_event(event, Arc::clone(&client), Arc::clone(&commands)));

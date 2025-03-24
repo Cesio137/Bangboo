@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::sync::Arc;
+use colored::Colorize;
 use twilight_http::Client;
 use twilight_model::{
     application::command::Command,
@@ -24,17 +25,28 @@ impl AppCommands {
         }
     }
 
-    pub async fn register_slash_commands(&self, client: Arc<Client>, id: Id<ApplicationMarker>) {
-        let slash_commands = slash_commands();
-        let cmd: Vec<Command> = slash_commands.values()
-            .map(|slash_command| slash_command.command.clone())
-            .collect();
-
-        let result = client.interaction(id).set_global_commands(&cmd).await;
-        if let Err(err) = result {
-            eprint!("Error trying to register slash commands: {:?}", err)
+    pub async fn register_slash_commands(&mut self, client: Arc<Client>, id: Id<ApplicationMarker>) {
+        let mut commands_to_remove = Vec::new();
+        for (key, value) in self.slash_commands.iter() {
+            let command = value.command.clone();
+            let result = client.interaction(id).set_global_commands(&[command]).await;
+            if let Err(err) = result {
+                println!("{}", " <ERROR> ".on_red());
+                println!("{} {} {} {}", "✖".bright_red(), "[/]".red(), key.bright_cyan(), "command not loaded!".bright_red());
+                println!("{} {}", " MOTIVE: ".on_red(), err);
+                println!("{}", " <ERROR/> ".on_red());                
+                commands_to_remove.push(key.clone());
+            } else {
+                println!("{} {} {} {}", "✔".bright_green(), "[/]".green(), key.bright_cyan(), "command loaded!".bright_green());
+            }
         }
+        for key in commands_to_remove {
+            self.slash_commands.remove(&key);
+        }
+        
+    }
+
+    pub fn len(&self) -> usize {
+        self.prefix_commands.len() + self.slash_commands.len()
     }
 }
-
-

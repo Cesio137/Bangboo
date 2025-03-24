@@ -1,22 +1,24 @@
-#[derive(Debug)]
-pub struct Colors {
-    pub default: u32,
-    pub primary: u32,
-    pub secondary: u32,
-    pub success: u32,
-    pub danger: u32,
-    pub warning: u32,
-    pub azoxo: u32,
-    pub green: u32,
-    pub yellow: u32,
-    pub fuchsia: u32,
-    pub magic: u32,
-    pub developer: u32,
-    pub balance: u32,
-    pub brilliance: u32,
-    pub nitro: u32,
-    pub bravery: u32,
+#[derive(Clone, Copy)]
+#[repr(u32)]
+pub enum EColor {
+    Default = 0x2B2D31,
+    Primary = 0x3B82F6,
+    Secondary = 0x4F545C,
+    Success = 0x22C55E,
+    Danger = 0xED4245,
+    Warning = 0xFBBD23,
+    Azoxo = 0x5865F2,
+    Green = 0x57F287,
+    Yellow = 0xFEE75C,
+    Fuchsia = 0xEB459E,
+    Magic = 0xC026D3,
+    Developer = 0x3E70DD,
+    Balance = 0x45DDC0,
+    Brilliance = 0xF07D5F,
+    Nitro = 0xFF6BFA,
+    Bravery = 0x9C84EF,
 }
+
 
 #[derive(Debug)]
 pub struct Emojis {
@@ -37,25 +39,6 @@ pub struct StaticEmojis {
     pub stop: &'static str,
     pub view: &'static str,
 }
-
-pub const COLORS: Colors = Colors {
-    default: 0x2B2D31,
-    primary: 0x3b82f6,
-    secondary: 0x4f545c,
-    success: 0x22c55e,
-    danger: 0xED4245,
-    warning: 0xfbbd23,
-    azoxo: 0x5865F2,
-    green: 0x57F287,
-    yellow: 0xFEE75C,
-    fuchsia: 0xEB459E,
-    magic: 0xc026d3,
-    developer: 0x3e70dd,
-    balance: 0x45ddc0,
-    brilliance: 0xf07d5f,
-    nitro: 0xff6bfa,
-    bravery: 0x9c84ef,
-};
 
 pub const EMOJIS: Emojis = Emojis {
     static_emojis: StaticEmojis {

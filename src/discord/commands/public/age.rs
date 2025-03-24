@@ -10,7 +10,7 @@ use twilight_util::{
     snowflake::Snowflake
 };
 use crate::{discord::app::creators::{create_slash_command, SlashCommand}, utils::embeds::res};
-use crate::settings::global::COLORS;
+use crate::settings::global::EColor;
 
 pub fn age_command() -> SlashCommand {
     let user_option = UserBuilder::new("user", "Select user.")
@@ -22,6 +22,7 @@ pub fn age_command() -> SlashCommand {
             .build(),
         |interaction, client| async move {
             let mut age: String = String::new();
+            let mut color = EColor::Green;
             let error_message = String::from("Error trying to responde /age command: Can't find an user ID.");
             
             if let Some(data) = &interaction.data {
@@ -49,6 +50,7 @@ pub fn age_command() -> SlashCommand {
                                                         age = format!("{}'s account was created at {}.", username, datetime.format("%a, %Hh%Mmin, %d/%b/%Y").to_string());
                                                     },
                                                     None => {
+                                                        color = EColor::Warning;
                                                         age = format!("{}'s account was created at NONE.", username);
                                                     },
                                                 }
@@ -76,13 +78,14 @@ pub fn age_command() -> SlashCommand {
                                 // convert timestamp to readble data
                                 match DateTime::from_timestamp_millis(timestamp as i64) {
                                     Some(datetime) => {
+                                        // format data to a readble string
                                         age = format!("{}'s account was created at {}.", username, datetime.format("%a, %Hh%Mmin, %d/%b/%Y").to_string());
                                     },
                                     None => {
+                                        color = EColor::Warning;
                                         age = format!("{}'s account was created at NONE.", username);
                                     },
                                 };
-                                // format data to a readble string
                                 
                             },
                             None => {},
@@ -92,8 +95,12 @@ pub fn age_command() -> SlashCommand {
                 }
             }
 
-            let color = if !age.is_empty() { COLORS.green } else { COLORS.danger };
+            if age.is_empty() { 
+                color = EColor::Danger; 
+                age = error_message;
+            }
             let embed = res(color, age);
+            
             
             let response = InteractionResponse {
                 kind: InteractionResponseType::ChannelMessageWithSource,
