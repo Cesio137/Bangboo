@@ -3,7 +3,6 @@ use std::sync::Arc;
 use colored::Colorize;
 use twilight_http::Client;
 use twilight_model::{
-    application::command::Command,
     id::Id,
     id::marker::ApplicationMarker,
 };

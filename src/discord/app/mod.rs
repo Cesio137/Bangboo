@@ -2,12 +2,11 @@ pub mod commands;
 pub mod creators;
 
 use ctrlc;
-use std::sync::atomic::{AtomicBool, Ordering};
 use std::{error::Error, sync::Arc};
 use colored::Colorize;
 use tokio::sync::Mutex;
 use twilight_cache_inmemory::{DefaultInMemoryCache, ResourceType};
-use twilight_gateway::{CloseFrame, Event, EventTypeFlags, Intents, Shard, ShardId, StreamExt as _};
+use twilight_gateway::{Event, EventTypeFlags, Intents, Shard, ShardId, StreamExt as _};
 use twilight_http::Client as HttpClient;
 use twilight_model::application::interaction::InteractionData::ApplicationCommand;
 use crate::discord::app::commands::AppCommands;
@@ -38,20 +37,13 @@ impl App {
 
         let commands = Arc::new(Mutex::new(AppCommands::new()));
 
-        let running = Arc::new(AtomicBool::new(true)); // Define uma flag para controlar o loop
-        let running_sigint = running.clone();
         let _ = ctrlc::set_handler(move || {
             println!("\n👋 bye!");
-            running_sigint.store(false, Ordering::SeqCst); // Atualiza a flag para encerrar o loop
+            std::process::exit(0);
         });
         
-
         // Process each event as they come in.
         while let Some(item) = shard.next_event(EventTypeFlags::all()).await {
-            if !running.load(Ordering::SeqCst) { 
-                shard.close(CloseFrame::NORMAL);
-                break; 
-            }
             let Ok(event) = item else {
                 tracing::warn!(source = ?item.unwrap_err(), "error receiving event");
 
