@@ -1,5 +1,6 @@
-mod settings;
 mod discord;
+mod settings;
+mod utils;
 
 use crate::discord::app::App;
 
