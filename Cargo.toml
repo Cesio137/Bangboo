@@ -10,9 +10,12 @@ twilight-http = { version = "0.16", features = ["simd-json"] }
 twilight-model = { version = "0.16" }
 twilight-util = { version = "0.16", features = ["full"] }
 #THIDRPARTY
+ctrlc = { version = "3.4"}
+colored = { version = "3"}
 dotenvy = { version = "0.15" }
 once_cell = { version = "1.21" }
 tokio = { version = "1.44", features = ["rt-multi-thread"] }
+gemini-ai = { version = "0.1" }
 anyhow = { version = "1.0" }
 tracing-subscriber = { version = "0.3" }
 tracing = { version = "0.1" }

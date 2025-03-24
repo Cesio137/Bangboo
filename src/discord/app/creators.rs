@@ -5,7 +5,7 @@ use twilight_model::{
     gateway::payload::incoming::{InteractionCreate, MessageCreate}
 };
 
-pub type PrefixCommandCallback = Box<dyn Fn(Box<MessageCreate>, Arc<Client>) -> Pin<Box<dyn Future<Output = ()> + Send>> + Send + 'static>;
+pub type PrefixCommandCallback = Box<dyn Fn(Box<MessageCreate>, Arc<Client>) -> Pin<Box<dyn Future<Output = ()> + Send>> + Send>;
 
 pub struct PrefixCommand {
     pub name: String,
@@ -23,7 +23,7 @@ where
     }
 }
 
-pub type SlashCommandCallback = Box<dyn Fn(Box<InteractionCreate>, Arc<Client>) -> Pin<Box<dyn Future<Output = ()> + Send>> + Send + 'static>;
+pub type SlashCommandCallback = Box<dyn Fn(Box<InteractionCreate>, Arc<Client>) -> Pin<Box<dyn Future<Output = ()> + Send>> + Send>;
 
 pub struct SlashCommand {
     pub command: Command,
