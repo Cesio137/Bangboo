@@ -6,12 +6,10 @@ use twilight_model::application::{
 };
 use twilight_model::http::interaction::{InteractionResponse, InteractionResponseData, InteractionResponseType};
 use twilight_util::{
-    builder::{
-        command::{CommandBuilder, UserBuilder}, 
-        embed
-    }, 
-    snowflake::Snowflake};
-use crate::discord::app::creators::{SlashCommand, create_slash_command};
+    builder::command::{CommandBuilder, UserBuilder}, 
+    snowflake::Snowflake
+};
+use crate::{discord::app::creators::{create_slash_command, SlashCommand}, utils::embeds::res};
 use crate::settings::global::COLORS;
 
 pub fn age_command() -> SlashCommand {
@@ -94,13 +92,8 @@ pub fn age_command() -> SlashCommand {
                 }
             }
 
-            let embed = embed::EmbedBuilder::new()
-                .color(if age.is_empty() { COLORS.danger } else { COLORS.success })
-                .description(if age.is_empty() { error_message } else { age })
-                .validate()
-                .unwrap()
-                .build();
-       
+            let color = if !age.is_empty() { COLORS.green } else { COLORS.danger };
+            let embed = res(color, age);
             
             let response = InteractionResponse {
                 kind: InteractionResponseType::ChannelMessageWithSource,
