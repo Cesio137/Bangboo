@@ -1,7 +1,7 @@
 # Folders
-/target
-/.idea
 /.vscode
+/.idea
+/target
 
 # Files
 /.env
