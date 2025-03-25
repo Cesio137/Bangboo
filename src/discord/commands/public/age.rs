@@ -9,7 +9,7 @@ use twilight_util::{
     builder::command::{CommandBuilder, UserBuilder}, 
     snowflake::Snowflake
 };
-use crate::{discord::app::creators::{create_slash_command, SlashCommand}, utils::{embeds::res, interaction::get_options}};
+use crate::{discord::app::creators::{create_slash_command, SlashCommand}, utils::{embeds::interaction_res, interaction::get_options}};
 use crate::settings::global::EColor;
 
 pub fn age_command() -> SlashCommand {
@@ -85,16 +85,9 @@ pub fn age_command() -> SlashCommand {
                 color = EColor::Danger; 
                 age = error_message;
             }
-            let embed = res(color, age);
-            
-            
-            let response = InteractionResponse {
-                kind: InteractionResponseType::ChannelMessageWithSource,
-                data: InteractionResponseData {
-                    embeds: vec![embed].into(),
-                    ..Default::default()
-                }.into(),
-            };
+
+            let response = interaction_res(color, age);
+
             let result = client.interaction(interaction.application_id)
                 .create_response(interaction.id, &interaction.token, &response).await;
 
