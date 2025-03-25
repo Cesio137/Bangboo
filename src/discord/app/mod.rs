@@ -1,5 +1,6 @@
 pub mod commands;
 pub mod creators;
+pub mod events;
 
 use ctrlc;
 use std::{error::Error, sync::Arc};
@@ -9,7 +10,9 @@ use twilight_cache_inmemory::{DefaultInMemoryCache, ResourceType};
 use twilight_gateway::{Event, EventTypeFlags, Intents, Shard, ShardId, StreamExt as _};
 use twilight_http::Client as HttpClient;
 use twilight_model::application::interaction::InteractionData::ApplicationCommand;
+use twilight_model::gateway::event::EventType;
 use crate::discord::app::commands::AppCommands;
+use crate::discord::app::events::AppEvents;
 use crate::settings::env::ENV_SCHEMA;
 
 pub struct App;
@@ -36,6 +39,7 @@ impl App {
             .build();
 
         let commands = Arc::new(Mutex::new(AppCommands::new()));
+        let events = Arc::new(Mutex::new(AppEvents::new()));
 
         let _ = ctrlc::set_handler(move || {
             println!("\n👋 bye!");
@@ -61,7 +65,7 @@ impl App {
                     println!("{} {} {}", "⤿".bright_green(), commands.lock().await.len().to_string().green(), "command(s) successfully registered globally!".green())
                 },
                 _ => {
-                    tokio::spawn(App::handle_event(event, Arc::clone(&client), Arc::clone(&commands)));
+                    tokio::spawn(App::handle_event(event, Arc::clone(&client), Arc::clone(&commands), Arc::clone(&events)));
                 }
             }
         }
@@ -69,11 +73,15 @@ impl App {
         Ok(())
     }
 
-    async fn handle_event(event: Event, client: Arc<HttpClient>, commands: Arc<Mutex<AppCommands>>) -> Result<(), Box<dyn Error + Send + Sync>> {
+    async fn handle_event(event: Event, client: Arc<HttpClient>, commands: Arc<Mutex<AppCommands>>, events: Arc<Mutex<AppEvents>>) -> Result<(), Box<dyn Error + Send + Sync>> {
+        if let Some(callback) = events.lock().await.events.get(&event.kind()) {
+            callback(event, client).await;
+            return Ok(());
+        }
         match event {
             Event::MessageCreate(msg) => {
                 if let Some(callback) = commands.lock().await.prefix_commands.get(msg.content.as_str()) {
-                    (callback)(msg.clone(), Arc::clone(&client)).await;
+                    callback(msg.clone(), Arc::clone(&client)).await;
                 }
                 
             },
