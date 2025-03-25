@@ -4,5 +4,5 @@
 /target
 
 # Files
-/.env
-/.Cargo.lock
+.env
+Cargo.lock
