@@ -1,8 +1,4 @@
-
-use twilight_model::channel::ChannelType;
 use twilight_model::gateway::event::{Event, EventType};
-use twilight_model::id::Id;
-use twilight_model::id::marker::ChannelMarker;
 use crate::discord::app::creators::{create_event, EventHandler};
 use crate::settings::global::EColor;
 use crate::utils::embeds::res;
