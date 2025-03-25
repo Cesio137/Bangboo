@@ -18,27 +18,31 @@ pub fn member_added() -> EventHandler {
 
             let name = &member.user.name;
             let message = format!("{} joined the server", name);
-
-            let channels = match client.guild_channels(member.guild_id).await {
-                Ok(channels) => channels,
+            let channel_id = match client.guild(member.guild_id).await {
+                Ok(guild) => {
+                    match guild.model().await {
+                        Ok(channel) => {
+                            match channel.system_channel_id {
+                                Some(system_channel) => system_channel,
+                                None => {
+                                    eprintln!("Error trying to responde MemberAdd event: Can not get system channel fom guild.");
+                                    return
+                                },
+                            }
+                        },
+                        Err(err) => {
+                            eprintln!("Error trying to responde MemberAdd event: Can not get system channel fom guild.\n{}", err);
+                            return
+                        },
+                    }
+                },
                 Err(err) => {
-                    eprintln!("Error trying to responde MemberAdd event: Can not get channels from guild.\n{}", err);
+                    eprintln!("Error trying to responde MemberAdd event: Can not get guild from id.\n{}", err);
                     return
                 }
             };
-
-            let mut welcome_channel: Option<Id<ChannelMarker>> = None;
-            for channel in channels.models().await.unwrap_or_default() {
-                if channel.name.as_deref() == Some("😏┊welcome") && channel.kind == ChannelType::GuildText {
-                    welcome_channel = channel.id.into()
-                }
-            };
-            if welcome_channel.is_none() {
-                eprintln!("Error trying to responde MemberAdd event: Can not get channels from guild.");
-                return;
-            }
             let embed_res = res(EColor::Success, message);
-            let result = client.create_message(welcome_channel.unwrap()).embeds(&[embed_res]).await;
+            let result = client.create_message(channel_id).embeds(&[embed_res]).await;
 
             if let Err(why) = result {
                 eprintln!("Error trying to responde MemberAdd event: {:?}", why);
