@@ -4,7 +4,6 @@ use twilight_model::application::{
     command::CommandType,
     interaction::application_command::CommandOptionValue
 };
-use twilight_model::http::interaction::{InteractionResponse, InteractionResponseData, InteractionResponseType};
 use twilight_util::{
     builder::command::{CommandBuilder, UserBuilder}, 
     snowflake::Snowflake

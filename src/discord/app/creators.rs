@@ -27,7 +27,7 @@ where
     }
 }
 
-pub type SlashCommandCallback = Box<dyn Fn(Box<InteractionCreate>, Arc<Client>) -> Pin<Box<dyn Future<Output = ()> + Send>> + Send>;
+pub type SlashCommandCallback = Box<dyn Fn(Box<InteractionCreate>, Arc<Client>) -> Pin<Box<dyn Future<Output = ()> + Send>> + Send + 'static>;
 
 pub struct SlashCommand {
     pub command: Command,
@@ -45,7 +45,7 @@ where
     }
 }
 
-pub type EventCallback = Box<dyn Fn(GatewayEvent, Arc<Client>) -> Pin<Box<dyn Future<Output = ()> + Send>> + Send>;
+pub type EventCallback = Box<dyn Fn(GatewayEvent, Arc<Client>) -> Pin<Box<dyn Future<Output = ()> + Send>> + Send + 'static>;
 
 pub struct EventHandler {
     pub event: EventType,
