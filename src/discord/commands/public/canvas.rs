@@ -1,7 +1,7 @@
-use std::sync::Arc;
-use tokio::sync::Mutex;
+use twilight_model::http::attachment::Attachment;
 use twilight_model::application::command::CommandType;
 use twilight_model::gateway::event::EventType;
+use twilight_model::http::interaction::{InteractionResponse, InteractionResponseData, InteractionResponseType};
 use crate::discord::app::creators::{create_slash_command, SlashCommand};
 use twilight_util::{
     builder::command::CommandBuilder,
@@ -46,8 +46,28 @@ pub fn canvas_command() -> SlashCommand {
                     }
                 }
             };
-            global_message(EventType::MemberAdd, user);
-            let response = interaction_res(EColor::Success, "Check the app!".to_string());
+            let message = format!("Welcome {}!", user.name.clone());
+            let mut response = interaction_res(EColor::Success, message);
+            let canvas = match global_message(EventType::MemberAdd, user).await {
+                Ok(canvas) => canvas,
+                Err(err) => {
+                    eprintln!("Error trying to responde /canvas command: {:?}", err);
+                    vec![]
+                }
+            };
+
+            if !canvas.is_empty() {
+                response = InteractionResponse {
+                    kind: InteractionResponseType::ChannelMessageWithSource,
+                    data: InteractionResponseData {
+                        attachments: vec![
+                            Attachment::from_bytes("welcome.png".to_string(), canvas, 1)
+                        ].into(),
+                        ..Default::default()
+                    }.into(),
+                }
+            }
+
 
             let result = client.interaction(interaction.application_id)
                 .create_response(interaction.id, &interaction.token, &response).await;
@@ -55,7 +75,6 @@ pub fn canvas_command() -> SlashCommand {
             if let Err(why) = result {
                 eprintln!("Error trying to responde /canvas command: {:?}", why);
             }
-            return ();
         }
     )
 }

@@ -61,7 +61,6 @@ impl App {
                 Event::Ready(ready) => {
                     commands.lock().await.register_slash_commands(Arc::clone(&client), ready.application.id).await;
                     println!("\n{} {}", "➡ Online as".green(), ready.user.name.bright_green());
-
                     println!("{} {} {}", "⤿".bright_green(), commands.lock().await.len().to_string().green(), "command(s) successfully registered globally!".green())
                 },
                 _ => {

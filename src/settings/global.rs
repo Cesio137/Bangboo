@@ -1,3 +1,11 @@
+// Assets
+pub const RUBIK: &[u8] = include_bytes!("../../assets/fonts/Rubik-Bold.ttf");
+pub const LATO: &[u8] = include_bytes!("../../assets/fonts/Lato-Regular.ttf");
+pub const JOIN_IMG: &[u8] = include_bytes!("../../assets/images/join.png");
+pub const LEAVE_IMG: &[u8] = include_bytes!("../../assets/images/leave.png");
+pub const ADD_ICON: &[u8] = include_bytes!("../../assets/icons/static/add.png");
+pub const MINUS_ICON: &[u8] = include_bytes!("../../assets/icons/static/minus.png");
+
 #[derive(Clone, Copy)]
 #[repr(u32)]
 pub enum EColor {

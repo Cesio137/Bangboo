@@ -25,5 +25,6 @@ pub fn slash_commands() -> HashMap<String, SlashCommand> {
     commands.insert(age.command.name.clone(), age);
     let canvas = public::canvas::canvas_command();
     commands.insert(canvas.command.name.clone(), canvas);
+
     commands
 }
