@@ -5,7 +5,7 @@ edition = "2024"
 
 [dependencies]
 twilight-cache-inmemory = { version = "0.16"}
-twilight-gateway = { version = "0.16", features = ["simd-json", "rustls-platform-verifier"] }
+twilight-gateway = { version = "0.16", features = ["simd-json", "native-tls"] }
 twilight-http = { version = "0.16", features = ["simd-json"] }
 twilight-model = { version = "0.16" }
 twilight-util = { version = "0.16", features = ["full"] }

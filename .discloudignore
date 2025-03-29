@@ -9,6 +9,7 @@
 # Ignored structure
 
 # Folders
+/.git
 /.vscode
 /.idea
 /target
