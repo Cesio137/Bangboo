@@ -1,6 +1,4 @@
 use tiny_skia::*;
-use image::DynamicImage;
-use std::hash::Hash;
 use twilight_gateway::EventType;
 use twilight_model::user::User;
 use twilight_util::snowflake::Snowflake;
@@ -41,20 +39,22 @@ pub async fn global_message(event: EventType, user: User) -> Result<Vec<u8>, Err
     let avatar = load_image_from_cdn(url).await?;
     let resized_avatar = resize_image(&avatar, 180, 180)?;
     let avatar_image = draw_circle_image(&resized_avatar, 90)?;
-    pixmap.draw_pixmap(61, 48, avatar_image.as_ref(), &Default::default(), Transform::default(), None);
+    pixmap.draw_pixmap(61, 48, avatar_image.as_ref(), &Default::default(), Transform::identity(), None);
 
     // Avatar action icon
     let action_icon = load_image_from_bytes(icon_action)?;
-    pixmap.draw_pixmap(205, 179, action_icon.as_ref(), &Default::default(), Transform::default(), None);
+    pixmap.draw_pixmap(205, 179, action_icon.as_ref(), &Default::default(), Transform::identity(), None);
 
-    // Renderizar texto 300, 110, 60f32 | 300, 170, 32f32
-    let name_pixmap = draw_text(user.name.as_str(), 60f32, RUBIK)?;
-    pixmap.draw_pixmap(300, 110, name_pixmap.as_ref(), &Default::default(), Transform::default(), None);
-    let nick_pixmap = draw_text(&format!("@{}", user.name), 32f32, LATO)?;
-    pixmap.draw_pixmap(300, 170, nick_pixmap.as_ref(), &Default::default(), Transform::default(), None);
+    // Render text
+    let name_pixmap = draw_text(&user.name, 60f32, RUBIK)?;
+    pixmap.draw_pixmap(300, 110, name_pixmap.as_ref(), &Default::default(), Transform::identity(), None);
+    let nickname = user.global_name.unwrap_or("Undefined".to_string());
+    let nick_pixmap = draw_text(&format!("@{}", nickname), 32f32, LATO)?;
+    pixmap.draw_pixmap(300, 170, nick_pixmap.as_ref(), &Default::default(), Transform::identity(), None);
 
-    // Salvar como PNG
-    let buffer = image::RgbaImage::from_raw(1024, 260, pixmap.data().to_vec()).ok_or(Error::new(ErrorKind::InvalidData, "Image buffer allocation failed"))?;
+    // Save as PNG buffer
+    let buffer = image::RgbaImage::from_raw(1024, 260, pixmap.data().to_vec())
+        .ok_or(Error::new(ErrorKind::InvalidData, "Image buffer allocation failed"))?;
 
     let mut png_buffer: Vec<u8> = Vec::new();
     let encoder = PngEncoder::new_with_quality(&mut png_buffer, CompressionType::Best, FilterType::Adaptive);

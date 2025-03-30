@@ -19,7 +19,7 @@ fast_image_resize = { version = "5.1" }
 fontdue = { version = "0.9" }
 image = { version = "0.25" }
 once_cell = { version = "1.21" }
-reqwest = { version = "0.12", features = ["blocking"] }
+reqwest = { version = "0.12" }
 tracing-subscriber = { version = "0.3" }
 tracing = { version = "0.1" }
 tiny-skia = { version = "0.11" }
