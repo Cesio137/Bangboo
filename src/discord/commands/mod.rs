@@ -1,9 +1,8 @@
-mod public;
 mod prefix;
+mod public;
 
-use std::collections::HashMap;
 use crate::discord::app::creators::{PrefixCommandCallback, SlashCommand};
-
+use std::collections::HashMap;
 
 type PrefixCommandMap = HashMap<String, PrefixCommandCallback>;
 
@@ -12,7 +11,7 @@ pub fn prefix_commands() -> HashMap<String, PrefixCommandCallback> {
     // Add more commands here...
     let ping = prefix::ping::ping_command();
     commands.insert(ping.name, ping.reply);
-    
+
     commands
 }
 

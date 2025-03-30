@@ -1,9 +1,9 @@
 mod member_added;
 mod member_removed;
 
+use super::app::creators::EventCallback;
 use std::collections::HashMap;
 use twilight_model::gateway::event::EventType;
-use super::app::creators::EventCallback;
 
 type EventsMap = HashMap<EventType, EventCallback>;
 

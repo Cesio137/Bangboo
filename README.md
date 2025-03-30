@@ -15,4 +15,5 @@ This project is currently for my personal use, but I hope to monetize it in the 
 
 - [Rust](https://www.rust-lang.org/)
 - [Twilight](https://crates.io/crates/twilight)
-- [Gemini](https://ai.google.dev/gemini-api/docs)
+- [Tiny Skia](https://crates.io/crates/tiny-skia)
+- [Fontdue](https://crates.io/crates/fontdue)
