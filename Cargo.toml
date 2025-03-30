@@ -5,8 +5,8 @@ edition = "2024"
 
 [dependencies]
 twilight-cache-inmemory = { version = "0.16"}
-twilight-gateway = { version = "0.16", features = ["simd-json"] }
-twilight-http = { version = "0.16", features = ["simd-json"] }
+twilight-gateway = { version = "0.16" }
+twilight-http = { version = "0.16" }
 twilight-model = { version = "0.16" }
 twilight-util = { version = "0.16", features = ["full"] }
 #THIDRPARTY
@@ -24,3 +24,4 @@ tracing-subscriber = { version = "0.3" }
 tracing = { version = "0.1" }
 tiny-skia = { version = "0.11" }
 tokio = { version = "1.44", features = ["rt-multi-thread"] }
+log = { version = "0.4" }

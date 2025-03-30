@@ -2,18 +2,19 @@ pub mod commands;
 pub mod creators;
 pub mod events;
 
+use crate::discord::app::{
+    commands::AppCommands,
+    events::AppEvents
+};
+use crate::settings::env::ENV_SCHEMA;
+use colored::Colorize;
 use ctrlc;
 use std::{error::Error, sync::Arc};
-use colored::Colorize;
 use tokio::sync::Mutex;
 use twilight_cache_inmemory::{DefaultInMemoryCache, ResourceType};
 use twilight_gateway::{Event, EventTypeFlags, Intents, Shard, ShardId, StreamExt as _};
 use twilight_http::Client as HttpClient;
 use twilight_model::application::interaction::InteractionData::ApplicationCommand;
-use twilight_model::gateway::event::EventType;
-use crate::discord::app::commands::AppCommands;
-use crate::discord::app::events::AppEvents;
-use crate::settings::env::ENV_SCHEMA;
 
 pub struct App;
 
@@ -45,7 +46,7 @@ impl App {
             println!("\n👋 bye!");
             std::process::exit(0);
         });
-        
+
         // Process each event as they come in.
         while let Some(item) = shard.next_event(EventTypeFlags::all()).await {
             let Ok(event) = item else {
@@ -59,12 +60,30 @@ impl App {
 
             match event {
                 Event::Ready(ready) => {
-                    commands.lock().await.register_slash_commands(Arc::clone(&client), ready.application.id).await;
-                    println!("\n{} {}", "➡ Online as".green(), ready.user.name.bright_green());
-                    println!("{} {} {}", "⤿".bright_green(), commands.lock().await.len().to_string().green(), "command(s) successfully registered globally!".green())
-                },
+                    commands
+                        .lock()
+                        .await
+                        .register_slash_commands(Arc::clone(&client), ready.application.id)
+                        .await;
+                    println!(
+                        "\n{} {}",
+                        "➡ Online as".green(),
+                        ready.user.name.bright_green()
+                    );
+                    println!(
+                        "{} {} {}",
+                        "⤿".bright_green(),
+                        commands.lock().await.len().to_string().green(),
+                        "command(s) successfully registered globally!".green()
+                    )
+                }
                 _ => {
-                    tokio::spawn(App::handle_event(event, Arc::clone(&client), Arc::clone(&commands), Arc::clone(&events)));
+                    tokio::spawn(App::handle_event(
+                        event,
+                        Arc::clone(&client),
+                        Arc::clone(&commands),
+                        Arc::clone(&events),
+                    ));
                 }
             }
         }
@@ -72,32 +91,45 @@ impl App {
         Ok(())
     }
 
-    async fn handle_event(event: Event, client: Arc<HttpClient>, commands: Arc<Mutex<AppCommands>>, events: Arc<Mutex<AppEvents>>) -> Result<(), Box<dyn Error + Send + Sync>> {
+    async fn handle_event(
+        event: Event,
+        client: Arc<HttpClient>,
+        commands: Arc<Mutex<AppCommands>>,
+        events: Arc<Mutex<AppEvents>>,
+    ) -> Result<(), Box<dyn Error + Send + Sync>> {
         if let Some(callback) = events.lock().await.events.get(&event.kind()) {
             callback(event, client).await;
             return Ok(());
         }
         match event {
             Event::MessageCreate(msg) => {
-                if let Some(callback) = commands.lock().await.prefix_commands.get(msg.content.as_str()) {
+                if let Some(callback) = commands
+                    .lock()
+                    .await
+                    .prefix_commands
+                    .get(msg.content.as_str())
+                {
                     callback(msg.clone(), Arc::clone(&client)).await;
                 }
-                
-            },
+            }
             Event::InteractionCreate(interaction) => {
                 let data = match &interaction.data {
                     Some(data) => data,
-                    None => {unreachable!()},
+                    None => {
+                        unreachable!()
+                    }
                 };
                 match data {
                     ApplicationCommand(command_data) => {
-                        if let Some(callback) = commands.lock().await.slash_commands.get(&command_data.name) {
+                        if let Some(callback) =
+                            commands.lock().await.slash_commands.get(&command_data.name)
+                        {
                             (callback.reply)(interaction.clone(), Arc::clone(&client)).await;
                         }
-                    },
-                    _ => {},
+                    }
+                    _ => {}
                 }
-            },
+            }
             // Other events here...
             _ => {}
         }

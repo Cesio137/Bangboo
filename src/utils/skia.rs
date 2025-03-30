@@ -1,18 +1,26 @@
+use fast_image_resize::{images::Image, PixelType, Resizer};
+use fontdue::{
+    Font,
+    FontSettings,
+    layout::{CoordinateSystem, Layout, LayoutSettings, TextStyle}
+};
+use image::{DynamicImage, GenericImageView, ImageReader};
 use std::io::{Error, ErrorKind};
-use fast_image_resize::images::Image;
-use fast_image_resize::{PixelType, Resizer};
-use fontdue::{Font, FontSettings};
-use fontdue::layout::{CoordinateSystem, Layout, LayoutSettings, TextStyle};
-use image::{load_from_memory, DynamicImage, GenericImageView, ImageReader};
-use tiny_skia::{FillRule, IntSize, Mask, MaskType, Paint, PathBuilder, Pixmap, PixmapPaint, Transform};
+use tiny_skia::{
+    FillRule, IntSize, Mask, MaskType, Paint, PathBuilder, Pixmap, PixmapPaint, Transform,
+};
 
 pub fn convert_image_to_pixmap(img: DynamicImage) -> Result<Pixmap, Error> {
     let rgba = img.to_rgba8();
     let (width, height) = img.dimensions();
-    let size = IntSize::from_wh(width, height)
-        .ok_or(Error::new(ErrorKind::InvalidData, "Failed to convert image to pixmap."))?;
-    let pixmap = Pixmap::from_vec(rgba.to_vec(), size)
-        .ok_or(Error::new(ErrorKind::InvalidData, "Failed to convert image to pixmap."))?;
+    let size = IntSize::from_wh(width, height).ok_or(Error::new(
+        ErrorKind::InvalidData,
+        "Failed to convert image to pixmap.",
+    ))?;
+    let pixmap = Pixmap::from_vec(rgba.to_vec(), size).ok_or(Error::new(
+        ErrorKind::InvalidData,
+        "Failed to convert image to pixmap.",
+    ))?;
     Ok(pixmap)
 }
 
@@ -22,7 +30,8 @@ pub fn resize_image(pixmap: &Pixmap, new_width: u32, new_height: u32) -> Result<
         pixmap.height(),
         pixmap.data().to_vec(),
         PixelType::U8x4,
-    ).map_err(|err| {
+    )
+    .map_err(|err| {
         let msg = format!("Failed to convert image to pixmap. {}", err);
         Error::new(ErrorKind::InvalidData, msg)
     })?;
@@ -33,23 +42,28 @@ pub fn resize_image(pixmap: &Pixmap, new_width: u32, new_height: u32) -> Result<
         Err(why) => return Err(Error::new(ErrorKind::InvalidData, why.to_string())),
         _ => (),
     };
-    let new_size = IntSize::from_wh(new_width, new_height)
-        .ok_or(Error::new(ErrorKind::InvalidData, "Failed to convert image to pixmap."))?;
-    let pixmap = Pixmap::from_vec(dst_image.into_vec(), new_size)
-        .ok_or(Error::new(ErrorKind::InvalidData, "Failed to convert image to pixmap."))?;
+    let new_size = IntSize::from_wh(new_width, new_height).ok_or(Error::new(
+        ErrorKind::InvalidData,
+        "Failed to convert image to pixmap.",
+    ))?;
+    let pixmap = Pixmap::from_vec(dst_image.into_vec(), new_size).ok_or(Error::new(
+        ErrorKind::InvalidData,
+        "Failed to convert image to pixmap.",
+    ))?;
     Ok(pixmap)
 }
 
 pub fn load_image_from_file(path: &str) -> Result<Pixmap, Error> {
-    let img = ImageReader::open(path).map_err(|err| {
-        let msg = format!("Failed to load image from file. \n{}", err);
-        Error::new(ErrorKind::InvalidInput, msg)
-    })?
-    .decode()
-    .map_err(|err| {
-        let msg = format!("Failed to decode image. \n{}", err);
-        Error::new(ErrorKind::InvalidData, msg)
-    })?;
+    let img = ImageReader::open(path)
+        .map_err(|err| {
+            let msg = format!("Failed to load image from file. \n{}", err);
+            Error::new(ErrorKind::InvalidInput, msg)
+        })?
+        .decode()
+        .map_err(|err| {
+            let msg = format!("Failed to decode image. \n{}", err);
+            Error::new(ErrorKind::InvalidData, msg)
+        })?;
     Ok(convert_image_to_pixmap(img)?)
 }
 
@@ -63,24 +77,35 @@ pub fn load_image_from_bytes(bytes: &[u8]) -> Result<Pixmap, Error> {
 
 pub fn draw_circle_image(image: &Pixmap, radius: u32) -> Result<Pixmap, Error> {
     let size = radius * 2;
-    let mut pixelmap_mask = Pixmap::new(size, size)
-        .ok_or(Error::new(ErrorKind::InvalidData, "Failed to create pixmap mask."))?;
+    let mut pixelmap_mask = Pixmap::new(size, size).ok_or(Error::new(
+        ErrorKind::InvalidData,
+        "Failed to create pixmap mask.",
+    ))?;
 
     let mut path_builder = PathBuilder::new();
     path_builder.push_circle(radius as f32, radius as f32, radius as f32);
-    let path = path_builder.finish()
+    let path = path_builder
+        .finish()
         .ok_or(Error::new(ErrorKind::InvalidData, "Failed to build path"))?;
 
     let mut paint = Paint::default();
     paint.set_color_rgba8(255, 255, 255, 255);
     paint.anti_alias = true;
 
-    pixelmap_mask.fill_path(&path, &paint, FillRule::Winding, Transform::identity(), None);
+    pixelmap_mask.fill_path(
+        &path,
+        &paint,
+        FillRule::Winding,
+        Transform::identity(),
+        None,
+    );
 
     let mask = Mask::from_pixmap(pixelmap_mask.as_ref(), MaskType::Alpha);
 
-    let mut pixmap = Pixmap::new(size, size)
-        .ok_or(Error::new(ErrorKind::InvalidData, "Failed to create pixmap."))?;
+    let mut pixmap = Pixmap::new(size, size).ok_or(Error::new(
+        ErrorKind::InvalidData,
+        "Failed to create pixmap.",
+    ))?;
     pixmap.draw_pixmap(
         0,
         0,
@@ -128,10 +153,10 @@ pub fn draw_text(text: &str, font_size: f32, font_bytes: &[u8]) -> Result<Pixmap
     // Use Fontdue's Layout system to calculate glyph positions
     let mut layout = Layout::new(CoordinateSystem::PositiveYDown); // Y grows downwards
     layout.reset(&LayoutSettings {
-        x: 0.0,                          // Starting X position
-        y: max_ascent as f32,            // Start at the baseline (y = ascent)
-        max_width: None,                 // No width limit
-        max_height: None,                // No height limit
+        x: 0.0,               // Starting X position
+        y: max_ascent as f32, // Start at the baseline (y = ascent)
+        max_width: None,      // No width limit
+        max_height: None,     // No height limit
         ..LayoutSettings::default()
     });
 
@@ -149,21 +174,22 @@ pub fn draw_text(text: &str, font_size: f32, font_bytes: &[u8]) -> Result<Pixmap
         }
 
         // Create a Pixmap for the individual glyph
-        let mut char_pixmap = Pixmap::new(metrics.width as u32, metrics.height as u32)
-            .ok_or(Error::new(ErrorKind::InvalidData, "Failed to create glyph Pixmap."))?;
+        let mut char_pixmap = Pixmap::new(metrics.width as u32, metrics.height as u32).ok_or(
+            Error::new(ErrorKind::InvalidData, "Failed to create glyph Pixmap."),
+        )?;
         let data = char_pixmap.data_mut();
 
         // Fill the Pixmap with the glyph's RGBA bitmap
         for (i, &alpha) in bitmap.iter().enumerate() {
-            let pixel_index = i * 4;   // Each pixel is represented by 4 bytes (RGBA)
-            data[pixel_index] = alpha;        // Red channel
-            data[pixel_index + 1] = alpha;    // Green channel
-            data[pixel_index + 2] = alpha;    // Blue channel
-            data[pixel_index + 3] = alpha;    // Alpha channel
+            let pixel_index = i * 4; // Each pixel is represented by 4 bytes (RGBA)
+            data[pixel_index] = alpha; // Red channel
+            data[pixel_index + 1] = alpha; // Green channel
+            data[pixel_index + 2] = alpha; // Blue channel
+            data[pixel_index + 3] = alpha; // Alpha channel
         }
 
         // Draw the glyph on the main Pixmap at the correct position
-        let y = (glyph.y - (total_height as f32 / 2f32)) as i32;
+        let y = (glyph.y - (total_height as f32 / 2f32)).round() as i32;
         pixmap.draw_pixmap(
             glyph.x as i32,
             y.max(0),

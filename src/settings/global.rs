@@ -1,6 +1,7 @@
 // Assets
-pub const RUBIK: &[u8] = include_bytes!("../../assets/fonts/Rubik-Bold.ttf");
 pub const LATO: &[u8] = include_bytes!("../../assets/fonts/Lato-Regular.ttf");
+pub const POPPINS: &[u8] = include_bytes!("../../assets/fonts/Poppins-SemiBold.ttf");
+pub const RUBIK: &[u8] = include_bytes!("../../assets/fonts/Rubik-Bold.ttf");
 pub const JOIN_IMG: &[u8] = include_bytes!("../../assets/images/join.png");
 pub const LEAVE_IMG: &[u8] = include_bytes!("../../assets/images/leave.png");
 pub const ADD_ICON: &[u8] = include_bytes!("../../assets/icons/static/add.png");
@@ -26,7 +27,6 @@ pub enum EColor {
     Nitro = 0xFF6BFA,
     Bravery = 0x9C84EF,
 }
-
 
 #[derive(Debug)]
 pub struct Emojis {

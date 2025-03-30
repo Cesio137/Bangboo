@@ -1,28 +1,35 @@
-use std::string::String;
-use chrono::DateTime;
-use twilight_model::{application::{
-    command::CommandType,
-    interaction::application_command::CommandOptionValue
-}, http::interaction::InteractionResponseType};
-use twilight_util::{
-    builder::command::{CommandBuilder, UserBuilder}, 
-    snowflake::Snowflake
-};
-use crate::{discord::app::creators::{create_slash_command, SlashCommand}, utils::{embeds::interaction_res, interaction::get_options}};
 use crate::settings::global::EColor;
+use crate::{
+    discord::app::creators::{create_slash_command, SlashCommand},
+    utils::{embeds::interaction_res, interaction::get_options, logger::error},
+};
+use chrono::DateTime;
+use std::string::String;
+use twilight_model::{
+    application::{command::CommandType, interaction::application_command::CommandOptionValue},
+    http::interaction::InteractionResponseType,
+};
+use twilight_util::{
+    builder::command::{CommandBuilder, UserBuilder},
+    snowflake::Snowflake,
+};
 
 pub fn age_command() -> SlashCommand {
-    let user_option = UserBuilder::new("user", "Select user.")
-        .build();
+    let user_option = UserBuilder::new("user", "Select user.").build();
 
     create_slash_command(
-        CommandBuilder::new("age", "Displays your or another user's account creation date.", CommandType::ChatInput)
-            .option(user_option)
-            .build(),
+        CommandBuilder::new(
+            "age",
+            "Displays your or another user's account creation date.",
+            CommandType::ChatInput,
+        )
+        .option(user_option)
+        .build(),
         |interaction, client| async move {
             let mut age: String = String::new();
             let mut color = EColor::Green;
-            let error_message = String::from("Error trying to responde /age command: Can't find an user ID.");
+            let error_message =
+                String::from("Error trying to responde /age command: Can't find an user ID.");
 
             if let Some(opt) = get_options(&interaction).first() {
                 if let CommandOptionValue::User(user) = &opt.value {
@@ -30,7 +37,7 @@ pub fn age_command() -> SlashCommand {
                     match client.user(*user).await {
                         Ok(user_res) => {
                             let username = match user_res.model().await {
-                                Ok(user) => user.name ,
+                                Ok(user) => user.name,
                                 Err(_) => "Unknow".to_string(),
                             };
                             let timestamp = match user_id {
@@ -41,15 +48,19 @@ pub fn age_command() -> SlashCommand {
                             match DateTime::from_timestamp_millis(timestamp as i64) {
                                 Some(datetime) => {
                                     // format data to a readble string
-                                    age = format!("{}'s account was created at {}.", username, datetime.format("%a, %Hh%Mmin, %d/%b/%Y").to_string());
-                                },
+                                    age = format!(
+                                        "{}'s account was created at {}.",
+                                        username,
+                                        datetime.format("%a, %Hh%Mmin, %d/%b/%Y").to_string()
+                                    );
+                                }
                                 None => {
                                     color = EColor::Warning;
                                     age = format!("{}'s account was created at NONE.", username);
-                                },
+                                }
                             }
-                        },
-                        Err(_) => {},
+                        }
+                        Err(_) => {}
                     }
                 }
             }
@@ -59,40 +70,51 @@ pub fn age_command() -> SlashCommand {
                     Some(member) => {
                         match &member.user {
                             Some(user) => {
-                                let username = user.name.clone();
+                                let username = &user.name;
                                 let timestamp = user.id.timestamp();
                                 // convert timestamp to readble data
                                 match DateTime::from_timestamp_millis(timestamp as i64) {
                                     Some(datetime) => {
                                         // format data to a readble string
-                                        age = format!("{}'s account was created at {}.", username, datetime.format("%a, %Hh%Mmin, %d/%b/%Y").to_string());
-                                    },
+                                        age = format!(
+                                            "{}'s account was created at {}.",
+                                            username,
+                                            datetime.format("%a, %Hh%Mmin, %d/%b/%Y").to_string()
+                                        );
+                                    }
                                     None => {
                                         color = EColor::Warning;
-                                        age = format!("{}'s account was created at NONE.", username);
-                                    },
+                                        age =
+                                            format!("{}'s account was created at NONE.", username);
+                                    }
                                 };
-                            },
-                            None => {},
+                            }
+                            None => {}
                         }
-                    },
-                    None => {},
+                    }
+                    None => {}
                 }
             }
 
-            if age.is_empty() { 
-                color = EColor::Danger; 
+            if age.is_empty() {
+                color = EColor::Danger;
                 age = error_message;
             }
 
-            let response = interaction_res(color, age, InteractionResponseType::ChannelMessageWithSource);
+            let response = interaction_res(
+                color,
+                age,
+                InteractionResponseType::ChannelMessageWithSource,
+            );
 
-            let result = client.interaction(interaction.application_id)
-                .create_response(interaction.id, &interaction.token, &response).await;
+            let result = client
+                .interaction(interaction.application_id)
+                .create_response(interaction.id, &interaction.token, &response)
+                .await;
 
-            if let Err(why) = result {
-                eprintln!("Error trying to responde /age command: {:?}", why);
+            if let Err(err) = result {
+                error(format!("Error trying to responde /age command: {:?}", err).as_str());
             }
-        }
+        },
     )
 }

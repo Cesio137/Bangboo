@@ -1,10 +1,10 @@
+use super::creators::EventCallback;
+use crate::discord::events::app_events;
 use std::collections::HashMap;
 use twilight_model::gateway::event::EventType;
-use crate::discord::events::app_events;
-use super::creators::EventCallback;
 
 pub struct AppEvents {
-    pub events: HashMap<EventType, EventCallback>
+    pub events: HashMap<EventType, EventCallback>,
 }
 
 impl AppEvents {
