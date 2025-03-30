@@ -1,7 +1,27 @@
+use std::sync::Arc;
+use std::io::Error;
+use twilight_http::Client;
 use twilight_model::{
     application::interaction::application_command::{CommandData, CommandDataOption},
-    gateway::payload::incoming::InteractionCreate,
+    gateway::payload::incoming::InteractionCreate, http::interaction::{InteractionResponse, InteractionResponseType},
 };
+
+pub async fn defer_reply(interaction: Box<InteractionCreate>, client: Arc<Client>) -> Result<(), Error> {
+    let response = InteractionResponse {
+        kind: InteractionResponseType::DeferredChannelMessageWithSource,
+        data: None,
+    };
+    client.interaction(interaction.application_id)
+        .create_response(interaction.id, &interaction.token, &response).await
+        .map_err(|err| {
+            let msg = err.to_string();
+            Error::new(
+                std::io::ErrorKind::ConnectionRefused,
+                msg
+            )
+        })?;
+    Ok(())
+}
 
 pub fn get_command_data(interaction: &Box<InteractionCreate>) -> Option<Box<CommandData>> {
     match &interaction.data {

@@ -1,16 +1,10 @@
-use std::collections::HashMap;
 use std::io::{Error, ErrorKind};
-use std::io::ErrorKind::InvalidData;
 use fast_image_resize::images::Image;
 use fast_image_resize::{PixelType, Resizer};
 use fontdue::{Font, FontSettings};
 use fontdue::layout::{CoordinateSystem, Layout, LayoutSettings, TextStyle};
 use image::{load_from_memory, DynamicImage, GenericImageView, ImageReader};
 use tiny_skia::{FillRule, IntSize, Mask, MaskType, Paint, PathBuilder, Pixmap, PixmapPaint, Transform};
-
-pub struct GlypData {
-
-}
 
 pub fn convert_image_to_pixmap(img: DynamicImage) -> Result<Pixmap, Error> {
     let rgba = img.to_rgba8();
@@ -47,22 +41,23 @@ pub fn resize_image(pixmap: &Pixmap, new_width: u32, new_height: u32) -> Result<
 }
 
 pub fn load_image_from_file(path: &str) -> Result<Pixmap, Error> {
-    let img = ImageReader::open(path).unwrap().decode().unwrap();
+    let img = ImageReader::open(path).map_err(|err| {
+        let msg = format!("Failed to load image from file. \n{}", err);
+        Error::new(ErrorKind::InvalidInput, msg)
+    })?
+    .decode()
+    .map_err(|err| {
+        let msg = format!("Failed to decode image. \n{}", err);
+        Error::new(ErrorKind::InvalidData, msg)
+    })?;
     Ok(convert_image_to_pixmap(img)?)
 }
 
 pub fn load_image_from_bytes(bytes: &[u8]) -> Result<Pixmap, Error> {
-    let img = load_from_memory(bytes).map_err(|err| {
-        let msg = format!("Failed to load image from memory. \n{}", err);
+    let pixmap = Pixmap::decode_png(bytes).map_err(|err| {
+        let msg = format!("Failed to decode image from memory. \n{}", err);
         Error::new(ErrorKind::InvalidData, msg)
     })?;
-    let rgba = img.to_rgba8();
-    let (width, height) = img.dimensions();
-    let size = IntSize::from_wh(width, height)
-        .ok_or(Error::new(ErrorKind::InvalidData, "Failed to convert image to pixmap."))?;
-    let pixmap = Pixmap::from_vec(rgba.into_raw(), size)
-        .ok_or(Error::new(ErrorKind::InvalidData, "Failed to convert image to pixmap."))?;
-
     Ok(pixmap)
 }
 
@@ -160,29 +155,24 @@ pub fn draw_text(text: &str, font_size: f32, font_bytes: &[u8]) -> Result<Pixmap
 
         // Fill the Pixmap with the glyph's RGBA bitmap
         for (i, &alpha) in bitmap.iter().enumerate() {
-            let pixel_index = i * 4; // Each pixel is represented by 4 bytes (RGBA)
-            data[pixel_index] = 200;          // Red channel
-            data[pixel_index + 1] = 200;      // Green channel
-            data[pixel_index + 2] = 200;      // Blue channel
-            data[pixel_index + 3] = alpha;  // Alpha channel
+            let pixel_index = i * 4;   // Each pixel is represented by 4 bytes (RGBA)
+            data[pixel_index] = alpha;        // Red channel
+            data[pixel_index + 1] = alpha;    // Green channel
+            data[pixel_index + 2] = alpha;    // Blue channel
+            data[pixel_index + 3] = alpha;    // Alpha channel
         }
 
         // Draw the glyph on the main Pixmap at the correct position
+        let y = (glyph.y - (total_height as f32 / 2f32)) as i32;
         pixmap.draw_pixmap(
             glyph.x as i32,
-            (glyph.y as i32 + metrics.ymin).max(0),
+            y.max(0),
             char_pixmap.as_ref(),
-            &PixmapPaint::default(),
+            &Default::default(),
             Transform::identity(),
             None,
         );
     }
 
-    // Save the final Pixmap as a PNG file
-    pixmap.save_png("draw_text.png").map_err(|err| {
-        let msg = format!("Failed to save text PNG.\n{}", err);
-        Error::new(ErrorKind::InvalidData, msg)
-    })?;
-
-    Ok(pixmap)
+    Ok(pixmap.to_owned())
 }

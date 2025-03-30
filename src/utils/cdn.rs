@@ -1,7 +1,8 @@
 use std::io::{Error, ErrorKind};
-use image::load_from_memory;
 use tiny_skia::Pixmap;
 use crate::utils::skia::convert_image_to_pixmap;
+
+use super::skia::load_image_from_bytes;
 
 pub fn display_avatar_url(user_id: u64, hash: &str, size: u16) -> String {
     let ext = if hash.starts_with("a_") { "gif" } else { "png" };
@@ -15,10 +16,6 @@ pub async fn load_image_from_cdn(url: String) -> Result<Pixmap, Error> {
     let bytes = data.bytes().await.map_err(|err| {
         Error::new(ErrorKind::InvalidData, err.to_string())
     })?;
-    let img = load_from_memory(bytes.as_ref()).map_err(|err| {
-        let msg = format!("Failed to load image from memory. \n{}", err);
-        Error::new(ErrorKind::InvalidData, msg)
-    })?;
-    let pixmap = convert_image_to_pixmap(img)?;
+    let pixmap = load_image_from_bytes(bytes.as_ref())?;
     Ok(pixmap)
 }

@@ -12,7 +12,7 @@ pub fn res(color: EColor, content: String) -> Embed {
         .build()
 }
 
-pub fn interaction_res(color: EColor, content: String) -> InteractionResponse {
+pub fn interaction_res(color: EColor, content: String, interaction_type: InteractionResponseType) -> InteractionResponse {
     let embed = embed::EmbedBuilder::new()
     .color(color as u32)
     .description(content)
@@ -21,7 +21,7 @@ pub fn interaction_res(color: EColor, content: String) -> InteractionResponse {
     .build();
 
     InteractionResponse {
-        kind: InteractionResponseType::ChannelMessageWithSource,
+        kind: interaction_type,
         data: InteractionResponseData {
             embeds: vec![embed].into(),
             ..Default::default()

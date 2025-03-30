@@ -1,9 +1,9 @@
 use std::string::String;
 use chrono::DateTime;
-use twilight_model::application::{
+use twilight_model::{application::{
     command::CommandType,
     interaction::application_command::CommandOptionValue
-};
+}, http::interaction::InteractionResponseType};
 use twilight_util::{
     builder::command::{CommandBuilder, UserBuilder}, 
     snowflake::Snowflake
@@ -85,7 +85,7 @@ pub fn age_command() -> SlashCommand {
                 age = error_message;
             }
 
-            let response = interaction_res(color, age);
+            let response = interaction_res(color, age, InteractionResponseType::ChannelMessageWithSource);
 
             let result = client.interaction(interaction.application_id)
                 .create_response(interaction.id, &interaction.token, &response).await;
