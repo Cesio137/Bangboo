@@ -1,6 +1,6 @@
 [package]
 name = "Bangboo"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2024"
 
 [dependencies]
@@ -20,6 +20,9 @@ fontdue = { version = "0.9" }
 image = { version = "0.25" }
 once_cell = { version = "1.21" }
 reqwest = { version = "0.12" }
+regex = { version = "1.11" }
+serde = { version = "1.0" }
+serde_json = { version = "1.0" }
 tracing-subscriber = { version = "0.3" }
 tracing = { version = "0.1" }
 tiny-skia = { version = "0.11" }
