@@ -2,7 +2,7 @@ use crate::discord::app::creators::{create_prefix_command, PrefixCommand};
 
 pub fn ping_command() -> PrefixCommand {
     create_prefix_command("!ping".to_string(), |message, client| async move {
-        if message.author.bot {
+        if message.author.bot || message.guild_id.is_none() {
             return;
         }
 

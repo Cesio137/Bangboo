@@ -6,7 +6,9 @@ use twilight_model::{
     application::command::CommandType, gateway::event::EventType::MemberAdd,
     http::attachment::Attachment,
 };
+use twilight_model::http::interaction::InteractionResponseType;
 use twilight_util::builder::command::CommandBuilder;
+use crate::utils::embeds::interaction_res;
 
 pub fn canvas_command() -> SlashCommand {
     create_slash_command(
@@ -17,6 +19,24 @@ pub fn canvas_command() -> SlashCommand {
         )
         .build(),
         |interaction, client| async move {
+            if interaction.guild_id.is_none() {
+                let response = interaction_res(
+                    EColor::Danger,
+                    "/canvas command can only be executed inside a guild.".to_string(),
+                    InteractionResponseType::ChannelMessageWithSource,
+                );
+
+                if let Err(err) = client
+                    .interaction(interaction.application_id)
+                    .create_response(interaction.id, &interaction.token, &response)
+                    .await
+                {
+                    error(&format!("Error responding to /canvas command: {:?}", err));
+                }
+
+                return;
+            }
+
             if let Err(err) = defer_reply(interaction.clone(), client.clone()).await {
                 error(format!("Error trying to responde /canvas command: {:?}", err).as_str());
                 return;
