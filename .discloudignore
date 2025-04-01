@@ -24,6 +24,7 @@
 /README.md
 
 # Extensions
+*.fig
 *.md
 *.zip
 *.exe
