@@ -5,11 +5,11 @@ pub fn success(message: &str) {
 }
 
 pub fn error(message: &str) {
-    println!("{} {message}", "✔".bright_red());
+    println!("{} {message}", "✘".bright_red());
 }
 
 pub fn warn(message: &str) {
-    println!("{} {message}", "✔".bright_yellow());
+    println!("{} {message}", "⚠".bright_yellow());
 }
 
 pub fn log(message: &str) {

@@ -17,3 +17,7 @@ This project is currently for my personal use, but I hope to monetize it in the 
 - [Twilight](https://crates.io/crates/twilight)
 - [Tiny Skia](https://crates.io/crates/tiny-skia)
 - [Fontdue](https://crates.io/crates/fontdue)
+
+## Special Mentions
+
+- [Ravena Star](https://github.com/ravenastar-js/shortlinks-scams) by the scam message filter against messages like ```free steam gift card```.

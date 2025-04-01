@@ -4,11 +4,12 @@ use crate::{
     utils::{embeds::interaction_res, interaction::get_options, logger::error},
 };
 use chrono::DateTime;
-use std::string::String;
+use twilight_http::{Error, Response};
 use twilight_model::{
     application::{command::CommandType, interaction::application_command::CommandOptionValue},
     http::interaction::InteractionResponseType,
 };
+use twilight_model::user::User;
 use twilight_util::{
     builder::command::{CommandBuilder, UserBuilder},
     snowflake::Snowflake,
@@ -23,97 +24,79 @@ pub fn age_command() -> SlashCommand {
             "Displays your or another user's account creation date.",
             CommandType::ChatInput,
         )
-        .option(user_option)
-        .build(),
+            .option(user_option)
+            .build(),
         |interaction, client| async move {
-            let mut age: String = String::new();
+            if interaction.guild_id.is_none() {
+                let response = interaction_res(
+                    EColor::Danger,
+                    "/age command can only be executed inside a guild.".to_string(),
+                    InteractionResponseType::ChannelMessageWithSource,
+                );
+
+                if let Err(err) = client
+                    .interaction(interaction.application_id)
+                    .create_response(interaction.id, &interaction.token, &response)
+                    .await
+                {
+                    error(&format!("Error responding to /age command: {:?}", err));
+                }
+
+                return;
+            }
             let mut color = EColor::Green;
-            let error_message =
-                String::from("Error trying to responde /age command: Can't find an user ID.");
+            let mut age = None;
 
-            if let Some(opt) = get_options(&interaction).first() {
-                if let CommandOptionValue::User(user) = &opt.value {
-                    let user_id = Some(*user);
-                    match client.user(*user).await {
-                        Ok(user_res) => {
-                            let username = match user_res.model().await {
-                                Ok(user) => user.name,
-                                Err(_) => "Unknow".to_string(),
-                            };
-                            let timestamp = match user_id {
-                                Some(id) => id.timestamp(),
-                                None => 0,
-                            };
-                            // convert timestamp to readble data
-                            match DateTime::from_timestamp_millis(timestamp as i64) {
-                                Some(datetime) => {
-                                    // format data to a readble string
-                                    age = format!(
-                                        "{}'s account was created at {}.",
-                                        username,
-                                        datetime.format("%a, %Hh%Mmin, %d/%b/%Y").to_string()
-                                    );
-                                }
-                                None => {
-                                    color = EColor::Warning;
-                                    age = format!("{}'s account was created at NONE.", username);
-                                }
-                            }
+            // Obtém o usuário do comando, se existir
+            let user_id = get_options(&interaction)
+                .first()
+                .and_then(|opt| match &opt.value {
+                    CommandOptionValue::User(user) => Some(*user),
+                    _ => None,
+                })
+                .or_else(|| interaction.member.as_ref()?.user.as_ref().map(|u| u.id));
+
+            if let Some(user_id) = user_id {
+                let timestamp = user_id.timestamp();
+                if let Some(datetime) = DateTime::from_timestamp_millis(timestamp as i64) {
+                    let user = client.user(user_id).await;
+                    let username = match user {
+                        Ok(user) => {
+                            let model = user.model().await.ok()
+                                .map(|user| user.name)
+                                .unwrap_or_else(|| "Unknown user".to_string());
+                            model
                         }
-                        Err(_) => {}
-                    }
+                        Err(_) => {"Unknown".to_string()}
+                    };
+                    age = Some(format!(
+                        "{}'s account was created at {}.",
+                        username,
+                        datetime.format("%a, %Hh%Mmin, %d/%b/%Y")
+                    ));
+                } else {
+                    color = EColor::Warning;
+                    age = Some("Account creation date unknown.".to_string());
                 }
             }
 
-            if age.is_empty() {
-                match &interaction.member {
-                    Some(member) => {
-                        match &member.user {
-                            Some(user) => {
-                                let username = &user.name;
-                                let timestamp = user.id.timestamp();
-                                // convert timestamp to readble data
-                                match DateTime::from_timestamp_millis(timestamp as i64) {
-                                    Some(datetime) => {
-                                        // format data to a readble string
-                                        age = format!(
-                                            "{}'s account was created at {}.",
-                                            username,
-                                            datetime.format("%a, %Hh%Mmin, %d/%b/%Y").to_string()
-                                        );
-                                    }
-                                    None => {
-                                        color = EColor::Warning;
-                                        age =
-                                            format!("{}'s account was created at NONE.", username);
-                                    }
-                                };
-                            }
-                            None => {}
-                        }
-                    }
-                    None => {}
-                }
-            }
-
-            if age.is_empty() {
+            let response_text = age.unwrap_or_else(|| {
                 color = EColor::Danger;
-                age = error_message;
-            }
+                "Error trying to respond to /age command: Can't find a user ID.".to_string()
+            });
 
             let response = interaction_res(
                 color,
-                age,
+                response_text,
                 InteractionResponseType::ChannelMessageWithSource,
             );
 
-            let result = client
+            if let Err(err) = client
                 .interaction(interaction.application_id)
                 .create_response(interaction.id, &interaction.token, &response)
-                .await;
-
-            if let Err(err) = result {
-                error(format!("Error trying to responde /age command: {:?}", err).as_str());
+                .await
+            {
+                error(&format!("Error responding to /age command: {:?}", err));
             }
         },
     )

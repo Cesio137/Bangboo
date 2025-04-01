@@ -10,11 +10,15 @@ use crate::settings::env::ENV_SCHEMA;
 use colored::Colorize;
 use ctrlc;
 use std::{error::Error, sync::Arc};
+use anyhow::anyhow;
 use tokio::sync::Mutex;
 use twilight_cache_inmemory::{DefaultInMemoryCache, ResourceType};
 use twilight_gateway::{Event, EventTypeFlags, Intents, Shard, ShardId, StreamExt as _};
 use twilight_http::Client as HttpClient;
 use twilight_model::application::interaction::InteractionData::ApplicationCommand;
+use twilight_model::channel::message::MessageReferenceType;
+use twilight_model::gateway::payload::incoming::MessageCreate;
+use crate::tools::automod::{DangerLevel, Report, ScamFilter};
 
 pub struct App;
 
@@ -41,6 +45,13 @@ impl App {
 
         let commands = Arc::new(Mutex::new(AppCommands::new()));
         let events = Arc::new(Mutex::new(AppEvents::new()));
+        let regex = match ScamFilter::new() {
+            Ok(regex) => Arc::new(Mutex::new(regex)),
+            Err(err) => {
+                println!("{}\n{:?}", "Error initializing ScamFilter".bright_red(), err.to_string().bright_red());
+                return Err(anyhow!("Scam filter creation failed: {:?}", err))
+            },
+        };
 
         let _ = ctrlc::set_handler(move || {
             println!("\n👋 bye!");
@@ -61,8 +72,7 @@ impl App {
             match event {
                 Event::Ready(ready) => {
                     commands
-                        .lock()
-                        .await
+                        .lock().await
                         .register_slash_commands(Arc::clone(&client), ready.application.id)
                         .await;
                     println!(
@@ -83,6 +93,7 @@ impl App {
                         Arc::clone(&client),
                         Arc::clone(&commands),
                         Arc::clone(&events),
+                        Arc::clone(&regex),
                     ));
                 }
             }
@@ -96,6 +107,7 @@ impl App {
         client: Arc<HttpClient>,
         commands: Arc<Mutex<AppCommands>>,
         events: Arc<Mutex<AppEvents>>,
+        regex: Arc<Mutex<ScamFilter>>
     ) -> Result<(), Box<dyn Error + Send + Sync>> {
         if let Some(callback) = events.lock().await.events.get(&event.kind()) {
             callback(event, client).await;
@@ -103,12 +115,22 @@ impl App {
         }
         match event {
             Event::MessageCreate(msg) => {
-                if let Some(callback) = commands
-                    .lock()
-                    .await
-                    .prefix_commands
-                    .get(msg.content.as_str())
-                {
+                if msg.guild_id.is_some() && !msg.author.bot {
+                    let result = regex.lock().await.filter_message(&msg.content);
+                    match result {
+                        DangerLevel::Safe => {}
+                        DangerLevel::High => {
+                            regex.lock().await.handle_spam(client, msg, None).await;
+                            return Ok(());
+                        }
+                        DangerLevel::HighReport(report) => {
+                            regex.lock().await.handle_spam(client, msg, Some(report)).await;
+                            return Ok(());
+                        }
+                    };
+                }
+
+                if let Some(callback) = commands.lock().await.prefix_commands.get(msg.content.as_str()) {
                     callback(msg.clone(), Arc::clone(&client)).await;
                 }
             }
