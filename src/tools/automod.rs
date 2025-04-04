@@ -77,9 +77,9 @@ impl ScamFilter {
             return DangerLevel::HighReport(report);
         }
 
-        if self.keywords.iter().any(|kw| message.contains(kw)) {
+        /*if self.keywords.iter().any(|kw| message.contains(kw)) {
             return DangerLevel::High;
-        }
+        }*/
 
         DangerLevel::Safe
     }
