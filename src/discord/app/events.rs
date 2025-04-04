@@ -10,6 +10,6 @@ pub struct AppEvents {
 impl AppEvents {
     pub fn new() -> Self {
         let events = app_events();
-        AppEvents { events: events }
+        AppEvents { events }
     }
 }

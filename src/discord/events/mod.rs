@@ -1,5 +1,7 @@
 mod member_added;
 mod member_removed;
+mod message_create;
+mod interaction_create;
 
 use super::app::creators::EventCallback;
 use std::collections::HashMap;
@@ -14,6 +16,10 @@ pub fn app_events() -> HashMap<EventType, EventCallback> {
     events.insert(member_added_event.event, member_added_event.reply);
     let member_removed_event = member_removed::member_removed();
     events.insert(member_removed_event.event, member_removed_event.reply);
+    let message_create = message_create::message_create();
+    events.insert(message_create.event, message_create.reply);
+    let interaction_create = interaction_create::interaction_create();
+    events.insert(interaction_create.event, interaction_create.reply);
 
     events
 }

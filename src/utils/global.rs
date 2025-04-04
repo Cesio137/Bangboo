@@ -7,12 +7,11 @@ use std::{
 };
 use tiny_skia::*;
 use twilight_gateway::EventType;
-use twilight_model::guild::Member;
+use twilight_model::user::User;
+use twilight_model::util::Timestamp;
 use twilight_util::snowflake::Snowflake;
 
-pub async fn global_message(event: EventType, member: &Member) -> Result<Vec<u8>, Error> {
-    let user = &member.user;
-
+pub async fn global_message(event: EventType, user: &User, joined_at: Option<Timestamp>) -> Result<Vec<u8>, Error> {
     let mut pixmap = Pixmap::new(1024, 260).ok_or(Error::new(
         ErrorKind::InvalidData,
         "Failed to create pixelmap.",
@@ -81,7 +80,7 @@ pub async fn global_message(event: EventType, member: &Member) -> Result<Vec<u8>
             if now >= timestamp {
                 let account_age = now - timestamp;
 
-                if let Some(joined_at) = member.joined_at {
+                if let Some(joined_at) = joined_at {
                     let join_age = now.saturating_sub(joined_at.as_micros() as u128 / 1000);
                     let timelimit = 60 * 1000;
                     if join_age > timelimit && account_age > timelimit {

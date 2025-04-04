@@ -1,8 +1,8 @@
 use fast_image_resize::{images::Image, PixelType, Resizer};
 use fontdue::{
+    layout::{CoordinateSystem, Layout, LayoutSettings, TextStyle},
     Font,
-    FontSettings,
-    layout::{CoordinateSystem, Layout, LayoutSettings, TextStyle}
+    FontSettings
 };
 use image::{DynamicImage, GenericImageView, ImageReader};
 use std::io::{Error, ErrorKind};

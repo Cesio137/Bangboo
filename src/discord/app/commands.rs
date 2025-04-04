@@ -4,8 +4,6 @@ use crate::discord::{
 };
 use colored::Colorize;
 use std::collections::HashMap;
-use std::fmt::Debug;
-use std::sync::Arc;
 use twilight_http::Client;
 use twilight_model::application::command::Command;
 use twilight_model::{id::marker::ApplicationMarker, id::Id};
@@ -25,7 +23,7 @@ impl AppCommands {
         }
     }
 
-    pub async fn register_slash_commands(&self, client: Arc<Client>, id: Id<ApplicationMarker>) {
+    pub async fn register_slash_commands(&self, client: &Client, id: Id<ApplicationMarker>) {
         let commands: Vec<Command> = self
             .slash_commands
             .values()

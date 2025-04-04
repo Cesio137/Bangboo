@@ -1,14 +1,14 @@
 use crate::discord::app::creators::{create_slash_command, SlashCommand};
 use crate::settings::global::EColor;
+use crate::utils::embeds::interaction_res;
 use crate::utils::logger::error;
 use crate::utils::{embeds::res, global::global_message, interaction::defer_reply};
+use twilight_model::http::interaction::InteractionResponseType;
 use twilight_model::{
     application::command::CommandType, gateway::event::EventType::MemberAdd,
     http::attachment::Attachment,
 };
-use twilight_model::http::interaction::InteractionResponseType;
 use twilight_util::builder::command::CommandBuilder;
-use crate::utils::embeds::interaction_res;
 
 pub fn canvas_command() -> SlashCommand {
     create_slash_command(
@@ -87,7 +87,7 @@ pub fn canvas_command() -> SlashCommand {
                     return;
                 }
             };
-            let canvas = global_message(MemberAdd, &member).await.unwrap_or(vec![]);
+            let canvas = global_message(MemberAdd, &member.user, None).await.unwrap_or(vec![]);
 
             if !canvas.is_empty() {
                 let result = client

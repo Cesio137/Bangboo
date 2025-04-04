@@ -1,3 +1,4 @@
+use crate::discord::app::context::{AppContext, PrefixCommandContext};
 use std::{pin::Pin, sync::Arc};
 use twilight_gateway::Event as GatewayEvent;
 use twilight_http::Client;
@@ -5,12 +6,12 @@ use twilight_model::{
     application::command::Command,
     gateway::{
         event::EventType,
-        payload::incoming::{InteractionCreate, MessageCreate},
+        payload::incoming::InteractionCreate,
     },
 };
 
 pub type PrefixCommandCallback =
-    Box<dyn Fn(Box<MessageCreate>, Arc<Client>) -> Pin<Box<dyn Future<Output = ()> + Send>> + Send>;
+    Box<dyn Fn(PrefixCommandContext) -> Pin<Box<dyn Future<Output = ()> + Send>> + Send>;
 
 pub struct PrefixCommand {
     pub name: String,
@@ -19,12 +20,12 @@ pub struct PrefixCommand {
 
 pub fn create_prefix_command<F, Fut>(name: String, reply: F) -> PrefixCommand
 where
-    F: Fn(Box<MessageCreate>, Arc<Client>) -> Fut + Send + 'static,
+    F: Fn(PrefixCommandContext) -> Fut + Send + 'static,
     Fut: Future<Output = ()> + Send + 'static,
 {
     PrefixCommand {
         name,
-        reply: Box::new(move |message, client| Box::pin(reply(message, client))),
+        reply: Box::new(move |context| Box::pin(reply(context))),
     }
 }
 
@@ -51,7 +52,7 @@ where
 }
 
 pub type EventCallback = Box<
-    dyn Fn(GatewayEvent, Arc<Client>) -> Pin<Box<dyn Future<Output = ()> + Send>> + Send + 'static,
+    dyn Fn(GatewayEvent, AppContext) -> Pin<Box<dyn Future<Output = ()> + Send>> + Send + 'static,
 >;
 
 pub struct EventHandler {
@@ -61,11 +62,11 @@ pub struct EventHandler {
 
 pub fn create_event<F, Fut>(event: EventType, reply: F) -> EventHandler
 where
-    F: Fn(GatewayEvent, Arc<Client>) -> Fut + Send + 'static,
+    F: Fn(GatewayEvent, AppContext) -> Fut + Send + 'static,
     Fut: Future<Output = ()> + Send + 'static,
 {
     EventHandler {
         event,
-        reply: Box::new(move |event, client| Box::pin(reply(event, client))),
+        reply: Box::new(move |event, context| Box::pin(reply(event, context))),
     }
 }

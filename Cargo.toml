@@ -1,6 +1,6 @@
 [package]
 name = "Bangboo"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2024"
 
 [profile.release]
@@ -17,7 +17,6 @@ twilight-model = { version = "0.16" }
 twilight-util = { version = "0.16", features = ["full"] }
 #THIDRPARTY
 anyhow = { version = "1.0" }
-ctrlc = { version = "3.4" }
 chrono = { version = "0.4" }
 colored = { version = "3" }
 dotenvy = { version = "0.15" }
@@ -32,4 +31,4 @@ serde_json = { version = "1.0" }
 tracing-subscriber = { version = "0.3" }
 tracing = { version = "0.1" }
 tiny-skia = { version = "0.11" }
-tokio = { version = "1.44", features = ["rt-multi-thread"] }
+tokio = { version = "1.44", features = ["rt-multi-thread", "signal"] }

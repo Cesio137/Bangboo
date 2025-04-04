@@ -4,12 +4,10 @@ use crate::{
     utils::{embeds::interaction_res, interaction::get_options, logger::error},
 };
 use chrono::DateTime;
-use twilight_http::{Error, Response};
 use twilight_model::{
     application::{command::CommandType, interaction::application_command::CommandOptionValue},
     http::interaction::InteractionResponseType,
 };
-use twilight_model::user::User;
 use twilight_util::{
     builder::command::{CommandBuilder, UserBuilder},
     snowflake::Snowflake,

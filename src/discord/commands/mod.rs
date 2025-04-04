@@ -28,6 +28,5 @@ pub fn slash_commands() -> HashMap<String, SlashCommand> {
     let age = public::age::age_command();
     commands.insert(age.command.name.clone(), age);
 
-
     commands
 }

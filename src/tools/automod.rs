@@ -1,18 +1,17 @@
+use crate::settings::global::EColor;
+use crate::utils::embeds::res;
+use crate::utils::logger::error;
 use anyhow::{Context, Error, Result};
+use regex::Regex;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::{HashMap, HashSet};
 use std::str::FromStr;
 use std::sync::Arc;
-use regex::Regex;
-use tracing_subscriber::filter::FilterExt;
 use twilight_http::Client;
 use twilight_model::gateway::payload::incoming::MessageCreate;
-use twilight_model::id::Id;
 use twilight_model::id::marker::{GuildMarker, UserMarker};
-use crate::settings::global::EColor;
-use crate::utils::embeds::res;
-use crate::utils::logger::error;
+use twilight_model::id::Id;
 
 const SHORTLINKS: &str = include_str!("../../resources/shortlinks.json");
 const REGEX: &str = r"(https?://(?:www\.)?(surl\.li|u\.to|t\.co|gclnk\.com|qptr\.ru|uclck\.ru|go-link\.ru|envs\.sh|shorter\.me|sc\.link|goo\.su|plhn\.pw|ej136\.cfd|f-link\.me|lnky\.ru|bitly\.cx))";
@@ -78,9 +77,9 @@ impl ScamFilter {
             return DangerLevel::HighReport(report);
         }
 
-        if self.keywords.iter().any(|kw| message.contains(kw)) {
+        /*if self.keywords.iter().any(|kw| message.contains(kw)) {
             return DangerLevel::High;
-        }
+        }*/
 
         DangerLevel::Safe
     }
