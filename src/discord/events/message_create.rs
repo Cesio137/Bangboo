@@ -9,6 +9,7 @@ pub fn message_create() -> EventHandler {
             Event::MessageCreate(message) => message,
             _ => return,
         };
+        if message.author.bot { return; }
 
         if let Some(callback) = context.commands.lock().await.prefix_commands.get(message.content.as_str()) {
             let ctx = PrefixCommandContext::new(message, context.client).unwrap();
