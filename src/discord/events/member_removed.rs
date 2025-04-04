@@ -7,19 +7,33 @@ use twilight_model::{
 };
 
 pub fn member_removed() -> EventHandler {
-    create_event(EventType::MemberRemove, |event, client| async move {
+    create_event(EventType::MemberRemove, |event, context| async move {
         let member = match &event {
-            Event::MemberAdd(member) => member,
+            Event::MemberRemove(member) => member,
             _ => return,
         };
-        if member.user.bot {
-            return;
-        }
+        if member.user.bot { return; }
 
-        let canvas = global_message(event.kind(), &member.member).await;
+        let channel_id = match context.client.guild(member.guild_id).await {
+            Ok(response) => {
+                match response.model().await.ok().and_then(|guild| guild.system_channel_id) {
+                    Some(channel_id) => channel_id,
+                    None => {
+                        error("Error getting system message channel".to_string().as_str());
+                        return
+                    }
+                }
+            },
+            Err(err) => {
+                error(format!("Error getting system message channel\n{:?}", err).as_str());
+                return
+            },
+        };
+
+        let canvas = global_message(event.kind(), &member.user, None).await;
         if let Ok(buffer) = canvas {
-            let result = client
-                .create_message(member.guild_id.cast())
+            let result = context.client
+                .create_message(channel_id)
                 .attachments(&vec![Attachment::from_bytes(
                     "welcome.png".to_string(),
                     buffer,
@@ -36,8 +50,8 @@ pub fn member_removed() -> EventHandler {
         let name = &member.user.name;
         let message = format!("{} left the server!", name);
         let embed_res = res(EColor::Danger, message);
-        let result = client
-            .create_message(member.guild_id.cast())
+        let result = context.client
+            .create_message(channel_id)
             .embeds(&[embed_res])
             .await;
 
