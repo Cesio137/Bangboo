@@ -4,24 +4,11 @@ pub mod creators;
 pub mod events;
 
 use crate::discord::app::context::AppContext;
-use crate::discord::app::{
-    commands::AppCommands,
-    events::AppEvents
-};
 use crate::settings::env::ENV_SCHEMA;
-use crate::tools::automod::{DangerLevel, Report, ScamFilter};
-use anyhow::anyhow;
 use colored::Colorize;
-use ctrlc;
-use std::{error::Error, sync::Arc};
-use tokio::sync::Mutex;
+use std::error::Error;
 use twilight_cache_inmemory::{DefaultInMemoryCache, ResourceType};
 use twilight_gateway::{Event, EventTypeFlags, Intents, Shard, ShardId, StreamExt as _};
-use twilight_http::Client as HttpClient;
-use twilight_model::application::interaction::InteractionData::ApplicationCommand;
-use twilight_model::channel::message::MessageReferenceType;
-use twilight_model::gateway::CloseFrame;
-use twilight_model::gateway::payload::incoming::MessageCreate;
 
 pub struct App;
 
