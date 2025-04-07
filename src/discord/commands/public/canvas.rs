@@ -3,9 +3,10 @@ use crate::settings::global::EColor;
 use crate::utils::embeds::interaction_res;
 use crate::utils::logger::error;
 use crate::utils::{embeds::res, global::global_message, interaction::defer_reply};
+use twilight_model::gateway::event::EventType::MemberAdd;
 use twilight_model::http::interaction::InteractionResponseType;
 use twilight_model::{
-    application::command::CommandType, gateway::event::EventType::MemberAdd,
+    application::command::CommandType,
     http::attachment::Attachment,
 };
 use twilight_util::builder::command::CommandBuilder;

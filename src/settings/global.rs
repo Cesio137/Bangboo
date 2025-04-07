@@ -1,11 +1,14 @@
 // Assets
 pub const LATO: &[u8] = include_bytes!("../../assets/fonts/Lato-Regular.ttf");
-pub const POPPINS: &[u8] = include_bytes!("../../assets/fonts/Poppins-SemiBold.ttf");
 pub const RUBIK: &[u8] = include_bytes!("../../assets/fonts/Rubik-Bold.ttf");
-pub const JOIN_IMG: &[u8] = include_bytes!("../../assets/images/join.png");
-pub const LEAVE_IMG: &[u8] = include_bytes!("../../assets/images/leave.png");
+pub const POPPINS: &[u8] = include_bytes!("../../assets/fonts/Poppins-SemiBold.ttf");
+pub const DEFAULT_AVATAR: &[u8] = include_bytes!("../../assets/member/default_avatar.png");
+pub const JOIN_IMG: &[u8] = include_bytes!("../../assets/canvas/join.png");
+pub const LEAVE_IMG: &[u8] = include_bytes!("../../assets/canvas/leave.png");
+pub const MOD_IMG: &[u8] = include_bytes!("../../assets/canvas/mod.png");
 pub const ADD_ICON: &[u8] = include_bytes!("../../assets/icons/static/add.png");
 pub const MINUS_ICON: &[u8] = include_bytes!("../../assets/icons/static/minus.png");
+pub const HAMMER_ICON: &[u8] = include_bytes!("../../assets/icons/static/hammer.png");
 
 #[derive(Clone, Copy)]
 #[repr(u32)]
