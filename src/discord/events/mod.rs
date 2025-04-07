@@ -1,3 +1,4 @@
+mod ban_add;
 mod member_added;
 mod member_removed;
 mod message_create;
@@ -16,6 +17,8 @@ pub fn app_events() -> HashMap<EventType, EventCallback> {
     events.insert(member_added_event.event, member_added_event.reply);
     let member_removed_event = member_removed::member_removed();
     events.insert(member_removed_event.event, member_removed_event.reply);
+    let ban_add = ban_add::ban_add();
+    events.insert(ban_add.event, ban_add.reply);
     let message_create = message_create::message_create();
     events.insert(message_create.event, message_create.reply);
     let interaction_create = interaction_create::interaction_create();

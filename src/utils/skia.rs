@@ -1,4 +1,5 @@
 use fast_image_resize::{images::Image, PixelType, Resizer};
+use fontdue::layout::VerticalAlign;
 use fontdue::{
     layout::{CoordinateSystem, Layout, LayoutSettings, TextStyle},
     Font,
@@ -118,7 +119,7 @@ pub fn draw_circle_image(image: &Pixmap, radius: u32) -> Result<Pixmap, Error> {
     Ok(pixmap)
 }
 
-pub fn draw_text(text: &str, font_size: f32, font_bytes: &[u8]) -> Result<Pixmap, Error> {
+pub fn draw_text(text: &str, font_size: f32, font_bytes: &[u8], vertical_align: VerticalAlign) -> Result<Pixmap, Error> {
     // Load font from bytes
     let font = Font::from_bytes(font_bytes, FontSettings::default()).map_err(|err| {
         let msg = format!("Failed to load font from bytes.\n{}", err);
@@ -126,7 +127,7 @@ pub fn draw_text(text: &str, font_size: f32, font_bytes: &[u8]) -> Result<Pixmap
     })?;
 
     // Calculate total width and maximum height of the Pixmap
-    let (mut total_width, mut max_ascent, mut max_descent) = (0, 0, 0);
+    let (mut total_width, mut max_ascent, mut is_ascent_neg, mut max_descent) = (0, 0, false, 0);
     for c in text.chars() {
         // Rasterize character to get metrics
         let (metrics, _) = font.rasterize(c, font_size);
@@ -135,7 +136,8 @@ pub fn draw_text(text: &str, font_size: f32, font_bytes: &[u8]) -> Result<Pixmap
         total_width += metrics.advance_width as u32 + 1;
 
         // Track the highest ascent (above baseline)
-        max_ascent = max_ascent.max(metrics.ymin.abs() as u32);
+        is_ascent_neg = metrics.ymin < 0;
+        max_ascent = max_ascent.max(metrics.bounds.ymin.abs() as u32);
 
         // Track the largest descent (below baseline)
         max_descent = max_descent.max(metrics.height as u32 - metrics.ymin.abs() as u32);
@@ -145,18 +147,37 @@ pub fn draw_text(text: &str, font_size: f32, font_bytes: &[u8]) -> Result<Pixmap
     let total_height = max_ascent + max_descent;
 
     // Create the Pixmap based on the calculated dimensions
-    let mut pixmap = Pixmap::new(total_width, total_height).ok_or(Error::new(
+    let height = {
+        if total_height >= font_size as u32 {
+            total_height
+        } else { 
+            font_size as u32
+        }
+    };
+    let mut pixmap = Pixmap::new(total_width, height).ok_or(Error::new(
         ErrorKind::InvalidData,
         "Failed to create text Pixmap.",
     ))?;
 
     // Use Fontdue's Layout system to calculate glyph positions
     let mut layout = Layout::new(CoordinateSystem::PositiveYDown); // Y grows downwards
+    let center_offset = {
+        let ascent = max_ascent as f32 * if is_ascent_neg { 1.0 } else { -1.0 };
+        let offset = {
+            if (total_height - max_descent) == max_ascent {
+                ascent
+            } else {
+                (total_height - max_descent) as f32 - max_ascent as f32
+            }
+        };
+        ascent - offset
+    };
     layout.reset(&LayoutSettings {
-        x: 0.0,               // Starting X position
-        y: max_ascent as f32, // Start at the baseline (y = ascent)
-        max_width: None,      // No width limit
-        max_height: None,     // No height limit
+        x: 0.0,
+        y: center_offset,
+        max_width: None,
+        max_height: Some(font_size),
+        vertical_align: vertical_align.into(),
         ..LayoutSettings::default()
     });
 
@@ -189,10 +210,9 @@ pub fn draw_text(text: &str, font_size: f32, font_bytes: &[u8]) -> Result<Pixmap
         }
 
         // Draw the glyph on the main Pixmap at the correct position
-        let y = (glyph.y - (total_height as f32 / 2f32)).round() as i32;
         pixmap.draw_pixmap(
             glyph.x as i32,
-            y.max(0),
+            glyph.y.round() as i32,
             char_pixmap.as_ref(),
             &Default::default(),
             Transform::identity(),
