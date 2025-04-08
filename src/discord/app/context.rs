@@ -7,20 +7,19 @@ use tokio::sync::Mutex;
 use twilight_http::Client;
 use twilight_model::gateway::payload::incoming::MessageCreate;
 
-#[derive(Clone)]
 pub struct AppContext {
     pub client: Arc<Client>,
-    pub commands: Arc<Mutex<AppCommands>>,
-    pub events: Arc<Mutex<AppEvents>>,
-    pub scam_filter: Arc<Mutex<ScamFilter>>,
+    pub commands: AppCommands,
+    pub events: AppEvents,
+    pub scam_filter: ScamFilter,
 }
 
 impl AppContext {
     pub fn new() -> Result<Self, Error> {
         let client = Arc::new(Client::new(ENV_SCHEMA.bot_token.clone()));
-        let commands = Arc::new(Mutex::new(AppCommands::new()));
-        let events = Arc::new(Mutex::new(AppEvents::new()));
-        let scam_filter = Arc::new(Mutex::new(ScamFilter::new()?));
+        let commands = AppCommands::new();
+        let events = AppEvents::new();
+        let scam_filter = ScamFilter::new()?;
 
         Ok(Self {
             client,
@@ -31,7 +30,6 @@ impl AppContext {
     }
 }
 
-#[derive(Clone)]
 pub struct PrefixCommandContext {
     pub message: Box<MessageCreate>,
     pub client: Arc<Client>,

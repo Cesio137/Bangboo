@@ -10,8 +10,7 @@ use twilight_model::{
     },
 };
 
-pub type PrefixCommandCallback =
-    Box<dyn Fn(PrefixCommandContext) -> Pin<Box<dyn Future<Output = ()> + Send>> + Send>;
+pub type PrefixCommandCallback = Box<dyn Fn(PrefixCommandContext) -> Pin<Box<dyn Future<Output = ()> + Send>> + Send + Sync>;
 
 pub struct PrefixCommand {
     pub name: String,
@@ -20,7 +19,7 @@ pub struct PrefixCommand {
 
 pub fn create_prefix_command<F, Fut>(name: String, reply: F) -> PrefixCommand
 where
-    F: Fn(PrefixCommandContext) -> Fut + Send + 'static,
+    F: Fn(PrefixCommandContext) -> Fut + Send + Sync + 'static,
     Fut: Future<Output = ()> + Send + 'static,
 {
     PrefixCommand {
@@ -29,11 +28,7 @@ where
     }
 }
 
-pub type SlashCommandCallback = Box<
-    dyn Fn(Box<InteractionCreate>, Arc<Client>) -> Pin<Box<dyn Future<Output = ()> + Send>>
-        + Send
-        + 'static,
->;
+pub type SlashCommandCallback = Box<dyn Fn(Box<InteractionCreate>, Arc<Client>) -> Pin<Box<dyn Future<Output = ()> + Send>> + Send + Sync + 'static>;
 
 pub struct SlashCommand {
     pub command: Command,
@@ -42,7 +37,7 @@ pub struct SlashCommand {
 
 pub fn create_slash_command<F, Fut>(command: Command, reply: F) -> SlashCommand
 where
-    F: Fn(Box<InteractionCreate>, Arc<Client>) -> Fut + Send + 'static,
+    F: Fn(Box<InteractionCreate>, Arc<Client>) -> Fut + Send + Sync + 'static,
     Fut: Future<Output = ()> + Send + 'static,
 {
     SlashCommand {
@@ -51,9 +46,7 @@ where
     }
 }
 
-pub type EventCallback = Box<
-    dyn Fn(GatewayEvent, AppContext) -> Pin<Box<dyn Future<Output = ()> + Send>> + Send + 'static,
->;
+pub type EventCallback = Box<dyn Fn(GatewayEvent, Arc<AppContext>) -> Pin<Box<dyn Future<Output = ()> + Send>> + Send + Sync + 'static>;
 
 pub struct EventHandler {
     pub event: EventType,
@@ -62,7 +55,7 @@ pub struct EventHandler {
 
 pub fn create_event<F, Fut>(event: EventType, reply: F) -> EventHandler
 where
-    F: Fn(GatewayEvent, AppContext) -> Fut + Send + 'static,
+    F: Fn(GatewayEvent, Arc<AppContext>) -> Fut + Send + Sync + 'static,
     Fut: Future<Output = ()> + Send + 'static,
 {
     EventHandler {

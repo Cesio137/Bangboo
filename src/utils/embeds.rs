@@ -14,11 +14,7 @@ pub fn res(color: EColor, content: String) -> Embed {
         .build()
 }
 
-pub fn interaction_res(
-    color: EColor,
-    content: String,
-    interaction_type: InteractionResponseType,
-) -> InteractionResponse {
+pub fn interaction_res(color: EColor, content: String, interaction_type: InteractionResponseType) -> InteractionResponse {
     let embed = embed::EmbedBuilder::new()
         .color(color as u32)
         .description(content)

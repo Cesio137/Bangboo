@@ -1,20 +1,16 @@
-use crate::settings::global::EColor;
-use crate::utils::embeds::res;
-use crate::utils::logger::error;
-use anyhow::{Context, Error, Result};
+use crate::settings::global::{EColor, REGEX, SHORTLINKS};
+use crate::utils::{embeds::res, logger::error};
+use anyhow::{Context, Result};
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::{HashMap, HashSet};
 use std::str::FromStr;
-use std::sync::Arc;
 use twilight_http::Client;
-use twilight_model::gateway::payload::incoming::MessageCreate;
-use twilight_model::id::marker::{GuildMarker, UserMarker};
-use twilight_model::id::Id;
-
-const SHORTLINKS: &str = include_str!("../../resources/shortlinks.json");
-const REGEX: &str = r"(https?://(?:www\.)?(surl\.li|u\.to|t\.co|gclnk\.com|qptr\.ru|uclck\.ru|go-link\.ru|envs\.sh|shorter\.me|sc\.link|goo\.su|plhn\.pw|ej136\.cfd|f-link\.me|lnky\.ru|bitly\.cx))";
+use twilight_model::{
+    gateway::payload::incoming::MessageCreate,
+    id::{Id, marker::{GuildMarker, UserMarker}}
+};
 
 #[derive(Debug, Clone)]
 pub enum DangerLevel {
@@ -37,7 +33,7 @@ pub struct Report {
 }
 
 impl ScamFilter {
-    pub fn new() -> Result<Self, Error> {
+    pub fn new() -> Result<Self> {
         let json_data: Value = serde_json::from_str(SHORTLINKS)?;
         let shortlinks = json_data.as_object().context("Failed to parse JSON as object.")?;
 
@@ -84,7 +80,7 @@ impl ScamFilter {
         DangerLevel::Safe
     }
 
-    pub async fn handle_spam(&self, client: Arc<Client>, message: Box<MessageCreate>, report: Option<Report>) {
+    pub async fn handle_spam(&self, client: &Client, message: Box<MessageCreate>, report: Option<Report>) {
         let username = match &message.author.global_name {
             Some(name) => name.clone(),
             None => message.author.name.clone(),
@@ -123,7 +119,7 @@ impl ScamFilter {
             .find_map(|(link, report)| msg.contains(link).then(|| report.clone()))
     }
 
-    async fn kick_member(&self, client: Arc<Client>, guild_id: Id<GuildMarker>, user_id: Id<UserMarker>) {
+    async fn kick_member(&self, client: &Client, guild_id: Id<GuildMarker>, user_id: Id<UserMarker>) {
         let guild = match client.guild(guild_id).await {
             Ok(guild) => guild.model().await.unwrap(),
             Err(err) => {
@@ -144,7 +140,7 @@ impl ScamFilter {
         self.send_dm(client, user_id, "It look like you probably got hacked and sent a message that was flagged as scam. You were just kicked from the server, but feel free to come back as soon as you resolve the issue with your account.").await;
     }
 
-    async fn send_dm(&self, client: Arc<Client>, user_id: Id<UserMarker>, content: &str) {
+    async fn send_dm(&self, client: &Client, user_id: Id<UserMarker>, content: &str) {
         let channel = match client.create_private_channel(user_id).await {
             Ok(channel) => channel.model().await.unwrap(),
             Err(err) => {
