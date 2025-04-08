@@ -38,7 +38,7 @@ pub fn canvas_command() -> SlashCommand {
                 return;
             }
 
-            if let Err(err) = defer_reply(interaction.clone(), client.clone()).await {
+            if let Err(err) = defer_reply(interaction.clone(), &client).await {
                 error(format!("Error trying to responde /canvas command: {:?}", err).as_str());
                 return;
             };
