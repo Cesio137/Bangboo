@@ -1,38 +1,36 @@
-use std::sync::Arc;
-use crate::discord::app::context::PrefixCommandContext;
-use crate::discord::app::creators::{create_event, EventHandler};
+use crate::discord::app::context::AppContext;
 use crate::tools::automod::DangerLevel;
-use twilight_model::gateway::event::{Event, EventType};
+use std::sync::Arc;
+use twilight_model::gateway::payload::incoming::MessageCreate;
+use crate::discord::commands::prefix_commands;
 
-pub fn message_create() -> EventHandler {
-    create_event(EventType::MessageCreate, |event, context| async move {
-        let message = match event {
-            Event::MessageCreate(message) => message,
-            _ => return,
+pub async fn event(message: Box<MessageCreate>, context: Arc<AppContext>) {
+    if message.author.bot {
+        return;
+    }
+
+    if prefix_commands(&message.content, message.clone(), Arc::clone(&context.client)).await.is_some() {
+        return;
+    };
+
+    if message.guild_id.is_some() && !message.author.bot {
+        let result = context.scam_filter.filter_message(&message.content);
+        match result {
+            DangerLevel::Safe => {}
+            DangerLevel::High => {
+                context
+                    .scam_filter
+                    .handle_spam(&context.client, message, None)
+                    .await;
+                return;
+            }
+            DangerLevel::HighReport(report) => {
+                context
+                    .scam_filter
+                    .handle_spam(&context.client, message, Some(report))
+                    .await;
+                return;
+            }
         };
-        if message.author.bot { return; }
-
-        if let Some(callback) = context.commands.prefix_commands.get(message.content.as_str()) {
-            let ctx = PrefixCommandContext::new(message, Arc::clone(&context.client)).unwrap();
-            callback(ctx).await;
-            return
-        }
-
-        if message.guild_id.is_some() && !message.author.bot {
-            let result = context.scam_filter.filter_message(&message.content);
-            match result {
-                DangerLevel::Safe => {}
-                DangerLevel::High => {
-                    context.scam_filter.handle_spam(&context.client, message, None).await;
-                    return;
-                }
-                DangerLevel::HighReport(report) => {
-                    context.scam_filter.handle_spam(&context.client, message, Some(report)).await;
-                    return;
-                }
-            };
-        }
-
-
-    })
+    }
 }

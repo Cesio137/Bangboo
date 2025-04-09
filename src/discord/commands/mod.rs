@@ -1,32 +1,36 @@
 mod prefix;
 mod public;
 
-use crate::discord::app::creators::{PrefixCommandCallback, SlashCommand};
-use std::collections::HashMap;
+use twilight_model::gateway::payload::incoming::{InteractionCreate, MessageCreate};
+use std::sync::Arc;
+use twilight_http::Client;
+use twilight_model::application::command::Command;
+use crate::discord::commands::{prefix::ping, public::{age, canvas}};
 
-type PrefixCommandMap = HashMap<String, PrefixCommandCallback>;
-
-pub fn prefix_commands() -> HashMap<String, PrefixCommandCallback> {
-    let mut commands = PrefixCommandMap::new();
+pub fn commands() -> Vec<Command> {
+    let mut commands: Vec<Command> = Vec::new();
+    // Debug commands
+    if cfg!(debug_assertions) {
+        commands.push(canvas::command());
+    }
     // Add more commands here...
-    let ping = prefix::ping::ping_command();
-    commands.insert(ping.name, ping.reply);
+    commands.push(age::command());
 
     commands
 }
 
-type SlashCommandMap = HashMap<String, SlashCommand>;
-
-pub fn slash_commands() -> HashMap<String, SlashCommand> {
-    let mut commands = SlashCommandMap::new();
-    // Debug commands
-    if cfg!(debug_assertions) {
-        let canvas = public::canvas::canvas_command();
-        commands.insert(canvas.command.name.clone(), canvas);
+pub async fn slash_commands(name: &str, interaction: Box<InteractionCreate>, client: Arc<Client>) {
+    match name {
+        "age" => age::run(interaction, client).await,
+        "canvas" => if cfg!(debug_assertions) { canvas::run(interaction, client).await },
+        _ => {}
     }
-    // Add more commands here...
-    let age = public::age::age_command();
-    commands.insert(age.command.name.clone(), age);
+}
 
-    commands
+pub async fn prefix_commands(name: &str, message: Box<MessageCreate>, client: Arc<Client>) -> Option<()> {
+    match name {
+        "!ping" => ping::run(message, client).await,
+        _ => {return None}
+    }
+    Some(())
 }
