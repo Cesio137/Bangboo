@@ -102,6 +102,7 @@ pub fn draw_circle_image(image: &Pixmap, radius: u32) -> Result<Pixmap, Error> {
     );
 
     let mask = Mask::from_pixmap(pixelmap_mask.as_ref(), MaskType::Alpha);
+    drop(pixelmap_mask);
 
     let mut pixmap = Pixmap::new(size, size).ok_or(Error::new(
         ErrorKind::InvalidData,
@@ -121,7 +122,11 @@ pub fn draw_circle_image(image: &Pixmap, radius: u32) -> Result<Pixmap, Error> {
 
 pub fn draw_text(text: &str, font_size: f32, font_bytes: &[u8], vertical_align: VerticalAlign) -> Result<Pixmap, Error> {
     // Load font from bytes
-    let font = Font::from_bytes(font_bytes, FontSettings::default()).map_err(|err| {
+    let font_settings = FontSettings {
+        scale: font_size,
+        ..Default::default()
+    };
+    let font = Font::from_bytes(font_bytes, font_settings).map_err(|err| {
         let msg = format!("Failed to load font from bytes.\n{}", err);
         Error::new(ErrorKind::InvalidData, msg)
     })?;
@@ -219,6 +224,8 @@ pub fn draw_text(text: &str, font_size: f32, font_bytes: &[u8], vertical_align: 
             None,
         );
     }
+    drop(font);
+    drop(layout);
 
-    Ok(pixmap.to_owned())
+    Ok(pixmap)
 }

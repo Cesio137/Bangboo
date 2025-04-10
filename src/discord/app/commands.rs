@@ -1,38 +1,29 @@
-use crate::discord::{
-    app::creators::{PrefixCommandCallback, SlashCommand},
-    commands::{prefix_commands, slash_commands}
-};
+use crate::discord::commands::commands;
 use colored::Colorize;
-use std::collections::HashMap;
 use twilight_http::Client;
-use twilight_model::application::command::Command;
-use twilight_model::{id::marker::ApplicationMarker, id::Id};
+use twilight_model::{
+    application::command::Command,
+    id::marker::ApplicationMarker,
+    id::Id
+};
 
 pub struct AppCommands {
-    pub prefix_commands: HashMap<String, PrefixCommandCallback>,
-    pub slash_commands: HashMap<String, SlashCommand>,
+    pub slash_commands: Vec<Command>,
 }
 
 impl AppCommands {
     pub fn new() -> Self {
-        let prefix_commands = prefix_commands();
-        let slash_commands = slash_commands();
+        let slash_commands = commands();
         Self {
-            prefix_commands,
             slash_commands,
         }
     }
 
     pub async fn register_slash_commands(&self, client: &Client, id: Id<ApplicationMarker>) {
-        let commands: Vec<Command> = self
-            .slash_commands
-            .values()
-            .map(|value| value.command.clone())
-            .collect();
-        let result = client.interaction(id).set_global_commands(&commands).await;
+        let result = client.interaction(id).set_global_commands(&self.slash_commands).await;
         match result {
             Ok(_) => {
-                for cmd in commands.iter() {
+                for cmd in self.slash_commands.iter() {
                     println!(
                         "{} {} {} {}",
                         "✔".bright_green(),
@@ -44,7 +35,7 @@ impl AppCommands {
             }
             Err(err) => {
                 println!("{}", " <ERROR> ".on_red());
-                for cmd in commands.iter() {
+                for cmd in self.slash_commands.iter() {
                     println!(
                         "{} {} {} {}",
                         "✖".bright_red(),
@@ -60,6 +51,6 @@ impl AppCommands {
     }
 
     pub fn len(&self) -> usize {
-        self.prefix_commands.len() + self.slash_commands.len()
+        self.slash_commands.len()
     }
 }

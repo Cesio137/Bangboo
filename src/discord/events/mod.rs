@@ -4,25 +4,19 @@ mod member_removed;
 mod message_create;
 mod interaction_create;
 
-use super::app::creators::EventCallback;
-use std::collections::HashMap;
-use twilight_model::gateway::event::EventType;
+use super::app::context::AppContext;
+use anyhow::Result;
+use std::sync::Arc;
+use twilight_gateway::Event;
 
-type EventsMap = HashMap<EventType, EventCallback>;
-
-pub fn app_events() -> HashMap<EventType, EventCallback> {
-    let mut events = EventsMap::new();
-    // Add more commands here...
-    let member_added_event = member_added::member_added();
-    events.insert(member_added_event.event, member_added_event.reply);
-    let member_removed_event = member_removed::member_removed();
-    events.insert(member_removed_event.event, member_removed_event.reply);
-    let ban_add = ban_add::ban_add();
-    events.insert(ban_add.event, ban_add.reply);
-    let message_create = message_create::message_create();
-    events.insert(message_create.event, message_create.reply);
-    let interaction_create = interaction_create::interaction_create();
-    events.insert(interaction_create.event, interaction_create.reply);
-
-    events
+pub async fn app_events(event: Event, context: Arc<AppContext>) -> Result<()> {
+    match event {
+        Event::BanAdd(banadd) => ban_add::run(banadd, context).await?,
+        Event::InteractionCreate(interaction) => interaction_create::run(interaction, context).await?,
+        Event::MemberAdd(member) => member_added::run(member, context).await?,
+        Event::MemberRemove(member) => member_removed::run(member, context).await?,
+        Event::MessageCreate(message) => message_create::event(message, context).await?,
+        _ => {}
+    }
+    Ok(())
 }

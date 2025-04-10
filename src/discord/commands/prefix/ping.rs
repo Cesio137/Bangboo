@@ -1,16 +1,12 @@
-use crate::discord::app::creators::{create_prefix_command, PrefixCommand};
+use anyhow::Result;
+use std::sync::Arc;
+use twilight_http::Client;
+use twilight_model::gateway::payload::incoming::MessageCreate;
 
-pub fn ping_command() -> PrefixCommand {
-    create_prefix_command("!ping".to_string(), |context| async move {
-        if context.message.author.bot || context.message.guild_id.is_none() {
-            return;
-        }
+pub async fn run(message: Box<MessageCreate>, client: Arc<Client>) -> Result<()> {
+    if message.author.bot || message.guild_id.is_none() { return Ok(()); }
 
-        let channel_id = context.message.channel_id;
-        let result = context.client.create_message(channel_id).content("Pong 🏓").await;
-
-        if let Err(err) = result {
-            eprintln!("Error trying to responde !Ping command: {:?}", err);
-        }
-    })
+    let channel_id = message.channel_id;
+    client.create_message(channel_id).content("Pong 🏓").await?;
+    Ok(())
 }

@@ -1,23 +1,18 @@
 pub mod commands;
 pub mod context;
-pub mod creators;
-pub mod events;
 
-use crate::discord::app::commands::AppCommands;
-use crate::discord::app::context::AppContext;
-use crate::discord::app::events::AppEvents;
+use crate::discord::app::{
+    commands::AppCommands,
+    context::AppContext
+};
 use crate::settings::env::ENV_SCHEMA;
-use crate::tools::automod::ScamFilter;
 use colored::Colorize;
-use std::error::Error;
-use std::sync::Arc;
-use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::{atomic::{AtomicBool, Ordering}, Arc};
 use tokio::signal;
-use twilight_cache_inmemory::{DefaultInMemoryCache, ResourceType};
-use twilight_gateway::{Config, Event, EventTypeFlags, Intents, Shard, ShardId, StreamExt as _};
-use twilight_http::Client;
+use twilight_gateway::{Config, Event, EventTypeFlags, Intents, Shard, StreamExt as _};
 use twilight_model::gateway::CloseFrame;
-use crate::discord::app::creators::EventCallback;
+
+use super::events::app_events;
 
 pub struct App;
 
@@ -73,23 +68,23 @@ impl App {
 
             match event {
                 Event::Ready(ready) => {
-                    context.commands.register_slash_commands(&context.client, ready.application.id).await;
+                    let commands = AppCommands::new();
+                    commands.register_slash_commands(&context.client, ready.application.id).await;
                     println!("\n{} {}", "➡ Online as".green(), ready.user.name.bright_green());
-                    println!("{} {} {}", "⤿".bright_green(), context.commands.len().to_string().green(), "command(s) successfully registered globally!".green());
+                    println!("{} {} {}", "⤿".bright_green(), commands.len().to_string().green(), "command(s) successfully registered globally!".green());
                 }
                 _ => {
-                    tokio::spawn(App::event_handler(event, context.clone()));
+                    let ctx = Arc::clone(&context);
+                    tokio::spawn(async move {
+                        if let Err(error) = app_events(event, ctx).await {
+                            tracing::warn!(?error, "error processing event");
+                        };
+                    });
                 }
             }
             // You'd normally want to spawn a new tokio task for each event and
             // handle the event there to not block the shard.
             //tracing::debug!(?event, shard = ?shard.id(), "received event");
-        }
-    }
-
-    async fn event_handler(event: Event, context: Arc<AppContext>) {
-        if let Some(callback) = context.events.events.get(&event.kind()) {
-            callback(event, Arc::clone(&context)).await;
         }
     }
 }

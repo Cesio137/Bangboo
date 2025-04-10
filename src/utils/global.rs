@@ -12,6 +12,7 @@ use twilight_util::snowflake::Snowflake;
 
 pub async fn global_message(event: EventType, user: &User, joined_at: Option<Timestamp>) -> Result<Vec<u8>> {
     let mut pixmap = Pixmap::new(1024, 260).ok_or_else(|| anyhow!("Failed to create pixelmap."))?;
+    let paint = PixmapPaint::default();
     // Path
     let (background, icon_action) = match event {
         EventType::MemberAdd => (JOIN_IMG, ADD_ICON),
@@ -28,10 +29,11 @@ pub async fn global_message(event: EventType, user: &User, joined_at: Option<Tim
         0,
         0,
         background_image.as_ref(),
-        &Default::default(),
+        &paint,
         Transform::identity(),
         None,
     );
+    drop(background_image);
 
     // Avatar
     let avatar_hash = user
@@ -49,14 +51,16 @@ pub async fn global_message(event: EventType, user: &User, joined_at: Option<Tim
         },
     };
     let avatar_image = draw_circle_image(&avatar, 90)?;
+    drop(avatar);
     pixmap.draw_pixmap(
         61,
         40,
         avatar_image.as_ref(),
-        &Default::default(),
+        &paint,
         Transform::identity(),
         None,
     );
+    drop(avatar_image);
 
     // Avatar action icon
     let action_icon = load_image_from_bytes(icon_action)?;
@@ -64,10 +68,11 @@ pub async fn global_message(event: EventType, user: &User, joined_at: Option<Tim
         197,
         171,
         action_icon.as_ref(),
-        &Default::default(),
+        &paint,
         Transform::identity(),
         None,
     );
+    drop(action_icon);
 
     // Welcome message
     if event == EventType::MemberAdd {
@@ -98,10 +103,11 @@ pub async fn global_message(event: EventType, user: &User, joined_at: Option<Tim
             x_pos,
             68,
             welcome_pixmap.as_ref(),
-            &Default::default(),
+            &paint,
             Transform::identity(),
             None,
         );
+        drop(welcome_pixmap);
     }
 
     // Render text
@@ -110,10 +116,11 @@ pub async fn global_message(event: EventType, user: &User, joined_at: Option<Tim
         300,
         110,
         name_pixmap.as_ref(),
-        &Default::default(),
+        &paint,
         Transform::identity(),
         None,
     );
+    drop(name_pixmap);
     let undefined_nick = "Undefined".to_string();
     let nickname = user.global_name.as_ref().unwrap_or(&undefined_nick);
     let nick_pixmap = draw_text(&format!("@{}", nickname), 32f32, LATO, VerticalAlign::Bottom)?;
@@ -121,13 +128,14 @@ pub async fn global_message(event: EventType, user: &User, joined_at: Option<Tim
         300,
         170,
         nick_pixmap.as_ref(),
-        &Default::default(),
+        &paint,
         Transform::identity(),
         None,
     );
+    drop(nick_pixmap);
 
     // Save as PNG buffer
-    let buffer = image::RgbaImage::from_raw(1024, 260, pixmap.data().to_vec())
+    let buffer = image::RgbaImage::from_raw(1024, 260, pixmap.take())
         .ok_or_else(|| anyhow!("Image buffer allocation failed"))?;
 
     let mut png_buffer: Vec<u8> = Vec::new();
