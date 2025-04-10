@@ -1,4 +1,4 @@
-use std::io::Error;
+use anyhow::Result;
 use twilight_http::Client;
 use twilight_model::{
     application::interaction::application_command::{CommandData, CommandDataOption},
@@ -6,19 +6,15 @@ use twilight_model::{
     http::interaction::{InteractionResponse, InteractionResponseType},
 };
 
-pub async fn defer_reply(interaction: Box<InteractionCreate>, client: &Client) -> Result<(), Error> {
+pub async fn defer_reply(interaction: Box<InteractionCreate>, client: &Client) -> Result<()> {
     let response = InteractionResponse {
         kind: InteractionResponseType::DeferredChannelMessageWithSource,
         data: None,
     };
-    client
-        .interaction(interaction.application_id)
+    client.interaction(interaction.application_id)
         .create_response(interaction.id, &interaction.token, &response)
-        .await
-        .map_err(|err| {
-            let msg = err.to_string();
-            Error::new(std::io::ErrorKind::ConnectionRefused, msg)
-        })?;
+        .await?;
+
     Ok(())
 }
 

@@ -1,6 +1,6 @@
 use crate::settings::global::{EColor, REGEX, SHORTLINKS};
-use crate::utils::{embeds::res, logger::error};
-use anyhow::{Context, Result};
+use crate::utils::embeds::res;
+use anyhow::{anyhow, Context, Result};
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -9,7 +9,7 @@ use std::str::FromStr;
 use twilight_http::Client;
 use twilight_model::{
     gateway::payload::incoming::MessageCreate,
-    id::{Id, marker::{GuildMarker, UserMarker}}
+    id::{marker::{GuildMarker, UserMarker}, Id}
 };
 
 #[derive(Debug, Clone)]
@@ -80,7 +80,7 @@ impl ScamFilter {
         DangerLevel::Safe
     }
 
-    pub async fn handle_spam(&self, client: &Client, message: Box<MessageCreate>, report: Option<Report>) {
+    pub async fn handle_spam(&self, client: &Client, message: Box<MessageCreate>, report: Option<Report>) -> Result<()> {
         let username = match &message.author.global_name {
             Some(name) => name.clone(),
             None => message.author.name.clone(),
@@ -95,23 +95,21 @@ impl ScamFilter {
         }
         let embed = res(EColor::Warning, warn);
 
-        if let Err(err) = client.create_message(channel_id).reply(message_id).embeds(&vec![embed]).await {
-            error(&format!("Error trying to reply scam message.\n{:?}", err));
-        }
-        if let Err(err) = client.delete_message(channel_id, message_id).await {
-            error(&format!("Error trying to delete scam message.\n{:?}", err));
-        }
+        client.create_message(channel_id).reply(message_id).embeds(&vec![embed]).await?;
+
+        client.delete_message(channel_id, message_id).await?;
 
         let guild_id = match message.guild_id {
             Some(guild_id) => guild_id,
             None => {
-                error("Message is not from a guild");
-                return;
+                return Err(anyhow!("Message is not from a guild"));
             }
         };
         let user_id = message.author.id;
 
-        self.kick_member(client, guild_id, user_id).await;
+        self.kick_member(client, guild_id, user_id).await?;
+
+        Ok(())
     }
 
     fn check_scamlinks(&self, msg: &str) -> Option<Report> {
@@ -119,39 +117,25 @@ impl ScamFilter {
             .find_map(|(link, report)| msg.contains(link).then(|| report.clone()))
     }
 
-    async fn kick_member(&self, client: &Client, guild_id: Id<GuildMarker>, user_id: Id<UserMarker>) {
-        let guild = match client.guild(guild_id).await {
-            Ok(guild) => guild.model().await.unwrap(),
-            Err(err) => {
-                error(&format!("Error getting guild: {:?}", err));
-                return;
-            }
-        };
+    async fn kick_member(&self, client: &Client, guild_id: Id<GuildMarker>, user_id: Id<UserMarker>) -> Result<()> {
+        let guild = client.guild(guild_id).await?.model().await?;
 
         if guild.owner_id == user_id {
-            error(&format!("Tried to kick the owner of the guild: {}", user_id));
-            return;
+            return Err(anyhow!("Tried to kick the owner of the guild: {}", user_id));
         }
 
-        if let Err(err) = client.remove_guild_member(guild_id, user_id).await {
-            error(&format!("Error kicking member: {:?}", err));
-        }
+        client.remove_guild_member(guild_id, user_id).await?;
 
-        self.send_dm(client, user_id, "It look like you probably got hacked and sent a message that was flagged as scam. You were just kicked from the server, but feel free to come back as soon as you resolve the issue with your account.").await;
+        self.send_dm(client, user_id, "It look like you probably got hacked and sent a message that was flagged as scam. You were just kicked from the server, but feel free to come back as soon as you resolve the issue with your account.").await?;
+        Ok(())
     }
 
-    async fn send_dm(&self, client: &Client, user_id: Id<UserMarker>, content: &str) {
-        let channel = match client.create_private_channel(user_id).await {
-            Ok(channel) => channel.model().await.unwrap(),
-            Err(err) => {
-                error(&format!("Error creating DM channel: {:?}", err));
-                return;
-            }
-        };
+    async fn send_dm(&self, client: &Client, user_id: Id<UserMarker>, content: &str) -> Result<()> {
+        let channel = client.create_private_channel(user_id).await?;
+        let channel_id = channel.model().await?.id;
 
         let embed = res(EColor::Warning, content.to_string());
-        if let Err(err) = client.create_message(channel.id).embeds(&vec![embed]).await {
-            error(&format!("Error sending DM: {:?}", err));
-        }
+        client.create_message(channel_id).embeds(&vec![embed]).await?;
+        Ok(())
     }
 }

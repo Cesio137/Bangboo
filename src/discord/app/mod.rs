@@ -6,17 +6,10 @@ use crate::discord::app::{
     context::AppContext
 };
 use crate::settings::env::ENV_SCHEMA;
-use crate::tools::automod::ScamFilter;
 use colored::Colorize;
-use std::{
-    error::Error,
-    result,
-    sync::{atomic::{AtomicBool, Ordering}, Arc}
-};
+use std::sync::{atomic::{AtomicBool, Ordering}, Arc};
 use tokio::signal;
-use twilight_cache_inmemory::{DefaultInMemoryCache, ResourceType};
-use twilight_gateway::{Config, Event, EventTypeFlags, Intents, Shard, ShardId, StreamExt as _};
-use twilight_http::Client;
+use twilight_gateway::{Config, Event, EventTypeFlags, Intents, Shard, StreamExt as _};
 use twilight_model::gateway::CloseFrame;
 
 use super::events::app_events;
@@ -83,7 +76,9 @@ impl App {
                 _ => {
                     let ctx = Arc::clone(&context);
                     tokio::spawn(async move {
-                        app_events(event, ctx).await;
+                        if let Err(error) = app_events(event, ctx).await {
+                            tracing::warn!(?error, "error processing event");
+                        };
                     });
                 }
             }

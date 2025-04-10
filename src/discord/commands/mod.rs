@@ -1,11 +1,15 @@
 mod prefix;
 mod public;
 
-use twilight_model::gateway::payload::incoming::{InteractionCreate, MessageCreate};
+use crate::discord::commands::{prefix::ping, public::{age, canvas}};
+use anyhow::Result;
+use std::pin::Pin;
 use std::sync::Arc;
 use twilight_http::Client;
 use twilight_model::application::command::Command;
-use crate::discord::commands::{prefix::ping, public::{age, canvas}};
+use twilight_model::gateway::payload::incoming::{InteractionCreate, MessageCreate};
+
+//type AsyncCommandFn = Box<dyn Fn(Box<InteractionCreate>, Arc<Client>) -> Pin<Box<dyn Future<Output = Result<()>> + Send>> + Send + Sync>;
 
 pub fn commands() -> Vec<Command> {
     let mut commands: Vec<Command> = Vec::new();
@@ -19,18 +23,19 @@ pub fn commands() -> Vec<Command> {
     commands
 }
 
-pub async fn slash_commands(name: &str, interaction: Box<InteractionCreate>, client: Arc<Client>) {
+pub async fn slash_commands(name: &str, interaction: Box<InteractionCreate>, client: Arc<Client>) -> Result<()> {
     match name {
-        "age" => age::run(interaction, client).await,
-        "canvas" => if cfg!(debug_assertions) { canvas::run(interaction, client).await },
+        "age" => age::run(interaction, client).await?,
+        "canvas" => if cfg!(debug_assertions) { canvas::run(interaction, client).await? },
         _ => {}
     }
+    Ok(())
 }
 
-pub async fn prefix_commands(name: &str, message: Box<MessageCreate>, client: Arc<Client>) -> Option<()> {
+pub async fn prefix_commands(name: &str, message: Box<MessageCreate>, client: Arc<Client>) -> Result<()> {
     match name {
-        "!ping" => ping::run(message, client).await,
-        _ => {return None}
+        "!ping" => ping::run(message, client).await?,
+        _ => {}
     }
-    Some(())
+    Ok(())
 }

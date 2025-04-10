@@ -1,6 +1,7 @@
 use crate::discord::app::context::AppContext;
 use crate::settings::global::EColor;
-use crate::utils::{embeds::res, global::global_message, logger::*};
+use crate::utils::{embeds::res, global::global_message};
+use anyhow::{anyhow, Result};
 use std::sync::Arc;
 use twilight_model::gateway::payload::incoming::MemberRemove;
 use twilight_model::{
@@ -8,51 +9,36 @@ use twilight_model::{
     http::attachment::Attachment,
 };
 
-pub async fn run(member: MemberRemove, context: Arc<AppContext>) {
-    if member.user.bot { return; }
+pub async fn run(member: MemberRemove, context: Arc<AppContext>) -> Result<()> {
+    if member.user.bot { return Ok(()); }
 
-    let channel_id = match context.client.guild(member.guild_id).await {
-        Ok(response) => {
-            match response.model().await.ok().and_then(|guild| guild.system_channel_id) {
-                Some(channel_id) => channel_id,
-                None => {
-                    error("Error getting system message channel".to_string().as_str());
-                    return
-                }
-            }
-        },
-        Err(err) => {
-            error(format!("Error getting system message channel\n{:?}", err).as_str());
-            return
-        },
+    let channel_id = context.client.guild(member.guild_id).await?;
+    let guild = channel_id.model().await?;
+    let system_channel_id = match guild.system_channel_id {
+        Some(id) => id,
+        None => return Err(anyhow!("Error getting system message channel.")),
     };
 
-    let canvas = global_message(EventType::MemberRemove, &member.user, None).await;
-    if let Ok(buffer) = canvas {
+    if let Ok(canvas) = global_message(EventType::MemberRemove, &member.user, None).await {
         let result = context.client
-            .create_message(channel_id)
+            .create_message(system_channel_id)
             .attachments(&vec![Attachment::from_bytes(
                 "welcome.png".to_string(),
-                buffer,
+                canvas,
                 1,
             )])
-            .await;
+            .await?;
 
-        if let Err(err) = result {
-            error(format!("Error trying to responde MemberRemoved event: {:?}", err).as_str());
-        }
-        return;
+        return Ok(());
     }
 
     let name = &member.user.name;
     let message = format!("{} left the server!", name);
     let embed_res = res(EColor::Danger, message);
-    let result = context.client
-        .create_message(channel_id)
+    context.client
+        .create_message(system_channel_id)
         .embeds(&[embed_res])
-        .await;
+        .await?;
 
-    if let Err(err) = result {
-        error(format!("Error trying to responde MemberRemoved event: {:?}", err).as_str());
-    }
+    Ok(())
 }

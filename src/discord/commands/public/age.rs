@@ -1,5 +1,6 @@
 use crate::settings::global::EColor;
-use crate::utils::{embeds::interaction_res, interaction::get_options, logger::error};
+use crate::utils::{embeds::interaction_res, interaction::get_options};
+use anyhow::Result;
 use chrono::DateTime;
 use std::sync::Arc;
 use twilight_http::Client;
@@ -25,7 +26,7 @@ pub fn command() -> Command {
         .build()
 }
 
-pub async fn run(interaction: Box<InteractionCreate>, client: Arc<Client>) {
+pub async fn run(interaction: Box<InteractionCreate>, client: Arc<Client>) -> Result<()> {
     if interaction.guild_id.is_none() {
         let response = interaction_res(
             EColor::Danger,
@@ -33,15 +34,11 @@ pub async fn run(interaction: Box<InteractionCreate>, client: Arc<Client>) {
             InteractionResponseType::ChannelMessageWithSource,
         );
 
-        if let Err(err) = client
-            .interaction(interaction.application_id)
+        client.interaction(interaction.application_id)
             .create_response(interaction.id, &interaction.token, &response)
-            .await
-        {
-            error(&format!("Error responding to /age command: {:?}", err));
-        }
+            .await?;
 
-        return;
+        return Ok(());
     }
     let mut color = EColor::Green;
     let mut age = None;
@@ -90,11 +87,9 @@ pub async fn run(interaction: Box<InteractionCreate>, client: Arc<Client>) {
         InteractionResponseType::ChannelMessageWithSource,
     );
 
-    if let Err(err) = client
-        .interaction(interaction.application_id)
+    client.interaction(interaction.application_id)
         .create_response(interaction.id, &interaction.token, &response)
-        .await
-    {
-        error(&format!("Error responding to /age command: {:?}", err));
-    }
+        .await?;
+
+    Ok(())
 }

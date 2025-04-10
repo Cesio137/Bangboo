@@ -2,20 +2,17 @@ use crate::discord::{
     app::context::AppContext,
     commands::slash_commands
 };
-use crate::utils::logger::*;
+use anyhow::{anyhow, Result};
 use std::sync::Arc;
 use twilight_model::{
     application::interaction::InteractionData::ApplicationCommand,
     gateway::payload::incoming::InteractionCreate
 };
 
-pub async fn run(interaction: Box<InteractionCreate>, context: Arc<AppContext>) {
+pub async fn run(interaction: Box<InteractionCreate>, context: Arc<AppContext>) -> Result<()> {
     let data = match &interaction.data {
         Some(data) => data,
-        None => {
-            error("Failed to get interaction data.");
-            return;
-        }
+        None => return Err(anyhow!("Failed to get interaction data.")),
     };
     match data {
         ApplicationCommand(command_data) => {
@@ -23,4 +20,6 @@ pub async fn run(interaction: Box<InteractionCreate>, context: Arc<AppContext>) 
         }
         _ => {}
     }
+
+    Ok(())
 }
