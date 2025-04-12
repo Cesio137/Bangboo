@@ -4,7 +4,7 @@ use crate::utils::{embeds::res, global::global_message};
 use anyhow::{anyhow, Result};
 use std::sync::Arc;
 use twilight_model::{
-    gateway::{payload::incoming::MemberAdd, event::EventType},
+    gateway::{event::EventType, payload::incoming::MemberAdd},
     http::attachment::Attachment,
 };
 
