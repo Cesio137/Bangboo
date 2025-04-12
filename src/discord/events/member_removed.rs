@@ -3,9 +3,8 @@ use crate::settings::global::EColor;
 use crate::utils::{embeds::res, global::global_message};
 use anyhow::{anyhow, Result};
 use std::sync::Arc;
-use twilight_model::gateway::payload::incoming::MemberRemove;
 use twilight_model::{
-    gateway::event::EventType,
+    gateway::{event::EventType, payload::incoming::MemberRemove},
     http::attachment::Attachment,
 };
 
@@ -20,7 +19,7 @@ pub async fn run(member: MemberRemove, context: Arc<AppContext>) -> Result<()> {
     };
 
     if let Ok(canvas) = global_message(EventType::MemberRemove, &member.user, None).await {
-        let result = context.client
+        context.client
             .create_message(system_channel_id)
             .attachments(&vec![Attachment::from_bytes(
                 "welcome.png".to_string(),

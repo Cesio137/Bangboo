@@ -3,13 +3,12 @@ mod public;
 
 use crate::discord::commands::{prefix::ping, public::{age, canvas}};
 use anyhow::Result;
-use std::pin::Pin;
 use std::sync::Arc;
 use twilight_http::Client;
-use twilight_model::application::command::Command;
-use twilight_model::gateway::payload::incoming::{InteractionCreate, MessageCreate};
-
-//type AsyncCommandFn = Box<dyn Fn(Box<InteractionCreate>, Arc<Client>) -> Pin<Box<dyn Future<Output = Result<()>> + Send>> + Send + Sync>;
+use twilight_model::{
+    application::command::Command,
+    gateway::payload::incoming::{InteractionCreate, MessageCreate}
+};
 
 pub fn commands() -> Vec<Command> {
     let mut commands: Vec<Command> = Vec::new();

@@ -3,16 +3,15 @@ pub mod context;
 
 use crate::discord::app::{
     commands::AppCommands,
-    context::AppContext
+    context::AppContext,
 };
+use super::events::app_events;
 use crate::settings::env::ENV_SCHEMA;
 use colored::Colorize;
 use std::sync::{atomic::{AtomicBool, Ordering}, Arc};
 use tokio::signal;
 use twilight_gateway::{Config, Event, EventTypeFlags, Intents, Shard, StreamExt as _};
 use twilight_model::gateway::CloseFrame;
-
-use super::events::app_events;
 
 pub struct App;
 
@@ -36,7 +35,7 @@ impl App {
 
         for shard in shards {
             senders.push(shard.sender());
-            tasks.push(tokio::spawn(App::runner(shard, Arc::clone(&context))));
+            tasks.push(tokio::task::spawn(App::runner(shard, Arc::clone(&context))));
         }
 
         signal::ctrl_c().await?;
@@ -75,10 +74,14 @@ impl App {
                 }
                 _ => {
                     let ctx = Arc::clone(&context);
-                    tokio::spawn(async move {
+                    let _ = tokio::task::spawn(async move {
                         if let Err(error) = app_events(event, ctx).await {
                             tracing::warn!(?error, "error processing event");
                         };
+                        #[cfg(not(target_os = "windows"))]
+                        unsafe {
+                            libc::malloc_trim(0);
+                        }
                     });
                 }
             }

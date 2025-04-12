@@ -5,7 +5,6 @@ use regex::Regex;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::{HashMap, HashSet};
-use std::str::FromStr;
 use twilight_http::Client;
 use twilight_model::{
     gateway::payload::incoming::MessageCreate,

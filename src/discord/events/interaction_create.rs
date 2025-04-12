@@ -16,7 +16,7 @@ pub async fn run(interaction: Box<InteractionCreate>, context: Arc<AppContext>) 
     };
     match data {
         ApplicationCommand(command_data) => {
-            slash_commands(&command_data.name, interaction.clone(), Arc::clone(&context.client)).await;
+            slash_commands(&command_data.name, interaction.clone(), Arc::clone(&context.client)).await?;
         }
         _ => {}
     }
