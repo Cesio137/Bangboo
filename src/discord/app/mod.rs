@@ -7,6 +7,8 @@ use crate::discord::app::{
 };
 use super::events::app_events;
 use crate::settings::env::ENV_SCHEMA;
+#[cfg(target_env = "gnu")]
+use crate::utils::malloc::*;
 use colored::Colorize;
 use std::sync::{atomic::{AtomicBool, Ordering}, Arc};
 use tokio::signal;
@@ -61,6 +63,8 @@ impl App {
                 Ok(event) => event,
                 Err(source) => {
                     tracing::warn!(?source, "error receiving event");
+                    #[cfg(target_env = "gnu")]
+                    malloc::trim();
                     continue;
                 }
             };
@@ -71,6 +75,8 @@ impl App {
                     commands.register_slash_commands(&context.client, ready.application.id).await;
                     println!("\n{} {}", "➡ Online as".green(), ready.user.name.bright_green());
                     println!("{} {} {}", "⤿".bright_green(), commands.len().to_string().green(), "command(s) successfully registered globally!".green());
+                    #[cfg(target_env = "gnu")]
+                    malloc::trim();
                 }
                 _ => {
                     let ctx = Arc::clone(&context);
@@ -78,10 +84,8 @@ impl App {
                         if let Err(error) = app_events(event, ctx).await {
                             tracing::warn!(?error, "error processing event");
                         };
-                        #[cfg(not(target_os = "windows"))]
-                        unsafe {
-                            libc::malloc_trim(0);
-                        }
+                        #[cfg(target_env = "gnu")]
+                        malloc::trim();
                     });
                 }
             }
