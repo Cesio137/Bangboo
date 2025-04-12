@@ -6,8 +6,10 @@ use image::codecs::png::{CompressionType, FilterType, PngEncoder};
 use std::time::{SystemTime, UNIX_EPOCH};
 use tiny_skia::*;
 use twilight_gateway::EventType;
-use twilight_model::user::User;
-use twilight_model::util::Timestamp;
+use twilight_model::{
+    user::User,
+    util::Timestamp
+};
 use twilight_util::snowflake::Snowflake;
 
 pub async fn global_message(event: EventType, user: &User, joined_at: Option<Timestamp>) -> Result<Vec<u8>> {

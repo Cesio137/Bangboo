@@ -1,5 +1,4 @@
 use crate::discord::app::context::AppContext;
-use crate::discord::commands::prefix_commands;
 use crate::tools::automod::DangerLevel;
 use anyhow::Result;
 use std::sync::Arc;
@@ -23,7 +22,9 @@ pub async fn event(message: Box<MessageCreate>, context: Arc<AppContext>) -> Res
         }
     }
 
-    prefix_commands(&message.content, message.clone(), Arc::clone(&context.client)).await?;
+    if let Some(callback) = context.commands.prefix_commands.get(&message.content) {
+        callback(message.clone(), Arc::clone(&context.client)).await?;
+    }
 
     Ok(())
 }

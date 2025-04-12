@@ -1,7 +1,6 @@
 use fast_image_resize::{images::Image, PixelType, Resizer};
-use fontdue::layout::VerticalAlign;
 use fontdue::{
-    layout::{CoordinateSystem, Layout, LayoutSettings, TextStyle},
+    layout::{CoordinateSystem, Layout, LayoutSettings, TextStyle, VerticalAlign},
     Font,
     FontSettings
 };
