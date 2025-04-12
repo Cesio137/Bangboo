@@ -4,10 +4,9 @@ use anyhow::Result;
 use chrono::DateTime;
 use std::sync::Arc;
 use twilight_http::Client;
-use twilight_model::application::command::Command;
-use twilight_model::gateway::payload::incoming::InteractionCreate;
 use twilight_model::{
-    application::{command::CommandType, interaction::application_command::CommandOptionValue},
+    application::{command::Command, command::CommandType, interaction::application_command::CommandOptionValue},
+    gateway::payload::incoming::InteractionCreate,
     http::interaction::InteractionResponseType,
 };
 use twilight_util::{

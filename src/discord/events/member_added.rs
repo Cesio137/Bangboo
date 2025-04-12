@@ -3,9 +3,8 @@ use crate::settings::global::EColor;
 use crate::utils::{embeds::res, global::global_message};
 use anyhow::{anyhow, Result};
 use std::sync::Arc;
-use twilight_model::gateway::payload::incoming::MemberAdd;
 use twilight_model::{
-    gateway::event::EventType,
+    gateway::{payload::incoming::MemberAdd, event::EventType},
     http::attachment::Attachment,
 };
 
