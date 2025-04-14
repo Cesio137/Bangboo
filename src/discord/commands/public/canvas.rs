@@ -2,7 +2,6 @@ use crate::discord::app::creators::{create_slash_command, SlashCommand};
 use crate::settings::global::EColor;
 use crate::utils::{
     embeds::*,
-    global::*,
     interaction::*
 };
 use anyhow::anyhow;
@@ -12,6 +11,7 @@ use twilight_model::{
     http::{attachment::Attachment, interaction::InteractionResponseType},
 };
 use twilight_util::builder::command::CommandBuilder;
+use crate::utils::global::global_message;
 
 pub fn canvas_command() -> SlashCommand {
     create_slash_command(

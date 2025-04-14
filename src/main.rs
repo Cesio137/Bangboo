@@ -2,6 +2,7 @@ mod discord;
 mod settings;
 mod tools;
 mod utils;
+mod models;
 
 use crate::discord::app::App;
 #[cfg(target_env = "gnu")]
@@ -12,5 +13,7 @@ async fn main() {
     #[cfg(target_env = "gnu")]
     malloc::limit_mmap_threshold();
 
-    let _ = App::bootstrap().await;
+    if let Err(err) = App::bootstrap().await {
+        tracing::error!("{}", err);
+    }
 }

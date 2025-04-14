@@ -13,7 +13,6 @@ pub async fn run(interaction: Box<InteractionCreate>, context: Arc<AppContext>) 
     };
     match data {
         ApplicationCommand(command_data) => {
-            //slash_commands(&command_data.name, interaction.clone(), Arc::clone(&context.client)).await?;
             if let Some(callback) = context.commands.slash_commands.get(&command_data.name) {
                 callback(interaction.clone(), Arc::clone(&context.client)).await?;
             }

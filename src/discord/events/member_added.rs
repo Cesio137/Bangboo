@@ -1,6 +1,6 @@
 use crate::discord::app::context::AppContext;
 use crate::settings::global::EColor;
-use crate::utils::{embeds::res, global::global_message};
+use crate::utils::{global::global_message, embeds::res};
 use anyhow::{anyhow, Result};
 use std::sync::Arc;
 use twilight_model::{
