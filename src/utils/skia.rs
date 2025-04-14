@@ -1,8 +1,7 @@
 use crate::models::skia::{Canvas as SkCanvas, Image as SkImage, Surface as SkSurface};
 use anyhow::{anyhow, Result};
 use skia_safe::{
-    textlayout::{FontCollection, ParagraphBuilder, ParagraphStyle, TextStyle, TypefaceFontProvider},
-    scalar, surfaces, Data, FontMgr, Image, Paint, Point, Rect, Size
+    scalar, surfaces, textlayout::{FontCollection, ParagraphBuilder, ParagraphStyle, TextStyle, TypefaceFontProvider}, CubicResampler, Data, FilterMode, FontMgr, Image, Paint, Point, Rect, SamplingOptions, Size
 };
 
 pub fn load_image_from_bytes(slice: &[u8]) -> Result<SkImage> {
@@ -17,13 +16,19 @@ pub fn resize_image(image: SkImage, new_width: u32, new_height: u32) -> Result<S
     let canvas = SkCanvas(surface.0.canvas());
 
     let size = Rect::from_size(Size::new(new_width as f32, new_height as f32));
+
+    let mut sampling = SamplingOptions::default();
+    sampling.cubic = CubicResampler::mitchell();
+    sampling.filter = FilterMode::Linear;
+
     let mut paint = Paint::default();
     paint.set_anti_alias(true);
 
-    canvas.0.draw_image_rect(
+    canvas.0.draw_image_rect_with_sampling_options(
         image.0,
         None,
         size,
+        sampling,
         &paint,
     );
 
