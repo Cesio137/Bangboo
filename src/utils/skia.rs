@@ -1,230 +1,64 @@
-use fast_image_resize::{images::Image, PixelType, Resizer};
-use fontdue::{
-    layout::{CoordinateSystem, Layout, LayoutSettings, TextStyle, VerticalAlign},
-    Font,
-    FontSettings
-};
-use image::{DynamicImage, GenericImageView, ImageReader};
-use std::io::{Error, ErrorKind};
-use tiny_skia::{
-    FillRule, IntSize, Mask, MaskType, Paint, PathBuilder, Pixmap, PixmapPaint, Transform,
+use crate::models::skia::{Canvas as SkCanvas, Image as SkImage, Surface as SkSurface};
+use anyhow::{anyhow, Result};
+use skia_safe::{
+    scalar, surfaces, textlayout::{FontCollection, ParagraphBuilder, ParagraphStyle, TextStyle, TypefaceFontProvider}, CubicResampler, Data, FilterMode, FontMgr, Image, Paint, Point, Rect, SamplingOptions, Size
 };
 
-pub fn convert_image_to_pixmap(img: DynamicImage) -> Result<Pixmap, Error> {
-    let rgba = img.to_rgba8();
-    let (width, height) = img.dimensions();
-    let size = IntSize::from_wh(width, height).ok_or(Error::new(
-        ErrorKind::InvalidData,
-        "Failed to convert image to pixmap.",
-    ))?;
-    let pixmap = Pixmap::from_vec(rgba.to_vec(), size).ok_or(Error::new(
-        ErrorKind::InvalidData,
-        "Failed to convert image to pixmap.",
-    ))?;
-    Ok(pixmap)
+pub fn load_image_from_bytes(slice: &[u8]) -> Result<SkImage> {
+    let data = Data::new_copy(&slice);
+    let image = SkImage(Image::from_encoded(&data).ok_or(anyhow!("Failed to decode image."))?);
+    Ok(image)
 }
 
-pub fn resize_image(pixmap: &Pixmap, new_width: u32, new_height: u32) -> Result<Pixmap, Error> {
-    let src_image = Image::from_vec_u8(
-        pixmap.width(),
-        pixmap.height(),
-        pixmap.data().to_vec(),
-        PixelType::U8x4,
-    )
-    .map_err(|err| {
-        let msg = format!("Failed to convert image to pixmap. {}", err);
-        Error::new(ErrorKind::InvalidData, msg)
-    })?;
+pub fn resize_image(image: SkImage, new_width: u32, new_height: u32) -> Result<SkImage> {
+    let mut surface = SkSurface(surfaces::raster_n32_premul((new_width as i32, new_height as i32))
+        .ok_or(anyhow!("Failed to create surface for resizing."))?);
+    let canvas = SkCanvas(surface.0.canvas());
 
-    let mut dst_image = Image::new(new_width, new_height, PixelType::U8x4);
-    let mut resizer = Resizer::new();
-    let _ = match resizer.resize(&src_image, &mut dst_image, None) {
-        Err(why) => return Err(Error::new(ErrorKind::InvalidData, why.to_string())),
-        _ => (),
-    };
-    let new_size = IntSize::from_wh(new_width, new_height).ok_or(Error::new(
-        ErrorKind::InvalidData,
-        "Failed to convert image to pixmap.",
-    ))?;
-    let pixmap = Pixmap::from_vec(dst_image.into_vec(), new_size).ok_or(Error::new(
-        ErrorKind::InvalidData,
-        "Failed to convert image to pixmap.",
-    ))?;
-    Ok(pixmap)
-}
+    let size = Rect::from_size(Size::new(new_width as f32, new_height as f32));
 
-pub fn load_image_from_file(path: &str) -> Result<Pixmap, Error> {
-    let img = ImageReader::open(path)
-        .map_err(|err| {
-            let msg = format!("Failed to load image from file. \n{}", err);
-            Error::new(ErrorKind::InvalidInput, msg)
-        })?
-        .decode()
-        .map_err(|err| {
-            let msg = format!("Failed to decode image. \n{}", err);
-            Error::new(ErrorKind::InvalidData, msg)
-        })?;
-    Ok(convert_image_to_pixmap(img)?)
-}
-
-pub fn load_image_from_bytes(bytes: &[u8]) -> Result<Pixmap, Error> {
-    let pixmap = Pixmap::decode_png(bytes).map_err(|err| {
-        let msg = format!("Failed to decode image from memory. \n{}", err);
-        Error::new(ErrorKind::InvalidData, msg)
-    })?;
-    Ok(pixmap)
-}
-
-pub fn draw_circle_image(image: &Pixmap, radius: u32) -> Result<Pixmap, Error> {
-    let size = radius * 2;
-    let mut pixelmap_mask = Pixmap::new(size, size).ok_or(Error::new(
-        ErrorKind::InvalidData,
-        "Failed to create pixmap mask.",
-    ))?;
-
-    let mut path_builder = PathBuilder::new();
-    path_builder.push_circle(radius as f32, radius as f32, radius as f32);
-    let path = path_builder
-        .finish()
-        .ok_or(Error::new(ErrorKind::InvalidData, "Failed to build path"))?;
+    let mut sampling = SamplingOptions::default();
+    sampling.cubic = CubicResampler::mitchell();
+    sampling.filter = FilterMode::Linear;
 
     let mut paint = Paint::default();
-    paint.set_color_rgba8(255, 255, 255, 255);
-    paint.anti_alias = true;
+    paint.set_anti_alias(true);
 
-    pixelmap_mask.fill_path(
-        &path,
-        &paint,
-        FillRule::Winding,
-        Transform::identity(),
+    canvas.0.draw_image_rect_with_sampling_options(
+        image.0,
         None,
+        size,
+        sampling,
+        &paint,
     );
 
-    let mask = Mask::from_pixmap(pixelmap_mask.as_ref(), MaskType::Alpha);
-    drop(pixelmap_mask);
-
-    let mut pixmap = Pixmap::new(size, size).ok_or(Error::new(
-        ErrorKind::InvalidData,
-        "Failed to create pixmap.",
-    ))?;
-    pixmap.draw_pixmap(
-        0,
-        0,
-        image.as_ref(),
-        &PixmapPaint::default(),
-        Transform::identity(),
-        (&mask).into(),
-    );
-
-    Ok(pixmap)
+    let resized_image = SkImage(surface.0.image_snapshot());
+    Ok(resized_image)
 }
 
-pub fn draw_text(text: &str, font_size: f32, font_bytes: &[u8], vertical_align: VerticalAlign) -> Result<Pixmap, Error> {
-    // Load font from bytes
-    let font_settings = FontSettings {
-        scale: font_size,
-        ..Default::default()
-    };
-    let font = Font::from_bytes(font_bytes, font_settings).map_err(|err| {
-        let msg = format!("Failed to load font from bytes.\n{}", err);
-        Error::new(ErrorKind::InvalidData, msg)
-    })?;
+pub fn draw_text_with_font(canvas: &SkCanvas, text: &str, font: &[u8], font_size: f32, x: f32, y: f32) -> Result<()> {
+    let mut font_provider = TypefaceFontProvider::new();
+    let font_mrg = FontMgr::new();
+    let typeface = font_mrg.new_from_data(font, None).ok_or(anyhow!("Failed to create typeface."))?;
+    font_provider.register_typeface(typeface, Some("CanvasFont"));
 
-    // Calculate total width and maximum height of the Pixmap
-    let (mut total_width, mut max_ascent, mut is_ascent_neg, mut max_descent) = (0, 0, false, 0);
-    for c in text.chars() {
-        // Rasterize character to get metrics
-        let (metrics, _) = font.rasterize(c, font_size);
+    let mut font_collection = FontCollection::new();
+    font_collection.set_default_font_manager(Some(font_provider.into()), None);
+    
+    let paragraph_style = ParagraphStyle::new();
+    let mut paragraph_builder = ParagraphBuilder::new(&paragraph_style, font_collection);
 
-        // Update total width
-        total_width += metrics.advance_width as u32 + 1;
+    let mut text_style = TextStyle::new();
+    text_style.set_font_size(font_size);
+    text_style.set_color(0xFFFFFFFF);
+    text_style.set_font_families(&["CanvasFont"]);
 
-        // Track the highest ascent (above baseline)
-        is_ascent_neg = metrics.ymin < 0;
-        max_ascent = max_ascent.max(metrics.bounds.ymin.abs() as u32);
+    paragraph_builder.push_style(&text_style);
+    paragraph_builder.add_text(text);
 
-        // Track the largest descent (below baseline)
-        max_descent = max_descent.max(metrics.height as u32 - metrics.ymin.abs() as u32);
-    }
+    let mut paragraph = paragraph_builder.build();
+    paragraph.layout(1024.0);
 
-    // Calculate the height of the Pixmap (ascent + descent)
-    let total_height = max_ascent + max_descent;
-
-    // Create the Pixmap based on the calculated dimensions
-    let height = {
-        if total_height >= font_size as u32 {
-            total_height
-        } else { 
-            font_size as u32
-        }
-    };
-    let mut pixmap = Pixmap::new(total_width, height).ok_or(Error::new(
-        ErrorKind::InvalidData,
-        "Failed to create text Pixmap.",
-    ))?;
-
-    // Use Fontdue's Layout system to calculate glyph positions
-    let mut layout = Layout::new(CoordinateSystem::PositiveYDown); // Y grows downwards
-    let center_offset = {
-        let ascent = max_ascent as f32 * if is_ascent_neg { 1.0 } else { -1.0 };
-        let offset = {
-            if (total_height - max_descent) == max_ascent {
-                ascent
-            } else {
-                (total_height - max_descent) as f32 - max_ascent as f32
-            }
-        };
-        ascent - offset
-    };
-    layout.reset(&LayoutSettings {
-        x: 0.0,
-        y: center_offset,
-        max_width: None,
-        max_height: Some(font_size),
-        vertical_align: vertical_align.into(),
-        ..LayoutSettings::default()
-    });
-
-    // Append text to the layout
-    layout.append(&[&font], &TextStyle::new(text, font_size, 0));
-
-    // Iterate through the glyphs and draw them onto the Pixmap
-    for glyph in layout.glyphs() {
-        // Rasterize each glyph to obtain its bitmap and metrics
-        let (metrics, bitmap) = font.rasterize_indexed(glyph.key.glyph_index, font_size);
-
-        // Skip glyphs that have no bitmap
-        if metrics.width == 0 || metrics.height == 0 {
-            continue;
-        }
-
-        // Create a Pixmap for the individual glyph
-        let mut char_pixmap = Pixmap::new(metrics.width as u32, metrics.height as u32).ok_or(
-            Error::new(ErrorKind::InvalidData, "Failed to create glyph Pixmap."),
-        )?;
-        let data = char_pixmap.data_mut();
-
-        // Fill the Pixmap with the glyph's RGBA bitmap
-        for (i, &alpha) in bitmap.iter().enumerate() {
-            let pixel_index = i * 4; // Each pixel is represented by 4 bytes (RGBA)
-            data[pixel_index] = alpha; // Red channel
-            data[pixel_index + 1] = alpha; // Green channel
-            data[pixel_index + 2] = alpha; // Blue channel
-            data[pixel_index + 3] = alpha; // Alpha channel
-        }
-
-        // Draw the glyph on the main Pixmap at the correct position
-        pixmap.draw_pixmap(
-            glyph.x as i32,
-            glyph.y.round() as i32,
-            char_pixmap.as_ref(),
-            &Default::default(),
-            Transform::identity(),
-            None,
-        );
-    }
-    drop(font);
-    drop(layout);
-
-    Ok(pixmap)
+    paragraph.paint(canvas.0, Point::new(x as scalar, y as scalar));
+    Ok(())
 }

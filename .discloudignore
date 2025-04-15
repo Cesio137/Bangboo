@@ -25,6 +25,7 @@
 
 # Extensions
 *.fig
+*.lock
 *.md
 *.zip
 *.exe

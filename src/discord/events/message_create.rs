@@ -12,11 +12,7 @@ pub async fn event(message: Box<MessageCreate>, context: Arc<AppContext>) -> Res
         match result {
             DangerLevel::Safe => {}
             DangerLevel::High => {
-                context.scam_filter.handle_spam(&context.client, message, None).await?;
-                return Ok(());
-            }
-            DangerLevel::HighReport(report) => {
-                context.scam_filter.handle_spam(&context.client, message, Some(report)).await?;
+                context.scam_filter.handle_spam(&context.client, message).await?;
                 return Ok(());
             }
         }

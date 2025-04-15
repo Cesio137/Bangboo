@@ -1,10 +1,8 @@
-use crate::settings::global::{EColor, REGEX, SHORTLINKS};
+use crate::settings::global::{EColor, REGEX};
 use crate::utils::embeds::res;
-use anyhow::{anyhow, Context, Result};
+use anyhow::{anyhow, Result};
 use regex::Regex;
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
-use std::collections::{HashMap, HashSet};
 use twilight_http::Client;
 use twilight_model::{
     gateway::payload::incoming::MessageCreate,
@@ -15,14 +13,13 @@ use twilight_model::{
 pub enum DangerLevel {
     Safe,
     High,
-    HighReport(Report),
 }
 
 pub struct ScamFilter {
     regex: Regex,
-    keywords: HashSet<String>,
-    scamlinks: HashSet<String>,
-    reports: HashMap<String, Report>,
+    //keywords: HashSet<String>,
+    //scamlinks: HashSet<String>,
+    //reports: HashMap<String, Report>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -33,11 +30,10 @@ pub struct Report {
 
 impl ScamFilter {
     pub fn new() -> Result<Self> {
+        /*
         let json_data: Value = serde_json::from_str(SHORTLINKS)?;
         let shortlinks = json_data.as_object().context("Failed to parse JSON as object.")?;
-
-        let regex = Regex::new(REGEX)?;
-
+        
         let keywords: HashSet<String> = shortlinks.get("keywords_scams")
             .and_then(|v| v.as_array())
             .map(|arr| arr.iter().filter_map(|v| v.as_str().map(String::from)).collect())
@@ -56,30 +52,26 @@ impl ScamFilter {
             .unwrap_or_default();
 
         let scamlinks: HashSet<String> = reports.keys().cloned().collect();
-
-        Ok(Self { regex, keywords, scamlinks, reports })
+        */
+        let regex = Regex::new(REGEX)?;
+        Ok(Self { regex })
     }
 
     pub fn filter_message(&self, message: &str) -> DangerLevel {
-        if let Some(cap) = self.regex.find(message) {
-            if let Some(report) = self.reports.get(cap.as_str()) {
-                return DangerLevel::HighReport(report.clone());
-            }
-            return DangerLevel::High;
-        }
-
+        if self.regex.is_match(message) { return DangerLevel::High; }
+        /*
         if let Some(report) = self.check_scamlinks(message) {
             return DangerLevel::HighReport(report);
         }
 
-        /*if self.keywords.iter().any(|kw| message.contains(kw)) {
+        if self.keywords.iter().any(|kw| message.starts_with(kw)) {
             return DangerLevel::High;
-        }*/
-
+        }
+        */
         DangerLevel::Safe
     }
 
-    pub async fn handle_spam(&self, client: &Client, message: Box<MessageCreate>, report: Option<Report>) -> Result<()> {
+    pub async fn handle_spam(&self, client: &Client, message: Box<MessageCreate>) -> Result<()> {
         let username = match &message.author.global_name {
             Some(name) => name.clone(),
             None => message.author.name.clone(),
@@ -87,11 +79,8 @@ impl ScamFilter {
 
         let channel_id = message.channel_id;
         let message_id = message.id;
-
-        let mut warn = format!("{username} probably got hacked and sent a message that was flagged as scam.");
-        if let Some(report) = report {
-            warn = format!("{warn}\n\nDescription: {}\n[Report about url]({})", report.desc, report.report);
-        }
+        
+        let warn = format!("{username} sent a message that was flagged as a scam. Messages containing ***[text](hyperlink)*** are strictly prohibited. Bangboo (me) will presume his/her account has been compromised, leading to a server kick!");
         let embed = res(EColor::Warning, warn);
 
         client.create_message(channel_id).reply(message_id).embeds(&vec![embed]).await?;
@@ -110,12 +99,12 @@ impl ScamFilter {
 
         Ok(())
     }
-
+    /*
     fn check_scamlinks(&self, msg: &str) -> Option<Report> {
         self.reports.iter()
             .find_map(|(link, report)| msg.contains(link).then(|| report.clone()))
     }
-
+    */
     async fn kick_member(&self, client: &Client, guild_id: Id<GuildMarker>, user_id: Id<UserMarker>) -> Result<()> {
         let guild = client.guild(guild_id).await?.model().await?;
 
@@ -125,7 +114,8 @@ impl ScamFilter {
 
         client.remove_guild_member(guild_id, user_id).await?;
 
-        self.send_dm(client, user_id, "It look like you probably got hacked and sent a message that was flagged as scam. You were just kicked from the server, but feel free to come back as soon as you resolve the issue with your account.").await?;
+        self.send_dm(client, user_id, "It look like you probably got hacked and sent a message that was flagged as scam containing ***[text](hyperlink)***. You were just kicked from the server, but feel free to come back as soon as you resolve the issue with your account.").await?;
+        self.send_dm(client, user_id, "").await?;
         Ok(())
     }
 

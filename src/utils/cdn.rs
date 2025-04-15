@@ -1,8 +1,7 @@
-use super::skia::load_image_from_bytes;
-use anyhow::Result;
-use image::{AnimationDecoder, DynamicImage};
-use std::io::Cursor;
-use tiny_skia::Pixmap;
+use crate::models::skia::Image as SkImage;
+use crate::utils::skia::load_image_from_bytes;
+use anyhow::{anyhow, Result};
+use skia_safe::{codec::{Options, ZeroInitialized}, surfaces, Codec, Data};
 
 pub fn display_avatar_url(user_id: u64, hash: &str, size: u16) -> (String, bool) {
     let mut is_gif = false;
@@ -16,33 +15,35 @@ pub fn display_avatar_url(user_id: u64, hash: &str, size: u16) -> (String, bool)
     )
 }
 
-pub async fn load_image_from_cdn(url: String, is_gif: bool) -> Result<Pixmap> {
-    let data = reqwest::get(url)
-        .await
-        .map_err(|err| anyhow::anyhow!("Failed to fetch image: {}", err))?;
-    let bytes = data
-        .bytes()
-        .await
-        .map_err(|err| anyhow::anyhow!("Failed to read image bytes: {}", err))?;
+pub async fn load_image_from_cdn(url: String, is_gif: bool) -> Result<SkImage> {
+    let data = reqwest::get(url).await?;
+    let bytes = data.bytes().await?;
     if is_gif {
         // Decode the GIF and extract the first frame
-        let cursor = Cursor::new(bytes);
-        let decoder = image::codecs::gif::GifDecoder::new(cursor)
-            .map_err(|err| anyhow::anyhow!("Failed to decode GIF: {}", err))?;
-        let frames = decoder.into_frames();
-        let first_frame = frames
-            .into_iter()
-            .next()
-            .ok_or_else(|| anyhow::anyhow!("No frames found in GIF"))?
-            .map_err(|err| anyhow::anyhow!("Failed to extract GIF frame: {}", err))?;
-        let image = DynamicImage::ImageRgba8(first_frame.into_buffer());
-        let pixmap = super::skia::convert_image_to_pixmap(image)
-            .map_err(|err| anyhow::anyhow!("Failed to convert image to Pixmap: {}", err))?;
-        Ok(pixmap)
+        let data = Data::new_copy(&bytes);
+        let mut codec = Codec::from_data(data).ok_or(anyhow!("Failed to decode gif."))?;
+        let image_info = codec.info();
+        let row_bytes = image_info.min_row_bytes();
+        let total_bytes = image_info.compute_byte_size(row_bytes);
+
+        let mut pixels = vec![0u8; total_bytes];
+
+        let options = Options {
+            zero_initialized: ZeroInitialized::Yes,
+            subset: None,
+            frame_index: 0,
+            prior_frame: None,
+        };
+
+        codec.get_pixels_with_options(&image_info, pixels.as_mut_slice(), row_bytes, Some(&options));
+        let mut surface = surfaces::wrap_pixels(&image_info, pixels.as_mut_slice(), row_bytes, None)
+            .ok_or(anyhow!(""))?;
+        let image = SkImage(surface.image_snapshot());
+        
+        Ok(image)
     } else {
         // Handle PNG or other static images
-        let pixmap = load_image_from_bytes(bytes.as_ref())
-            .map_err(|err| anyhow::anyhow!("Failed to load image from bytes: {}", err))?;
-        Ok(pixmap)
+        let image = load_image_from_bytes(bytes.as_ref())?;
+        Ok(image)
     }
 }

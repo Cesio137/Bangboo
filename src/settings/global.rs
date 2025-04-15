@@ -9,9 +9,7 @@ pub const MOD_IMG: &[u8] = include_bytes!("../../assets/canvas/mod.png");
 pub const ADD_ICON: &[u8] = include_bytes!("../../assets/icons/static/add.png");
 pub const MINUS_ICON: &[u8] = include_bytes!("../../assets/icons/static/minus.png");
 pub const HAMMER_ICON: &[u8] = include_bytes!("../../assets/icons/static/hammer.png");
-
-pub const SHORTLINKS: &str = include_str!("../../resources/shortlinks.json");
-pub const REGEX: &str = r"(https?://(?:www\.)?(surl\.li|u\.to|t\.co|gclnk\.com|qptr\.ru|uclck\.ru|go-link\.ru|envs\.sh|shorter\.me|sc\.link|goo\.su|plhn\.pw|ej136\.cfd|f-link\.me|lnky\.ru|bitly\.cx))";
+pub const REGEX: &str = r"\[([^\]]+)\]\((https?://[^\)]+)\)";
 
 #[derive(Clone, Copy)]
 #[repr(u32)]

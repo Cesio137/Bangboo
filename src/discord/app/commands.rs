@@ -1,12 +1,11 @@
 use crate::discord::commands::{prefix_commands, slash_commands};
+use super::creators::{PrefixCommandCallback, SlashCommandCallback};
 use colored::Colorize;
 use std::collections::HashMap;
 use twilight_http::Client;
 use twilight_model::{
     application::command::Command, id::{marker::ApplicationMarker, Id}
 };
-
-use super::creators::{PrefixCommandCallback, SlashCommandCallback};
 
 pub struct AppCommands {
     pub commands: Vec<Command>,

@@ -18,5 +18,6 @@ pub async fn app_events(event: Event, context: Arc<AppContext>) -> Result<()> {
         Event::MessageCreate(message) => message_create::event(message, context).await?,
         _ => {}
     }
+    
     Ok(())
 }
