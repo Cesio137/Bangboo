@@ -6,9 +6,10 @@ use crate::utils::{
 };
 use anyhow::anyhow;
 use twilight_model::{
-    application::command::*,
+    application::{command::*, interaction::InteractionContextType},
     gateway::event::EventType,
     http::{attachment::Attachment, interaction::InteractionResponseType},
+    oauth::ApplicationIntegrationType,
 };
 use twilight_util::builder::command::CommandBuilder;
 use crate::utils::global::global_message;
@@ -19,23 +20,10 @@ pub fn canvas_command() -> SlashCommand {
             "canvas",
             "Canvas creator test command.",
             CommandType::ChatInput,
-        )
-        .build(),
-        |interaction, client| async move {
-            if interaction.guild_id.is_none() {
-                let response = interaction_res(
-                    EColor::Danger,
-                    "/canvas command can only be executed inside a guild.".to_string(),
-                    InteractionResponseType::ChannelMessageWithSource,
-                );
-        
-                client.interaction(interaction.application_id)
-                    .create_response(interaction.id, &interaction.token, &response)
-                    .await?;
-        
-                return Ok(());
-            }
-        
+            ).integration_types(vec![ApplicationIntegrationType::GuildInstall])
+            .contexts(vec![InteractionContextType::Guild])
+            .build(),
+        |interaction, client| async move {        
             defer_reply(interaction.clone(), &client).await?;
         
             let guild_id = match interaction.guild_id {
