@@ -3,8 +3,9 @@ use crate::settings::global::EColor;
 use crate::utils::{embeds::interaction_res, interaction::get_options};
 use chrono::DateTime;
 use twilight_model::{
-    application::{command::CommandType, interaction::application_command::CommandOptionValue},
+    application::{command::CommandType, interaction::{application_command::CommandOptionValue, InteractionContextType}},
     http::interaction::InteractionResponseType,
+    oauth::ApplicationIntegrationType
 };
 use twilight_util::{
     builder::command::{CommandBuilder, UserBuilder},
@@ -18,27 +19,15 @@ pub fn age_command() -> SlashCommand {
             "age",
             "Displays your or another user's account creation date.",
             CommandType::ChatInput,
-        )
+            ).integration_types(vec![ApplicationIntegrationType::GuildInstall])
+            .contexts(vec![InteractionContextType::Guild])
             .option(user_option)
             .build(),
         |interaction, client| async move {
-            if interaction.guild_id.is_none() {
-                let response = interaction_res(
-                    EColor::Danger,
-                    "/age command can only be executed inside a guild.".to_string(),
-                    InteractionResponseType::ChannelMessageWithSource,
-                );
-        
-                client.interaction(interaction.application_id)
-                    .create_response(interaction.id, &interaction.token, &response)
-                    .await?;
-        
-                return Ok(());
-            }
             let mut color = EColor::Green;
             let mut age = None;
         
-            // Obtém o usuário do comando, se existir
+            // Try get user
             let user_id = get_options(&interaction)
                 .first()
                 .and_then(|opt| match &opt.value {
@@ -80,6 +69,7 @@ pub fn age_command() -> SlashCommand {
                 color,
                 response_text,
                 InteractionResponseType::ChannelMessageWithSource,
+                false
             );
         
             client.interaction(interaction.application_id)

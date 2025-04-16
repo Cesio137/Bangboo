@@ -97,7 +97,7 @@ pub async fn global_message(event: EventType, user: &User, joined_at: Option<Tim
 
     let undefined_nick = "Undefined".to_string();
     let nickname = user.global_name.as_ref().unwrap_or(&undefined_nick);
-    draw_text_with_font(&canvas, &format!("@{}", nickname), LATO, 32.0, 300.0, 160.0)?;
+    draw_text_with_font(&canvas, &format!("@{}", nickname), LATO, 32.0, 300.0, 164.0)?;
     canvas.0.save();
     
     let image = SkImage(surface.0.image_snapshot());
