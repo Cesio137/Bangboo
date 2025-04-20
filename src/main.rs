@@ -4,10 +4,12 @@ mod settings;
 mod tools;
 mod utils;
 
+#[cfg(target_env = "gnu")]
+use utils::malloc::malloc;
+
 use crate::discord::app::base::App;
 use crate::settings::env::ENV_SCHEMA;
 use serenity::prelude::*;
-use utils::malloc::malloc;
 
 #[tokio::main]
 async fn main() {
