@@ -16,8 +16,8 @@ anyhow = { version = "1.0" }
 chrono = { version = "0.4" }
 colored = { version = "3" }
 dotenvy = { version = "0.15" }
+isahc = { version = "1.7" }
 once_cell = { version = "1.21" }
-reqwest = { version = "0.12" }
 regex = { version = "1.11" }
 serde = { version = "1.0" }
 serde_json = { version = "1.0" }

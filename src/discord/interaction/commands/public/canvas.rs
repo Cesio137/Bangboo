@@ -25,7 +25,7 @@ pub fn command() -> SlashCommand {
                 }
                 Some(member) => member.user.clone(),
             };
-
+            
             let canvas = global_message(EventType::MemberAdd, &user).await.unwrap_or(vec![]);
 
             if !canvas.is_empty() {
@@ -33,10 +33,10 @@ pub fn command() -> SlashCommand {
                 if let Err(err) = reply_with_attachment(&ctx, &interaction, attachment, true).await {
                     tracing::error!("Error trying to responde /canvas command: {}", err);
                 }
-
+                
                 return 
             }
-
+            
             let embed = res(EColor::Danger, "Error trying to create canvas.".to_string());
             if let Err(err) = reply_with_embed(&ctx, &interaction, embed, true).await {
                 tracing::error!("Error trying to responde /canvas command: {}", err);

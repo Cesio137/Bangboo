@@ -11,8 +11,8 @@ pub struct App {
     pub scam_filter: ScamFilter
 }
 
-unsafe impl Send for App {}
-unsafe impl Sync for App {}
+//unsafe impl Send for App {}
+//unsafe impl Sync for App {}
 
 impl App {
     pub fn new() -> Self {

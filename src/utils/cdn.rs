@@ -1,7 +1,7 @@
-use crate::models::skia::Image as SkImage;
 use crate::utils::skia::load_image_from_bytes;
 use anyhow::{anyhow, Result};
-use skia_safe::{codec::{Options, ZeroInitialized}, surfaces, Codec, Data};
+use isahc::prelude::*;
+use skia_safe::{codec::{Options, ZeroInitialized}, surfaces, Codec, Data, Image};
 
 pub fn display_avatar_url(user_id: u64, hash: &str, size: u16) -> (String, bool) {
     let mut is_gif = false;
@@ -22,9 +22,13 @@ pub fn display_avatar_url(user_id: u64, hash: &str, size: u16) -> (String, bool)
     )
 }
 
-pub async fn load_image_from_cdn(url: String, is_gif: bool) -> Result<SkImage> {
-    let data = reqwest::get(url).await?;
-    let bytes = data.bytes().await?;
+pub fn load_image_from_cdn(url: String, is_gif: bool) -> Result<Image> {
+    let mut response = isahc::get(url)?;
+    if !response.status().is_success() {
+        return Err(anyhow!("Failed to download avatar: status {}", response.status()));
+    }
+    let bytes = response.bytes()?;
+
     if is_gif {
         // Decode the GIF and extract the first frame
         let data = Data::new_copy(&bytes);
@@ -45,12 +49,11 @@ pub async fn load_image_from_cdn(url: String, is_gif: bool) -> Result<SkImage> {
         codec.get_pixels_with_options(&image_info, pixels.as_mut_slice(), row_bytes, Some(&options));
         let mut surface = surfaces::wrap_pixels(&image_info, pixels.as_mut_slice(), row_bytes, None)
             .ok_or(anyhow!(""))?;
-        let image = SkImage(surface.image_snapshot());
+        let image = surface.image_snapshot();
         
-        Ok(image)
-    } else {
-        // Handle PNG or other static images
-        let image = load_image_from_bytes(bytes.as_ref())?;
-        Ok(image)
+        return Ok(image)
     }
+    // PNG
+    let image = load_image_from_bytes(bytes.as_ref())?;
+    Ok(image)
 }
