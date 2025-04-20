@@ -7,7 +7,7 @@ pub async fn defer_reply(ctx: &Context, interaction: &CommandInteraction) -> Res
         interaction.id,
         &interaction.token,
         &CreateInteractionResponse::Defer(
-            CreateInteractionResponseMessage::new()
+            CreateInteractionResponseMessage::default()
         ),
         vec![]
     ).await?;
@@ -17,9 +17,8 @@ pub async fn defer_reply(ctx: &Context, interaction: &CommandInteraction) -> Res
 
 pub async fn reply_with_embed(ctx: &Context, interaction: &CommandInteraction, embed: CreateEmbed, is_defered: bool) -> Result<()> {
     if is_defered {
-        let interaction_message = CreateInteractionResponse::UpdateMessage(
-            CreateInteractionResponseMessage::new().embed(embed)
-        );
+        let interaction_message = CreateInteractionResponseMessage::default()
+            .embed(embed);
         ctx.http.edit_original_interaction_response(
             &interaction.token,
             &interaction_message,
@@ -27,7 +26,7 @@ pub async fn reply_with_embed(ctx: &Context, interaction: &CommandInteraction, e
         ).await?;
     } else {
         let interaction_message = CreateInteractionResponse::Message(
-            CreateInteractionResponseMessage::new().embed(embed)
+            CreateInteractionResponseMessage::default().embed(embed)
         );
         ctx.http.create_interaction_response(
             interaction.id,
@@ -38,13 +37,12 @@ pub async fn reply_with_embed(ctx: &Context, interaction: &CommandInteraction, e
     }
 
     Ok(())
+
 }
 
 pub async fn reply_with_attachment(ctx: &Context, interaction: &CommandInteraction, attachment: CreateAttachment, is_defered: bool) -> Result<()> {
     if is_defered {
-        let interaction_message = CreateInteractionResponse::UpdateMessage(
-            CreateInteractionResponseMessage::new()
-        );
+        let interaction_message = CreateInteractionResponseMessage::default();
         ctx.http.edit_original_interaction_response(
             &interaction.token,
             &interaction_message,
@@ -52,7 +50,7 @@ pub async fn reply_with_attachment(ctx: &Context, interaction: &CommandInteracti
         ).await?;
     } else { 
         let interaction_message = CreateInteractionResponse::Message(
-            CreateInteractionResponseMessage::new()
+            CreateInteractionResponseMessage::default()
         );
         ctx.http.create_interaction_response(
             interaction.id,
