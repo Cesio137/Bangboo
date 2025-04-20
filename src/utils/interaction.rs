@@ -1,45 +1,66 @@
 use anyhow::Result;
-use twilight_http::Client;
-use twilight_model::{
-    application::interaction::application_command::{CommandData, CommandDataOption},
-    gateway::payload::incoming::InteractionCreate,
-    http::interaction::{InteractionResponse, InteractionResponseType},
-};
+use serenity::all::{CommandInteraction, Context, CreateEmbed, CreateInteractionResponse, CreateInteractionResponseMessage};
+use serenity::builder::CreateAttachment;
 
-pub async fn defer_reply(interaction: Box<InteractionCreate>, client: &Client) -> Result<()> {
-    let response = InteractionResponse {
-        kind: InteractionResponseType::DeferredChannelMessageWithSource,
-        data: None,
-    };
-    client.interaction(interaction.application_id)
-        .create_response(interaction.id, &interaction.token, &response)
-        .await?;
+pub async fn defer_reply(ctx: &Context, interaction: &CommandInteraction) -> Result<()> {
+    ctx.http.create_interaction_response(
+        interaction.id,
+        &interaction.token,
+        &CreateInteractionResponse::Defer(
+            CreateInteractionResponseMessage::new()
+        ),
+        vec![]
+    ).await?;
 
     Ok(())
 }
 
-pub fn get_command_data(interaction: &Box<InteractionCreate>) -> Option<Box<CommandData>> {
-    match &interaction.data {
-        Some(data) => match data {
-            twilight_model::application::interaction::InteractionData::ApplicationCommand(
-                command_data,
-            ) => {
-                return command_data.clone().into();
-            }
-            _ => None,
-        },
-        None => None,
+pub async fn reply_with_embed(ctx: &Context, interaction: &CommandInteraction, embed: CreateEmbed, is_defered: bool) -> Result<()> {
+    if is_defered {
+        let interaction_message = CreateInteractionResponse::UpdateMessage(
+            CreateInteractionResponseMessage::new().embed(embed)
+        );
+        ctx.http.edit_original_interaction_response(
+            &interaction.token,
+            &interaction_message,
+            vec![]
+        ).await?;
+    } else {
+        let interaction_message = CreateInteractionResponse::Message(
+            CreateInteractionResponseMessage::new().embed(embed)
+        );
+        ctx.http.create_interaction_response(
+            interaction.id,
+            &interaction.token,
+            &interaction_message,
+            vec![]
+        ).await?;
     }
+
+    Ok(())
 }
 
-pub fn get_options(interaction: &Box<InteractionCreate>) -> Vec<CommandDataOption> {
-    match get_command_data(interaction) {
-        Some(command_data) => {
-            if command_data.options.len() == 0 {
-                return vec![];
-            }
-            return command_data.clone().options;
-        }
-        None => vec![],
+pub async fn reply_with_attachment(ctx: &Context, interaction: &CommandInteraction, attachment: CreateAttachment, is_defered: bool) -> Result<()> {
+    if is_defered {
+        let interaction_message = CreateInteractionResponse::UpdateMessage(
+            CreateInteractionResponseMessage::new()
+        );
+        ctx.http.edit_original_interaction_response(
+            &interaction.token,
+            &interaction_message,
+            vec![attachment]
+        ).await?;
+    } else { 
+        let interaction_message = CreateInteractionResponse::Message(
+            CreateInteractionResponseMessage::new()
+        );
+        ctx.http.create_interaction_response(
+            interaction.id,
+            &interaction.token,
+            &interaction_message,
+            vec![attachment]
+        ).await?;
     }
+
+    Ok(())
 }

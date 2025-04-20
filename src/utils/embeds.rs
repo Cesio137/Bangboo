@@ -1,20 +1,12 @@
 use crate::settings::global::EColor;
-use twilight_model::{
-    channel::message::Embed,
-    http::interaction::{InteractionResponse, InteractionResponseData, InteractionResponseType}
-};
-use twilight_model::channel::message::MessageFlags;
-use twilight_util::builder::embed;
+use serenity::all::CreateEmbed;
 
-pub fn res(color: EColor, content: String) -> Embed {
-    embed::EmbedBuilder::new()
+pub fn res(color: EColor, content: String) -> CreateEmbed {
+    CreateEmbed::new()
         .color(color as u32)
         .description(content)
-        .validate()
-        .unwrap()
-        .build()
 }
-
+/*
 pub fn interaction_res(color: EColor, content: String, interaction_type: InteractionResponseType, ephemeral: bool) -> InteractionResponse {
     let embed = embed::EmbedBuilder::new()
         .color(color as u32)
@@ -33,3 +25,4 @@ pub fn interaction_res(color: EColor, content: String, interaction_type: Interac
         .into(),
     }
 }
+*/

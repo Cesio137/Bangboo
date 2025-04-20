@@ -4,7 +4,7 @@ use crate::utils::embeds::res;
 use crate::utils::global::{global_message, EventType};
 use serenity::all::{Context, CreateAttachment, CreateMessage, GuildId, User};
 
-pub async fn run(app: &App, ctx: Context, guild_id: GuildId, user: User) {
+pub async fn run(app: &App, ctx: Context, guild_id: GuildId, banned_user: User) {
     let guild = match guild_id.to_partial_guild(&ctx.http).await {
         Ok(guild) => guild,
         Err(why) => {
@@ -20,7 +20,7 @@ pub async fn run(app: &App, ctx: Context, guild_id: GuildId, user: User) {
         }
     };
 
-    let canvas = global_message(EventType::MemberRemove, &user).await.unwrap_or(vec![]);
+    let canvas = global_message(EventType::BanAdd, &banned_user).await.unwrap_or(vec![]);
     if !canvas.is_empty() {
         let message = CreateMessage::new();
         let attachment = CreateAttachment::bytes(canvas.as_slice(), "Bye.png");
@@ -30,7 +30,7 @@ pub async fn run(app: &App, ctx: Context, guild_id: GuildId, user: User) {
         return;
     }
 
-    let id = user.id.as_ref().to_string();
+    let id = banned_user.id.as_ref().to_string();
     let message = format!("<@{}> left the server!", id);
     let embed = res(EColor::Success, message);
     let message = CreateMessage::new().embed(embed);

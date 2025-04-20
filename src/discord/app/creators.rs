@@ -1,9 +1,9 @@
-use anyhow::Result;
-use std::{pin::Pin, sync::Arc};
-use twilight_http::Client;
-use twilight_model::{application::command::Command, gateway::payload::incoming::{InteractionCreate, MessageCreate}};
+use serenity::all::{CommandInteraction, Message};
+use serenity::builder::CreateCommand;
+use serenity::client::Context;
+use std::pin::Pin;
 
-pub type PrefixCommandCallback = Box<dyn Fn(Box<MessageCreate>, Arc<Client>) -> Pin<Box<dyn Future<Output = Result<()>> + Send>> + Send + Sync>;
+pub type PrefixCommandCallback = Box<dyn Fn(Context, Message) -> Pin<Box<dyn Future<Output = ()> + Send>> + Send + Sync>;
 
 pub struct PrefixCommand {
     pub name: String,
@@ -12,8 +12,8 @@ pub struct PrefixCommand {
 
 pub fn create_prefix_command<F, Fut>(name: &str, run: F) -> PrefixCommand
 where
-    F: Fn(Box<MessageCreate>, Arc<Client>) -> Fut + Send + Sync + 'static,
-    Fut: Future<Output = Result<()>> + Send + 'static,
+    F: Fn(Context, Message) -> Fut + Send + Sync + 'static,
+    Fut: Future<Output = ()> + Send + 'static,
 {
     PrefixCommand {
         name: format!("!{name}"),
@@ -21,20 +21,19 @@ where
     }
 }
 
-pub type SlashCommandCallback = Box<dyn Fn(Box<InteractionCreate>, Arc<Client>) -> Pin<Box<dyn Future<Output = Result<()>> + Send>> + Send + Sync>;
-
+pub type SlashCommandCallback = Box<dyn Fn(Context, CommandInteraction) -> Pin<Box<dyn Future<Output = ()> + Send + Sync>> + Send + Sync >;
 pub struct SlashCommand {
-    pub command: Command,
+    pub command: CreateCommand,
     pub run: SlashCommandCallback,
 }
 
-pub fn create_slash_command<F, Fut>(command: Command, reply: F) -> SlashCommand
+pub fn create_slash_command<F, Fut>(command: CreateCommand, reply: F) -> SlashCommand
 where
-    F: Fn(Box<InteractionCreate>, Arc<Client>) -> Fut + Send + Sync + 'static,
-    Fut: Future<Output = Result<()>> + Send + 'static,
+    F: Fn(Context, CommandInteraction) -> Fut + Send + Sync + 'static,
+    Fut: Future<Output = ()> + Send + Sync + 'static,
 {
     SlashCommand {
         command,
-        run: Box::new(move |interaction, client| Box::pin(reply(interaction, client))),
+        run: Box::new(move |context, interaction| Box::pin(reply(context, interaction))),
     }
 }
