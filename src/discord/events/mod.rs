@@ -5,7 +5,7 @@ mod member_removed;
 mod ban_added;
 
 #[cfg(target_env = "gnu")]
-use crate::utils::malloc::*;
+use crate::utils::malloc::malloc;
 
 use super::app::base::App;
 use colored::Colorize;
