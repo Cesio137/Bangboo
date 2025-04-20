@@ -16,12 +16,14 @@ pub fn prefix_commands() -> Vec<PrefixCommand> {
 
 pub fn slash_commands() -> Vec<SlashCommand> {
     let mut commands = Vec::new();
+
+    if cfg!(debug_assertions) {
+        let canvas = canvas::command();
+        commands.push(canvas);
+    }
     
     let age = age::command();
     commands.push(age);
-    
-    let canvas = canvas::command();
-    commands.push(canvas);
     
     commands
 }
