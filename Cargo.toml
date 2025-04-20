@@ -1,6 +1,6 @@
 [package]
 name = "Bangboo"
-version = "0.2.9"
+version = "0.2.10"
 edition = "2024"
 
 [profile.release]
@@ -10,12 +10,8 @@ codegen-units = 1
 panic = "abort"
 
 [dependencies]
-twilight-cache-inmemory = { version = "0.16" }
-twilight-gateway = { version = "0.16", features = ["zlib-stock", "native-tls"] }
-twilight-http = { version = "0.16", features = ["native-tls"] }
-twilight-model = { version = "0.16" }
-twilight-util = { version = "0.16", features = ["full"] }
-#THIDRPARTY
+serenity = { version = "0.12" }
+# THIRDPARTY
 anyhow = { version = "1.0" }
 chrono = { version = "0.4" }
 colored = { version = "3" }

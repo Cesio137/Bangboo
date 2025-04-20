@@ -14,7 +14,7 @@ This project is currently for my personal use, but I hope to monetize it in the 
 ## Thirdparty Libraries
 
 - [Rust](https://www.rust-lang.org/)
-- [Twilight](https://crates.io/crates/twilight)
+- [Serenity](https://crates.io/crates/serenity)
 - [Skia Safe](https://crates.io/crates/skia-safe)
 
 ## Special Mentions

@@ -7,10 +7,17 @@ pub fn display_avatar_url(user_id: u64, hash: &str, size: u16) -> (String, bool)
     let mut is_gif = false;
     let ext = if hash.starts_with("a_") { is_gif = true; "gif" } else { "png" };
     (
-        format!(
-            "https://cdn.discordapp.com/avatars/{}/{}.{}?size={}",
-            user_id, hash, ext, size
-        ),
+        if size == 0 {
+            format!(
+                "https://cdn.discordapp.com/avatars/{}/{}.{}",
+                user_id, hash, ext
+            )
+        } else {
+            format!(
+                "https://cdn.discordapp.com/avatars/{}/{}.{}?size={}",
+                user_id, hash, ext, size
+            )
+        },        
         is_gif
     )
 }

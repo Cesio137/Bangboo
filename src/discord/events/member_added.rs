@@ -1,43 +1,45 @@
-use crate::discord::app::context::AppContext;
+use crate::discord::app::base::App;
 use crate::settings::global::EColor;
-use crate::utils::{global::global_message, embeds::res};
-use anyhow::{anyhow, Result};
-use std::sync::Arc;
-use twilight_model::{
-    gateway::{event::EventType, payload::incoming::MemberAdd},
-    http::attachment::Attachment,
-};
+use crate::utils::embeds::res;
+use crate::utils::global::{global_message, EventType};
+use serenity::all::{Context, Member};
+use serenity::builder::{CreateAttachment, CreateMessage};
 
-pub async fn run(member: Box<MemberAdd>, context: Arc<AppContext>) -> Result<()> {
-    if member.user.bot { return Ok(()); }
-
-    let channel_id = context.client.guild(member.guild_id).await?;
-    let guild = channel_id.model().await?;
+pub async fn run(app: &App, ctx: Context, member_added: Member) {
+    let guild_id = member_added.guild_id.as_ref();
+    let guild = match guild_id.to_partial_guild(&ctx.http).await {
+        Ok(guild) => guild,
+        Err(why) => {
+            tracing::error!("Failed to get guild info: {:?}", why);
+            return;
+        }
+    };
     let system_channel_id = match guild.system_channel_id {
-        Some(id) => id,
-        None => return Err(anyhow!("Error getting system message channel.")),
+        Some(channel_id) => channel_id,
+        None => {
+            tracing::error!("System channel not set for guild.");
+            return;
+        }
     };
 
-    if let Ok(canvas) = global_message(EventType::MemberAdd, &member.user, member.joined_at).await {
-        context.client
-            .create_message(system_channel_id)
-            .attachments(&vec![Attachment::from_bytes(
-                "welcome.png".to_string(),
-                canvas,
-                1,
-            )])
-            .await?;
 
-        return Ok(());
-    };
+    let user = member_added.user.clone();
+    let canvas = global_message(EventType::MemberAdd, &user).await.unwrap_or(vec![]);
+    if !canvas.is_empty() {
+        let message = CreateMessage::new();
+        let attachment = CreateAttachment::bytes(canvas.as_slice(), "Welcome.png");
+        if let Err(err) = system_channel_id.send_files(&ctx.http, vec![attachment], message).await {
+            tracing::error!("Error when sending welcome image: {:?}", err);
+        }
+        return;
+    }
 
-    let name = &member.user.name;
-    let message = format!("{} join the server!", name);
-    let embed_res = res(EColor::Success, message);
-    context.client
-        .create_message(system_channel_id)
-        .embeds(&[embed_res])
-        .await?;
+    let id = member_added.user.id.to_string();
+    let message = format!("<@{}> join the server!", id);
+    let embed = res(EColor::Success, message);
+    let message = CreateMessage::new().embed(embed); 
 
-    Ok(())
+    if let Err(err) = system_channel_id.send_message(&ctx.http, message).await {
+        tracing::error!("Failed to send welcome message: {:?}", err);
+    }
 }

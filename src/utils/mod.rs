@@ -1,7 +1,9 @@
 pub mod embeds;
+pub mod global;
 pub mod interaction;
 pub mod logger;
 pub mod malloc;
-pub mod global;
+//pub mod global;
 pub mod skia;
 pub mod cdn;
+//pub mod global;

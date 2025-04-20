@@ -4,17 +4,17 @@ use crate::models::skia::{Canvas as SkCanvas, Image as SkImage, Surface as SkSur
 use crate::settings::global::{ADD_ICON, DEFAULT_AVATAR, HAMMER_ICON, JOIN_IMG, LATO, LEAVE_IMG, MINUS_ICON, MOD_IMG, POPPINS, RUBIK};
 use crate::utils::skia::load_image_from_bytes;
 use anyhow::{anyhow, Result};
+use serenity::all::User;
 use skia_safe::{scalar, EncodedImageFormat, ISize, Paint, Path, Point};
-use std::time::{SystemTime, UNIX_EPOCH};
-use twilight_gateway::EventType;
-use twilight_model::{
-    user::User,
-    util::Timestamp
-};
-use twilight_util::snowflake::Snowflake;
 
+#[derive(Eq, PartialEq)]
+pub enum EventType {
+    MemberAdd,
+    MemberRemove,
+    BanAdd
+}
 
-pub async fn global_message(event: EventType, user: &User, joined_at: Option<Timestamp>) -> Result<Vec<u8>> {
+pub async fn global_message(event: EventType, user: &User) -> Result<Vec<u8>> {
     let mut surface = SkSurface(skia_safe::surfaces::raster_n32_premul(ISize {width: 1024, height: 260, })
         .ok_or(anyhow!("Failed to create surface."))?);
     let canvas = SkCanvas(surface.0.canvas());
@@ -44,7 +44,7 @@ pub async fn global_message(event: EventType, user: &User, joined_at: Option<Tim
         .ok_or_else(|| anyhow!("User does not have an avatar."))?
         .to_string();
     
-    let (url, is_gif) = display_avatar_url(user.id.id(), avatar_hash.as_str(), 256);
+    let (url, is_gif) = display_avatar_url(user.id.get(), avatar_hash.as_str(), 256);
     let avatar = match load_image_from_cdn(url, is_gif).await {
         Ok(avatar) => {
             resize_image(avatar, 180, 180)?
@@ -67,28 +67,8 @@ pub async fn global_message(event: EventType, user: &User, joined_at: Option<Tim
     
     // Welcome message
     if event == EventType::MemberAdd {
-        let mut welcome_text = "FIRST TIME".to_string();
-        if let Ok(duration) = SystemTime::now().duration_since(UNIX_EPOCH) {
-            let now = duration.as_millis();
-            let timestamp = user.id.timestamp() as u128;
-            if now >= timestamp {
-                let account_age = now - timestamp;
-
-                if let Some(joined_at) = joined_at {
-                    let join_age = now.saturating_sub(joined_at.as_micros() as u128 / 1000);
-                    let timelimit = 60 * 1000;
-                    if join_age > timelimit && account_age > timelimit {
-                        welcome_text = "WELCOME BACK".to_string();
-                    }
-                }
-            }
-        }
-        let x_pos = if welcome_text == "FIRST TIME" {
-            556.0
-        } else {
-            533.0
-        };
-        draw_text_with_font(&canvas, &welcome_text, POPPINS, 16.0, x_pos, 68.0 - 6.0)?;
+        let mut welcome_text = "WELCOME ABOARD";
+        draw_text_with_font(&canvas, &welcome_text, POPPINS, 16.0, 522.0, 68.0 - 6.0)?;
         canvas.0.save();
     }
 

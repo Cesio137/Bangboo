@@ -1,24 +1,17 @@
-use crate::discord::app::context::AppContext;
-use anyhow::{anyhow, Result};
-use std::sync::Arc;
-use twilight_model::{
-    application::interaction::InteractionData::ApplicationCommand,
-    gateway::payload::incoming::InteractionCreate
-};
+use crate::discord::app::base::App;
+use serenity::all::{Context, Interaction};
 
-pub async fn run(interaction: Box<InteractionCreate>, context: Arc<AppContext>) -> Result<()> {
-    let data = match &interaction.data {
-        Some(data) => data,
-        None => return Err(anyhow!("Failed to get interaction data.")),
-    };
-    match data {
-        ApplicationCommand(command_data) => {
-            if let Some(callback) = context.commands.slash_commands.get(&command_data.name) {
-                callback(interaction.clone(), Arc::clone(&context.client)).await?;
+pub async fn run(app: &App, ctx: Context, interaction: Interaction) {
+    match interaction {
+        Interaction::Ping(_) => {}
+        Interaction::Command(command) => {
+            if let Some(callback) = app.slash_commands.get(&command.data.name) {
+                callback(ctx, command).await;
             }
         }
+        Interaction::Autocomplete(_) => {}
+        Interaction::Component(_) => {}
+        Interaction::Modal(_) => {}
         _ => {}
     }
-
-    Ok(())
 }

@@ -3,11 +3,8 @@ use crate::utils::embeds::res;
 use anyhow::{anyhow, Result};
 use regex::Regex;
 use serde::{Deserialize, Serialize};
-use twilight_http::Client;
-use twilight_model::{
-    gateway::payload::incoming::MessageCreate,
-    id::{marker::{GuildMarker, UserMarker}, Id}
-};
+use serenity::all::{CreateMessage, Message};
+use serenity::client::Context;
 
 #[derive(Debug, Clone)]
 pub enum DangerLevel {
@@ -71,33 +68,33 @@ impl ScamFilter {
         DangerLevel::Safe
     }
 
-    pub async fn handle_spam(&self, client: &Client, message: Box<MessageCreate>) -> Result<()> {
+    pub async fn handle_spam(&self, ctx: Context, message: Message) {
         let username = match &message.author.global_name {
-            Some(name) => name.clone(),
-            None => message.author.name.clone(),
+            Some(name) => name,
+            None => &message.author.name,
         };
 
-        let channel_id = message.channel_id;
-        let message_id = message.id;
-        
+        let channel_id = &message.channel_id;
+        let message_id = &message.id;
+
         let warn = format!("{username} sent a message that was flagged as a scam. Messages containing ***[text](hyperlink)*** are strictly prohibited. Bangboo (me) will presume his/her account has been compromised, leading to a server kick!");
         let embed = res(EColor::Warning, warn);
-
-        client.create_message(channel_id).reply(message_id).embeds(&vec![embed]).await?;
-
-        client.delete_message(channel_id, message_id).await?;
-
-        let guild_id = match message.guild_id {
-            Some(guild_id) => guild_id,
-            None => {
-                return Err(anyhow!("Message is not from a guild"));
-            }
-        };
-        let user_id = message.author.id;
-
-        self.kick_member(client, guild_id, user_id).await?;
-
-        Ok(())
+        
+        // Corrigido: usar ctx.http para operações HTTP
+        if let Err(err) = channel_id.send_message(
+            ctx.http.as_ref(),
+            CreateMessage::new()
+                .embed(embed)
+        ).await {
+            tracing::error!("Failed to send warning message: {}", err);
+            return;
+        }
+        
+        // Corrigido: usar ctx.http para deletar a mensagem
+        channel_id.delete_message(ctx.http.as_ref(), message_id).await;
+        
+        // Corrigido: passar o ctx em vez de client
+        self.kick_member(ctx, message).await;
     }
     /*
     fn check_scamlinks(&self, msg: &str) -> Option<Report> {
@@ -105,26 +102,58 @@ impl ScamFilter {
             .find_map(|(link, report)| msg.contains(link).then(|| report.clone()))
     }
     */
-    async fn kick_member(&self, client: &Client, guild_id: Id<GuildMarker>, user_id: Id<UserMarker>) -> Result<()> {
-        let guild = client.guild(guild_id).await?.model().await?;
+    async fn kick_member(&self, ctx: Context, message: Message) {
+        let guild_id = match message.guild_id.as_ref().ok_or_else(|| anyhow!("Message is not from a guild")) {
+            Ok(guild_id) => guild_id,
+            Err(err) => {
+                tracing::error!("Failed to get guild ID: {}", err);
+                return;
+            }       
+        };
+        let user_id = message.author.id.as_ref();
+        let guild = match guild_id.to_guild_cached(ctx.cache.as_ref()) {
+            Some(guild) => guild.clone(),
+            None => {
+                tracing::error!("Failed to get guild");
+                return;
+            }      
+        };
 
-        if guild.owner_id == user_id {
-            return Err(anyhow!("Tried to kick the owner of the guild: {}", user_id));
+        if guild.owner_id.get() == user_id.get() {
+            tracing::error!("Tried to kick the owner of the guild: {}", user_id);
+            return;
         }
 
-        client.remove_guild_member(guild_id, user_id).await?;
-
-        self.send_dm(client, user_id, "It look like you probably got hacked and sent a message that was flagged as scam containing ***[text](hyperlink)***. You were just kicked from the server, but feel free to come back as soon as you resolve the issue with your account.").await?;
-        self.send_dm(client, user_id, "").await?;
-        Ok(())
+        if let Err(err) = guild_id.kick(ctx.http.as_ref(), user_id).await {
+            tracing::error!("Failed to kick member: {}", err);
+        };
+        
+        
+        // Corrigido: passar o ctx em vez de client
+        self.send_dm(ctx, message, "It look like you probably got hacked and sent a message that was flagged as scam containing ***[text](hyperlink)***. You were just kicked from the server, but feel free to come back as soon as you resolve the issue with your account.").await;
     }
 
-    async fn send_dm(&self, client: &Client, user_id: Id<UserMarker>, content: &str) -> Result<()> {
-        let channel = client.create_private_channel(user_id).await?;
-        let channel_id = channel.model().await?.id;
+    async fn send_dm(&self, ctx: Context, message: Message, content: &str) {
+        // Corrigido: criar canal privado usando ctx
+        let user_id = &message.author.id;
+        let channel = match user_id.create_dm_channel(&ctx.http).await {
+            Ok(channel) => channel,
+            Err(err) => {
+                tracing::error!("Failed to create DM channel: {}", err);
+                return;
+            }       
+        };
 
         let embed = res(EColor::Warning, content.to_string());
-        client.create_message(channel_id).embeds(&vec![embed]).await?;
-        Ok(())
+        
+        // Corrigido: enviar mensagem usando ctx.http
+        if let Err(err) = channel.send_message(
+            &ctx.http,
+            CreateMessage::new()
+                .embed(embed)
+        ).await {
+            tracing::error!("Failed to send warning message: {}", err);
+            return;
+        };
     }
 }

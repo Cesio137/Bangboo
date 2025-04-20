@@ -6,6 +6,8 @@ pub const DEFAULT_AVATAR: &[u8] = include_bytes!("../../assets/member/default_av
 pub const JOIN_IMG: &[u8] = include_bytes!("../../assets/canvas/join.png");
 pub const LEAVE_IMG: &[u8] = include_bytes!("../../assets/canvas/leave.png");
 pub const MOD_IMG: &[u8] = include_bytes!("../../assets/canvas/mod.png");
+pub const OFFICER_IMG: &[u8] = include_bytes!("../../assets/avatar/Officer.png");
+
 pub const ADD_ICON: &[u8] = include_bytes!("../../assets/icons/static/add.png");
 pub const MINUS_ICON: &[u8] = include_bytes!("../../assets/icons/static/minus.png");
 pub const HAMMER_ICON: &[u8] = include_bytes!("../../assets/icons/static/hammer.png");
@@ -30,6 +32,7 @@ pub enum EColor {
     Brilliance = 0xF07D5F,
     Nitro = 0xFF6BFA,
     Bravery = 0x9C84EF,
+    Royal = 0x1447E6
 }
 
 #[derive(Debug)]
