@@ -1,11 +1,11 @@
 use crate::utils::skia::load_image_from_bytes;
 use anyhow::{anyhow, Result};
-use isahc::prelude::*;
+use curl::easy::Easy;
 use skia_safe::{codec::{Options, ZeroInitialized}, surfaces, Codec, Data, Image};
 
 pub fn display_avatar_url(user_id: u64, hash: &str, size: u16) -> (String, bool) {
-    let mut is_gif = false;
-    let ext = if hash.starts_with("a_") { is_gif = true; "gif" } else { "png" };
+    let mut is_animated = false;
+    let ext = if hash.starts_with("a_") { is_animated = true; "gif" } else { "png" };
     (
         if size == 0 {
             format!(
@@ -17,21 +17,29 @@ pub fn display_avatar_url(user_id: u64, hash: &str, size: u16) -> (String, bool)
                 "https://cdn.discordapp.com/avatars/{}/{}.{}?size={}",
                 user_id, hash, ext, size
             )
-        },        
-        is_gif
+        },
+        is_animated
     )
 }
 
-pub fn load_image_from_cdn(url: String, is_gif: bool) -> Result<Image> {
-    let mut response = isahc::get(url)?;
-    if !response.status().is_success() {
-        return Err(anyhow!("Failed to download avatar: status {}", response.status()));
-    }
-    let bytes = response.bytes()?;
+pub fn load_image_from_cdn(url: &str, is_animated: bool) -> Result<Image> {
+    let mut bytes = Vec::new();
+    let mut easy = Easy::new();
+    easy.ssl_options(curl::easy::SslOpt::new().no_revoke(true))?;
+    easy.url(url)?;
 
-    if is_gif {
+    {
+        let mut transfer = easy.transfer();
+        transfer.write_function(|data| {
+            bytes.extend_from_slice(data);
+            Ok(data.len())
+        })?;
+        transfer.perform()?;
+    }
+
+    if is_animated {
         // Decode the GIF and extract the first frame
-        let data = Data::new_copy(&bytes);
+        let data = Data::new_copy(bytes.as_slice());
         let mut codec = Codec::from_data(data).ok_or(anyhow!("Failed to decode gif."))?;
         let image_info = codec.info();
         let row_bytes = image_info.min_row_bytes();
@@ -50,10 +58,11 @@ pub fn load_image_from_cdn(url: String, is_gif: bool) -> Result<Image> {
         let mut surface = surfaces::wrap_pixels(&image_info, pixels.as_mut_slice(), row_bytes, None)
             .ok_or(anyhow!(""))?;
         let image = surface.image_snapshot();
+        drop(surface);
         
         return Ok(image)
     }
     // PNG
-    let image = load_image_from_bytes(bytes.as_ref())?;
+    let image = load_image_from_bytes(bytes.as_slice())?;
     Ok(image)
 }

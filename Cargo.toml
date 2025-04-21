@@ -1,6 +1,6 @@
 [package]
 name = "Bangboo"
-version = "0.2.11"
+version = "0.2.12"
 edition = "2024"
 
 [profile.release]
@@ -12,11 +12,12 @@ panic = "abort"
 [dependencies]
 serenity = { version = "0.12" }
 # THIRDPARTY
+async-trait = { version = "0.1" }
 anyhow = { version = "1.0" }
 chrono = { version = "0.4" }
 colored = { version = "3" }
+curl = { version = "0.4" }
 dotenvy = { version = "0.15" }
-isahc = { version = "1.7" }
 once_cell = { version = "1.21" }
 regex = { version = "1.11" }
 serde = { version = "1.0" }

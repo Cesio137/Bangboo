@@ -1,4 +1,4 @@
-use crate::discord::app::creators::{PrefixCommandCallback, SlashCommandCallback};
+use crate::discord::app::creators::{PrefixCommandHandler, SlashCommandHandler};
 use crate::discord::interaction::commands::{prefix_commands, slash_commands};
 use crate::tools::automod::ScamFilter;
 use serenity::builder::CreateCommand;
@@ -6,35 +6,35 @@ use std::collections::HashMap;
 
 pub struct App {
     pub commands: Vec<CreateCommand>,
-    pub prefix_commands: HashMap<String, PrefixCommandCallback>,
-    pub slash_commands: HashMap<String, SlashCommandCallback>,
+    pub prefix_command_handlers: HashMap<String, Box<dyn PrefixCommandHandler + Send + Sync>>,
+    pub slash_command_handlers: HashMap<String, Box<dyn SlashCommandHandler + Send + Sync>>,
     pub scam_filter: ScamFilter
 }
 
-//unsafe impl Send for App {}
-//unsafe impl Sync for App {}
-
 impl App {
     pub fn new() -> Self {
-        let cmds = slash_commands();
+        let slash_commands = slash_commands();
         let mut commands = Vec::new();
-        let mut slash_commands_callback = HashMap::new();
-        for cmd in cmds {
-            let name = extract_command_name(&cmd.command);
-            commands.push(cmd.command);
-            slash_commands_callback.insert(name, cmd.run);
+        let mut slash_command_handlers = HashMap::new();
+        for slash_command in slash_commands {
+            let command_handler = slash_command;
+            let name = extract_command_name(&command_handler.command());
+            commands.push(command_handler.command());
+            slash_command_handlers.insert(name, command_handler);
         }
         
-        let mut prefix_commands_callback = HashMap::new();
         let prefix_commands = prefix_commands();
+        let mut prefix_command_handlers = HashMap::new();
         for command in prefix_commands {
-            prefix_commands_callback.insert(command.name, command.run);
+            let command_handler = command;
+            let name = format!("!{}", command_handler.name());
+            prefix_command_handlers.insert(name, command_handler);
         }
         let scam_filter = ScamFilter::new().unwrap();
         Self {
             commands,
-            prefix_commands: prefix_commands_callback,
-            slash_commands: slash_commands_callback,
+            prefix_command_handlers,
+            slash_command_handlers,
             scam_filter
         }
     }

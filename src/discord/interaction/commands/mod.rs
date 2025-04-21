@@ -1,29 +1,25 @@
 pub mod public;
 pub mod prefix;
 
-use crate::discord::app::creators::{PrefixCommand, SlashCommand};
+use crate::discord::app::creators::{PrefixCommandHandler, SlashCommandHandler};
 use prefix::*;
 use public::*;
 
-pub fn prefix_commands() -> Vec<PrefixCommand> {
-    let mut commands = Vec::new();
+pub fn prefix_commands() -> Vec<Box<dyn PrefixCommandHandler + Send + Sync>> {
+    let mut commands: Vec<Box<dyn PrefixCommandHandler + Send + Sync>> = Vec::new();
 
-    let ping = ping::command();
-    commands.push(ping);
+    commands.push(Box::new(ping::Ping));
 
     commands
 }
 
-pub fn slash_commands() -> Vec<SlashCommand> {
-    let mut commands = Vec::new();
+pub fn slash_commands() -> Vec<Box<dyn SlashCommandHandler + Send + Sync>> {
+    let mut commands: Vec<Box<dyn SlashCommandHandler + Send + Sync>> = Vec::new();
 
     if cfg!(debug_assertions) {
-        let canvas = canvas::command();
-        commands.push(canvas);
+        commands.push(Box::new(canvas::Canvas));
     }
-    
-    let age = age::command();
-    commands.push(age);
+    commands.push(Box::new(age::Age));
     
     commands
 }

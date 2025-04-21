@@ -4,17 +4,12 @@ mod settings;
 mod tools;
 mod utils;
 
-#[cfg(target_env = "gnu")]
-use utils::malloc::malloc;
-
 use crate::discord::app::base::App;
 use crate::settings::env::ENV_SCHEMA;
 use serenity::prelude::*;
 
 #[tokio::main]
 async fn main() {
-    #[cfg(target_env = "gnu")]
-    malloc::limit_mmap_threshold();
     
     let intents = GatewayIntents::GUILD_MESSAGES
         | GatewayIntents::DIRECT_MESSAGES

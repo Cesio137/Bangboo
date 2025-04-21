@@ -6,6 +6,7 @@ use anyhow::{anyhow, Result};
 use serenity::all::User;
 use skia_safe::{scalar, EncodedImageFormat, ISize, Paint, Path, Point};
 
+
 #[derive(Eq, PartialEq)]
 pub enum EventType {
     MemberAdd,
@@ -14,7 +15,6 @@ pub enum EventType {
 }
 
 pub async fn global_message(event: EventType, user: &User) -> Result<Vec<u8>> {
-
     let mut surface = skia_safe::surfaces::raster_n32_premul(ISize {width: 1024, height: 260, })
         .ok_or(anyhow!("Failed to create surface."))?;
     let canvas = surface.canvas();
@@ -23,10 +23,7 @@ pub async fn global_message(event: EventType, user: &User) -> Result<Vec<u8>> {
     let (background, icon_action) = match event {
         EventType::MemberAdd => (JOIN_IMG, ADD_ICON),
         EventType::MemberRemove => (LEAVE_IMG, MINUS_ICON),
-        EventType::BanAdd => (MOD_IMG, HAMMER_ICON),
-        _ => {
-            return Err(anyhow!("Event is not MemberAdd or MemberRemove."));
-        }
+        EventType::BanAdd => (MOD_IMG, HAMMER_ICON)
     };
 
     // Text paint
@@ -41,13 +38,24 @@ pub async fn global_message(event: EventType, user: &User) -> Result<Vec<u8>> {
     // Avatar
     let avatar_hash = user
         .avatar
-        .as_ref()
-        .ok_or_else(|| anyhow!("User does not have an avatar."))?
-        .to_string();
-
-    let (url, is_gif) = display_avatar_url(user.id.get(), avatar_hash.as_str(), 256);
-    let cdn_avatar = load_image_from_cdn(url, is_gif)
-        .unwrap_or(load_image_from_bytes(DEFAULT_AVATAR)?);
+        .as_ref();
+    //let avatar_url = user.avatar_url();
+    
+    let cdn_avatar = {
+        if avatar_hash.is_some() {
+            //let avatar_url = avatar_url.unwrap();
+            let avatar_hash = avatar_hash.unwrap();
+            let is_animated = avatar_hash.is_animated();
+            let (url, _) = display_avatar_url(user.id.get(), &avatar_hash.to_string(), 0);
+            match load_image_from_cdn(&url, is_animated) {
+                Ok(image) => image,
+                Err(_) => load_image_from_bytes(DEFAULT_AVATAR)?
+            }
+        }
+        else {
+            load_image_from_bytes(DEFAULT_AVATAR)?
+        }
+    };
     
     let avatar = resize_image(cdn_avatar, 180, 180)?;
 
@@ -60,25 +68,22 @@ pub async fn global_message(event: EventType, user: &User) -> Result<Vec<u8>> {
     // Action icon
     let action_icon = load_image_from_bytes(icon_action)?;
     canvas.draw_image(&action_icon, Point { x: 205.0, y: 179.0 }, None);
-    canvas.save();
 
     // Welcome message
     if event == EventType::MemberAdd {
         let welcome_text = "WELCOME ABOARD";
         draw_text_with_font(&canvas, welcome_text, POPPINS, 16.0, 522.0, 68.0 - 6.0)?;
-        canvas.save();
     }
 
     draw_text_with_font(&canvas, &user.name, RUBIK, 60.0, 300.0, 100.0)?;
-    canvas.save();
 
     let undefined_nick = "Undefined".to_string();
     let nickname = user.global_name.as_ref().unwrap_or(&undefined_nick);
     draw_text_with_font(&canvas, &format!("@{}", nickname), LATO, 32.0, 300.0, 164.0)?;
-    canvas.save();
 
     let image = surface.image_snapshot();
     let encoded_data = image.encode(None, EncodedImageFormat::PNG, Some(100))
         .ok_or(anyhow!("Failed to encode image."))?;
+    
     Ok(encoded_data.to_vec())
 }
