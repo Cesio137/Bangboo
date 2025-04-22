@@ -20,14 +20,16 @@ pub async fn run(app: &App, ctx: Context, guild_id: GuildId, banned_user: User) 
         }
     };
 
-    let canvas = global_message(EventType::BanAdd, &banned_user).await.unwrap_or(vec![]);
-    if !canvas.is_empty() {
+    let canvas = global_message(EventType::BanAdd, &banned_user).await;
+    if let Ok(bytes) = canvas {
         let message = CreateMessage::new();
-        let attachment = CreateAttachment::bytes(canvas.as_slice(), "Bye.png");
+        let attachment = CreateAttachment::bytes(bytes, "Bye.png");
         if let Err(err) = system_channel_id.send_files(&ctx.http, vec![attachment], message).await {
             tracing::error!("Error when sending bye image: {:?}", err);
         }
         return;
+    } else if let Err(err) = canvas {
+        tracing::error!("Failed to create ban canvas: {:?}", err);
     }
 
     let id = banned_user.id.as_ref().to_string();

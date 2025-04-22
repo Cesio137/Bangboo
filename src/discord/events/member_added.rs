@@ -24,14 +24,16 @@ pub async fn run(app: &App, ctx: Context, member_added: Member) {
 
 
     let user = member_added.user.clone();
-    let canvas = global_message(EventType::MemberAdd, &user).await.unwrap_or(vec![]);
-    if !canvas.is_empty() {
+    let canvas = global_message(EventType::MemberAdd, &user).await;
+    if let Ok(bytes) = canvas {
         let message = CreateMessage::new();
-        let attachment = CreateAttachment::bytes(canvas.as_slice(), "Welcome.png");
+        let attachment = CreateAttachment::bytes(bytes, "Welcome.png");
         if let Err(err) = system_channel_id.send_files(&ctx.http, vec![attachment], message).await {
             tracing::error!("Error when sending welcome image: {:?}", err);
         }
         return;
+    } else if let Err(err) = canvas {
+        tracing::error!("Failed to create welcome canvas: {:?}", err);
     }
 
     let id = member_added.user.id.to_string();
