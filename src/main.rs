@@ -6,9 +6,8 @@ mod utils;
 
 #[cfg(target_env = "gnu")]
 use utils::malloc::malloc;
-
-use crate::discord::app::base::App;
-use crate::settings::env::ENV_SCHEMA;
+use discord::app::base::App;
+use settings::env::ENV_SCHEMA;
 use serenity::prelude::*;
 
 #[tokio::main]

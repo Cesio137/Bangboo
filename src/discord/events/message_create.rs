@@ -3,7 +3,7 @@ use crate::tools::automod::DangerLevel;
 use serenity::all::Message;
 use serenity::client::Context;
 
-pub async fn run(app: &App, ctx: Context, message: Message) {    
+pub async fn run(app: &App, ctx: Context, message: Message) {
     let result = app.scam_filter.filter_message(&message.content);
     match result {
         DangerLevel::Safe => {}
@@ -13,7 +13,7 @@ pub async fn run(app: &App, ctx: Context, message: Message) {
         }
     }
     
-    if let Some(callback) = app.prefix_commands.get(&message.content) {
-        callback(ctx, message).await;
+    if let Some(callback) = app.prefix_command_handlers.get(&message.content) {
+        callback.run(ctx, message).await;
     }
 }
