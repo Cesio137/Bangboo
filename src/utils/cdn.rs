@@ -1,8 +1,6 @@
-use crate::utils::skia::{load_image_from_bytes, wrap_sendable_image};
+use crate::utils::skia::load_image_from_bytes;
 use anyhow::{anyhow, Result};
-use skia_safe::{codec::{Options, ZeroInitialized}, surfaces, Codec, Data, Image, Sendable};
-#[cfg(target_env = "gnu")]
-use crate::utils::malloc::malloc;
+use skia_safe::{codec::{Options, ZeroInitialized}, surfaces, Codec, Data, Image};
 
 pub fn display_avatar_url(user_id: u64, hash: &str, size: u16) -> (String, bool) {
     let mut is_animated = false;
@@ -23,13 +21,10 @@ pub fn display_avatar_url(user_id: u64, hash: &str, size: u16) -> (String, bool)
     )
 }
 
-pub async fn load_image_from_cdn(url: &str, is_animated: bool) -> Result<Sendable<Image>> {
-    let response = reqwest::get(url).await?;
-    let bytes = response.bytes().await?;
-
+pub fn load_image_from_cdn(bytes: &[u8], is_animated: bool) -> Result<Image> {
     if is_animated {
         // Decode the GIF and extract the first frame
-        let data = Data::new_copy(&bytes);
+        let data = Data::new_copy(bytes);
         let mut codec = Codec::from_data(data).ok_or(anyhow!("Failed to decode gif."))?;
         let image_info = codec.info();
         let row_bytes = image_info.min_row_bytes();
@@ -49,18 +44,9 @@ pub async fn load_image_from_cdn(url: &str, is_animated: bool) -> Result<Sendabl
             .ok_or(anyhow!(""))?;
         let image = surface.image_snapshot();
         
-        drop(codec);
-        drop(image_info);
-        drop(bytes);
-        drop(surface);
-        #[cfg(target_env = "gnu")]
-        malloc::trim();
-        return Ok(wrap_sendable_image(image)?)
+        return Ok(image)
     }
     // PNG
     let image = load_image_from_bytes(&bytes)?;
-    drop(bytes);
-    #[cfg(target_env = "gnu")]
-    malloc::trim();
     Ok(image)
 }
