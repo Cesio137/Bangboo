@@ -14,6 +14,6 @@ pub async fn run(app: &App, ctx: Context, message: Message) {
     }
     
     if let Some(callback) = app.prefix_command_handlers.get(&message.content) {
-        callback.run(ctx, message).await;
+        callback.run(app, ctx, message).await;
     }
 }

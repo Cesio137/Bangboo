@@ -2,9 +2,10 @@ use async_trait::async_trait;
 use crate::settings::global::EColor;
 use crate::utils::embeds::res;
 use crate::utils::global::{global_message, EventType};
-use crate::utils::interaction::{defer_reply, reply_with_attachment, reply_with_embed};
-use serenity::all::{CommandInteraction, CommandType, Context, CreateCommand, InteractionContext};
+use crate::utils::interaction::{reply_with_attachment, reply_with_embed};
+use serenity::all::{CacheHttp, CommandInteraction, CommandType, Context, CreateCommand, InteractionContext};
 use serenity::builder::CreateAttachment;
+use crate::discord::app::base::App;
 use crate::discord::app::creators::SlashCommandHandler;
 
 pub struct Canvas;
@@ -18,8 +19,8 @@ impl SlashCommandHandler for Canvas {
             .add_context(InteractionContext::Guild)
     }
 
-    async fn run(&self, ctx: Context, interaction: CommandInteraction) {
-        if let Err(err) = defer_reply(&ctx, &interaction).await {
+    async fn run(&self, app: &App, ctx: Context, interaction: CommandInteraction) {
+        if let Err(err) = interaction.defer(ctx.http()).await {
             tracing::error!("{}", err);
             return
         }

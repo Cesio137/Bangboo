@@ -20,6 +20,7 @@ pub fn slash_commands() -> Vec<Box<dyn SlashCommandHandler + Send + Sync>> {
         commands.push(Box::new(canvas::Canvas));
     }
     commands.push(Box::new(age::Age));
+    commands.push(Box::new(moderate::Moderate));
     
     commands
 }

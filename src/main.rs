@@ -1,18 +1,19 @@
 mod discord;
-mod models;
 mod settings;
 mod tools;
 mod utils;
 
 #[cfg(target_env = "gnu")]
 use utils::malloc::malloc::configure_malloc;
-use std::sync::Arc;
 use discord::app::base::App;
 use settings::env::ENV_SCHEMA;
+use std::sync::Arc;
 use serenity::prelude::*;
+use tokio::signal;
+use anyhow::Result;
 
 #[tokio::main]
-async fn main() { 
+async fn main() -> Result<()> { 
     #[cfg(target_env = "gnu")]
     configure_malloc();
 
@@ -28,7 +29,9 @@ async fn main() {
         .await
         .expect("Err creating client");
 
-    if let Err(err) = client.start().await {
+    if let Err(err) = client.start_autosharded().await {
         println!("Client error: {err:?}");
     }
+
+    Ok(())
 }
