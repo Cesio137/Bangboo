@@ -1,62 +1,42 @@
 use anyhow::Result;
-use serenity::all::{CommandInteraction, Context, CreateEmbed, CreateInteractionResponse, CreateInteractionResponseMessage};
-use serenity::builder::CreateAttachment;
-
-pub async fn defer_reply(ctx: &Context, interaction: &CommandInteraction) -> Result<()> {
-    ctx.http.create_interaction_response(
-        interaction.id,
-        &interaction.token,
-        &CreateInteractionResponse::Defer(
-            CreateInteractionResponseMessage::default()
-        ),
-        vec![]
-    ).await?;
-
-    Ok(())
-}
+use serenity::all::{CacheHttp, CommandInteraction, Context, CreateAttachment, CreateEmbed, CreateInteractionResponse, CreateInteractionResponseFollowup, CreateInteractionResponseMessage, EditInteractionResponse};
 
 pub async fn reply_with_embed(ctx: &Context, interaction: &CommandInteraction, embed: CreateEmbed, is_defered: bool) -> Result<()> {
     if is_defered {
-        let interaction_message = CreateInteractionResponseMessage::default()
+        let interaction_message = CreateInteractionResponseMessage::new()
             .embed(embed);
-        ctx.http.edit_original_interaction_response(
-            &interaction.token,
-            &interaction_message,
-            vec![]
+        interaction.create_response(
+            ctx.http(),
+            CreateInteractionResponse::Message(interaction_message)
         ).await?;
     } else {
-        let interaction_message = CreateInteractionResponse::Message(
-            CreateInteractionResponseMessage::default().embed(embed)
-        );
-        ctx.http.create_interaction_response(
-            interaction.id,
-            &interaction.token,
-            &interaction_message,
-            vec![]
+        let followup_message = CreateInteractionResponseFollowup::new()
+            .embed(embed);
+        interaction.create_followup(
+            ctx.http(),
+            followup_message
         ).await?;
     }
 
     Ok(())
-
 }
 
 pub async fn reply_with_attachment(ctx: &Context, interaction: &CommandInteraction, attachment: CreateAttachment, is_defered: bool) -> Result<()> {
     if is_defered {
-        let interaction_message = CreateInteractionResponseMessage::default();
-        ctx.http.edit_original_interaction_response(
-            &interaction.token,
-            &interaction_message,
-            vec![attachment]
+        let interaction_message = EditInteractionResponse::new()
+            .new_attachment(attachment);
+        interaction.edit_response(
+            ctx.http(),
+            interaction_message
         ).await?;
     } else { 
         let interaction_message = CreateInteractionResponse::Message(
-            CreateInteractionResponseMessage::default()
+            CreateInteractionResponseMessage::new()
+                .add_file(attachment)
         );
-        ctx.http.create_interaction_response(
-            interaction.id,
-            &interaction.token,
-            &interaction_message,
-            vec![attachment]
+        interaction.create_response(
+            ctx.http(),
+            interaction_message
         ).await?;
     }
 

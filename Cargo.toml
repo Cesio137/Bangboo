@@ -1,6 +1,6 @@
 [package]
 name = "Bangboo"
-version = "0.2.16"
+version = "0.3.0"
 edition = "2024"
 
 [profile.release]
@@ -10,11 +10,10 @@ codegen-units = 1
 panic = "abort"
 
 [dependencies]
-serenity = { version = "0.12" }
+serenity = { version = "0.12", features = ["collector"] }
 # THIRDPARTY
 async-trait = { version = "0.1" }
 anyhow = { version = "1.0" }
-chrono = { version = "0.4" }
 colored = { version = "3" }
 dotenvy = { version = "0.15" }
 once_cell = { version = "1.21" }
@@ -26,3 +25,4 @@ skia-safe = { version = "0.84", features = ["textlayout"] }
 tracing-subscriber = { version = "0.3" }
 tracing = { version = "0.1" }
 tokio = { version = "1.44", features = ["rt-multi-thread", "signal"] }
+chrono = { version = "0.4" }

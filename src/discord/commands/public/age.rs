@@ -4,6 +4,7 @@ use crate::settings::global::EColor;
 use crate::utils::{embeds::res, interaction::reply_with_embed};
 use serenity::all::{CommandDataOptionValue, CommandInteraction, CommandOptionType, CommandType, Context, CreateCommand, InteractionContext};
 use serenity::builder::CreateCommandOption;
+use crate::discord::app::base::App;
 
 pub struct Age;
 
@@ -19,14 +20,14 @@ impl SlashCommandHandler for Age {
             .add_context(InteractionContext::Guild)
     }
 
-    async fn run(&self, ctx: Context, interaction: CommandInteraction) {
+    async fn run(&self, app: &App, ctx: Context, interaction: CommandInteraction) {
         let user_id = match interaction.data.options.first() {
             None => interaction.user.id,
             Some(option) => {
                 if let CommandDataOptionValue::User(user_id) = option.value {
-                    user_id
+                    user_id.clone()
                 } else {
-                    interaction.user.id
+                    interaction.user.id.clone()
                 }
             }
         };
@@ -53,7 +54,6 @@ impl SlashCommandHandler for Age {
         );
 
         let embed = res(EColor::Green, content);
-
         if let Err(err) = reply_with_embed(&ctx, &interaction, embed, false).await {
             tracing::error!("Failed to reply /age command.\n{}", err);
         }

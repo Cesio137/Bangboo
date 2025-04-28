@@ -6,7 +6,7 @@ pub async fn run(app: &App, ctx: Context, interaction: Interaction) {
         Interaction::Ping(_) => {}
         Interaction::Command(command) => {
             if let Some(callback) = app.slash_command_handlers.get(&command.data.name) {
-                callback.run(ctx, command).await;
+                callback.run(app, ctx, command).await;
             }
         }
         Interaction::Autocomplete(_) => {}
