@@ -9,7 +9,7 @@ This project is currently for my personal use, but I hope to monetize it in the 
 ## Scripts
 
 - `cargo run`: running bot
-- `cargo build`: build the bot project
+- `cargo build --release`: build the bot project
 
 ## Thirdparty Libraries
 
