@@ -6,7 +6,7 @@ use actions::*;
 use components::*;
 use modal::*;
 use crate::discord::app::creators::ResponderHandler;
-use crate::settings::global::EColor;
+use crate::settings::global::{EColor, APP_RULE_ID, KERNEL_RULE_ID, STF_RULE_ID};
 use anyhow::Result;
 use async_trait::async_trait;
 use serenity::all::{CreateEmbed, CreateEmbedAuthor};
@@ -221,7 +221,7 @@ pub async fn filter_ids(ctx: &Context, guild_id: &GuildId, ids: Vec<UserId>) -> 
                 }
             }
 
-            if member.roles.contains(&RoleId::new(1254154469428691035)) {
+            if member.roles.contains(&RoleId::new(KERNEL_RULE_ID)) || member.roles.contains(&RoleId::new(STF_RULE_ID)) || member.roles.contains(&RoleId::new(APP_RULE_ID)) {
                 continue;
             }
 

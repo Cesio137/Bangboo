@@ -13,6 +13,11 @@ pub const MINUS_ICON: &[u8] = include_bytes!("../../assets/icons/static/minus.pn
 pub const HAMMER_ICON: &[u8] = include_bytes!("../../assets/icons/static/hammer.png");
 pub const REGEX: &str = r"\[([^\]]+)\]\((https?://[^\)]+)\)";
 
+// Rules
+pub const APP_RULE_ID: u64 = 1287814349372653660;
+pub const KERNEL_RULE_ID: u64 = 1254151838287138887;
+pub const STF_RULE_ID: u64 = 1254154469428691035;
+
 #[derive(Clone, Copy)]
 #[repr(u32)]
 pub enum EColor {
