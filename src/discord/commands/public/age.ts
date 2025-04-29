@@ -1,11 +1,12 @@
 import { createCommand } from "#base";
 import { res } from "#functions";
-import { ApplicationCommandOptionType, ApplicationCommandType } from "discord.js";
+import { ApplicationCommandOptionType, ApplicationCommandType, InteractionContextType } from "discord.js";
 
 createCommand({
     name: "age",
     description: "Displays your or another user's account creation date.",
     type: ApplicationCommandType.ChatInput,
+    contexts: [ InteractionContextType.Guild ],
     options: [
         {
             name: "user",

@@ -1,7 +1,6 @@
 import { spaceBuilder } from "@magicyan/discord";
 import ck from "chalk";
 import { ButtonInteraction, CacheType, ChannelSelectMenuInteraction, MentionableSelectMenuInteraction, MessageComponentInteraction, ModalMessageModalSubmitInteraction, ModalSubmitInteraction, RoleSelectMenuInteraction, StringSelectMenuInteraction, UserSelectMenuInteraction } from "discord.js";
-import { isPromise } from "node:util/types";
 import { findRoute, RouterContext } from "rou3";
 import { baseStorage } from "./base.storage.js";
 import { CheckRoute, NotEmptyArray, Params, Prettify, UniqueArray } from "./base.types.js";
@@ -44,7 +43,7 @@ export interface ResponderData<
     types: NotEmptyArray<UniqueArray<Types>>, 
     cache?: Cache;
     parse?(params: Params<Path>): Parsed;
-    run(interaction: ResponderInteraction<Types[number], Cache>, params: ResolveParams<Path, Parsed>): void;
+    run(interaction: ResponderInteraction<Types[number], Cache>, params: ResolveParams<Path, Parsed>): Promise<void>;
 }
 
 type GenericResponderData = ResponderData<string, readonly ResponderType[], any, CacheType>;
@@ -85,23 +84,20 @@ export async function baseResponderHandler(interaction: MessageComponentInteract
     const middleware = baseStorage.config.responders.middleware;
     const onError = baseStorage.config.responders.onError;
 
-    try {
-        let block = false;
-        if (middleware) await middleware(interaction, params, () => block=true);
-        if (block) return;
-        
-        const execution = handler.data.run(interaction as never, params);
-        if (isPromise(execution) && onError){
-            execution.catch(error => onError(error, interaction, params));
-        }
-    } catch(error){
-        if (onError) onError(error, interaction, params);
-        else throw error;
+    let block = false;
+    if (middleware) await middleware(interaction, () => block=true, params);
+    if (block) return;
+    
+    const execution = handler.data.run(interaction as never, params);
+    if (onError){
+        await execution.catch(error => onError(error, interaction, params));
+    } else {
+        await execution;
     }
 }
 
 export function baseResponderLog(customId: string, type: string){
     const u = ck.underline;
     baseStorage.loadLogs.responders
-    .push(ck.green(spaceBuilder(u.greenBright(type),u.blue(customId),"responder loaded!")))
+    .push(ck.green(spaceBuilder(ck.greenBright(`▸ ${type}`),ck.gray(">"), u.blue(customId),"✓")))
 }

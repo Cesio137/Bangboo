@@ -1,45 +1,60 @@
 import { createCommand, createResponder, ResponderType } from "#base";
-import { createEmbed, createEmbedAuthor, createRow } from "@magicyan/discord";
-import { ApplicationCommandType, ButtonBuilder, ButtonStyle, InteractionReplyOptions, User } from "discord.js";
+import { settings } from "#settings";
+import { createContainer, createSection } from "@magicyan/discord";
+import { ApplicationCommandType, ButtonBuilder, ButtonStyle, InteractionReplyOptions } from "discord.js";
 
 createCommand({
     name: "counter",
     description: "Counter command 🔢",
     type: ApplicationCommandType.ChatInput,
-    run(interaction) {
-        interaction.reply(counterMenu(interaction.user, 0));
+    async run(interaction) {
+        await interaction.reply(counterMenu(0));
     }
 });
 
 createResponder({
     customId: "counter/:current",
     types: [ResponderType.Button], cache: "cached",
+    parse: params => ({ 
+        current: Number.parseInt(params.current) 
+    }),
     async run(interaction, { current }) {
-        const parsed = Number.parseInt(current);
-        await interaction.update(counterMenu(interaction.user, parsed));
+        await interaction.update(
+            counterMenu(current)
+        );
     },
 });
 
-function counterMenu<R>(user: User, current: number): R {    
-    const embed = createEmbed({
-        author: createEmbedAuthor(user),
-        color: "Random",
-        description: `Current value: ${current}`
+function counterMenu<R>(current: number): R {
+    const container = createContainer({
+        accentColor: settings.colors.azoxo,
+        components: [
+            createSection({
+                content: `## Current value: \` ${current} \``,
+                button: new ButtonBuilder({
+                    customId: `counter/00`, 
+                    label: "Reset", style: ButtonStyle.Secondary
+                }),
+            }),
+            createSection({
+                content: `-# Increment value`,
+                button: new ButtonBuilder({
+                    customId: `counter/${current+1}`, 
+                    label: "+", style: ButtonStyle.Success
+                }),
+            }),
+            createSection({
+                content: `-# Decrement value`,
+                button: new ButtonBuilder({
+                    customId: `counter/${current-1}`, 
+                    label: "-", style: ButtonStyle.Danger
+                }),
+            }),
+        ]
     });
-    const components = [
-        createRow(
-            new ButtonBuilder({
-                customId: `counter/${current+1}`, 
-                label: "+", style: ButtonStyle.Success
-            }),
-            new ButtonBuilder({
-                customId: `counter/${current-1}`, 
-                label: "-", style: ButtonStyle.Danger
-            }),
-        )
-    ];
 
     return ({
-        flags, embeds: [embed], components
+        flags: ["Ephemeral", "IsComponentsV2"],
+        components: [container]
     } satisfies InteractionReplyOptions) as R;
 }

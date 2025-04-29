@@ -1,16 +1,17 @@
 import { Canvas, loadImage } from "@napi-rs/canvas";
 import {
   AttachmentBuilder,
-  ChannelType,
   Events,
   GuildMember,
   PartialGuildMember,
+  TextChannel,
 } from "discord.js";
 import { join } from "path";
 
 export async function globalMessage(
   event: Events,
   member: GuildMember | PartialGuildMember,
+  channel: TextChannel
 ) {
   const canvas = new Canvas(1024, 260);
   const context = canvas.getContext("2d");
@@ -75,11 +76,5 @@ export async function globalMessage(
   const buffer = await canvas.encode("png");
   const attachment = new AttachmentBuilder(buffer, { name: "card.png" });
 
-  const { guild } = member;
-  const channel = guild.channels.cache.find((ch) => ch.name === "😏┊welcome");
-  if (channel?.type !== ChannelType.GuildText) {
-    console.log("Channel not found");
-    return;
-  }
   channel.send({ files: [attachment] });
 }

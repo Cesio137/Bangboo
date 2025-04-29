@@ -4,24 +4,26 @@ import { baseCommandLog, CommandData, CommandType } from "./base.command.js";
 import { baseEventLog, EventData } from "./base.event.js";
 import { baseResponderLog, ResponderData, ResponderType } from "./base.responder.js";
 import { baseStorage } from "./base.storage.js";
-import { BaseStorageCommandConfig, BaseStorageRespondersConfig } from "./base.types.js";
+import { BaseStorageCommandConfig, BaseStorageEventsConfig, BaseStorageRespondersConfig } from "./base.types.js";
 
 interface CommandCreatorOptions extends Partial<BaseStorageCommandConfig> {
     defaultMemberPermissions?: PermissionResolvable[];
 }
 
-interface ResponderCreatorOptions extends Partial<BaseStorageRespondersConfig> {
-    
-}
+interface ResponderCreatorOptions extends Partial<BaseStorageRespondersConfig> {}
+
+interface EventCreatorOptions extends Partial<BaseStorageEventsConfig> {}
 
 interface SetupCreatorsOptions {
     commands?: CommandCreatorOptions;
-    responders?: ResponderCreatorOptions
+    responders?: ResponderCreatorOptions;
+    events?: EventCreatorOptions;
 }
 export function setupCreators(options: SetupCreatorsOptions = {}){
     
     /** @commands */
     baseStorage.config.commands.guilds = options.commands?.guilds??[];
+    baseStorage.config.commands.verbose = options.commands?.verbose
     baseStorage.config.commands.middleware = options.commands?.middleware;
     baseStorage.config.commands.onNotFound = options.commands?.onNotFound;
     baseStorage.config.commands.onError = options.commands?.onError;
@@ -30,8 +32,10 @@ export function setupCreators(options: SetupCreatorsOptions = {}){
     baseStorage.config.responders.middleware = options.responders?.middleware;
     baseStorage.config.responders.onNotFound = options.responders?.onNotFound;
     baseStorage.config.responders.onError = options.responders?.onError;
-
-    /** @logs */
+    
+    /** @events  */
+    baseStorage.config.events.middleware = options.events?.middleware;
+    baseStorage.config.events.onError = options.events?.onError;
 
     return {
         createCommand: function<
@@ -42,12 +46,13 @@ export function setupCreators(options: SetupCreatorsOptions = {}){
             /** @defaults */
             data.type??=ApplicationCommandType.ChatInput as Type
             data.dmPermission??=false as DmPermission;
-            data.defaultMemberPermissions??=options.commands?.defaultMemberPermissions;
+            if (options.commands?.defaultMemberPermissions){
+                data.defaultMemberPermissions??=options.commands?.defaultMemberPermissions;
+            }
             /** @store */
             baseStorage.commands.set(data.name, data);
 
             baseCommandLog(data);
-
             return data;
         },
         createEvent: function<
@@ -59,14 +64,13 @@ export function setupCreators(options: SetupCreatorsOptions = {}){
             baseStorage.events.set(data.event, events);
 
             baseEventLog(data);
-            
             return data;
         },
         createResponder: function<
             Path extends string, 
             const Types extends readonly ResponderType[], 
             Schema, 
-            Cache extends CacheType = CacheType
+            Cache extends CacheType = CacheType,
         >(data: ResponderData<Path, Types, Schema, Cache>){
             /** @store */
             const { customId } = data;

@@ -1,12 +1,13 @@
-import { baseErrorHandler, log } from "#settings";
-import { CustomItents, CustomPartials } from "@magicyan/discord";
+import { baseErrorHandler, env, logger } from "#settings";
 import { Client, ClientOptions, version as djsVersion } from "discord.js";
+import { CustomItents, CustomPartials } from "@magicyan/discord";
 import { baseAutocompleteHandler, baseCommandHandler, baseRegisterCommands } from "./base.command.js";
+import { baseStorage } from "./base.storage.js";
 import { baseRegisterEvents } from "./base.event.js";
 import { baseResponderHandler } from "./base.responder.js";
-import { baseStorage } from "./base.storage.js";
-import glob from "fast-glob";
+import { BASE_VERSION, runtimeDisplay } from "./base.version.js";
 import ck from "chalk";
+import glob from "fast-glob";
 import { baseLoadDiscordPlayerExtractors } from "./base.player.js";
 
 interface BootstrapOptions extends Partial<ClientOptions> {
@@ -25,7 +26,7 @@ interface BootstrapOptions extends Partial<ClientOptions> {
     whenReady?(client: Client<true>): void;
 }
 export async function bootstrap(options: BootstrapOptions){
-    const client = createClient(process.env.BOT_TOKEN, options);
+    const client = createClient(env.BOT_TOKEN, options);
     options.beforeLoad?.(client);
     
     await loadModules(options.meta.dirname, options.directories);
@@ -33,12 +34,13 @@ export async function bootstrap(options: BootstrapOptions){
     if (options.loadLogs??true){
         loadLogs();
     }
-
-    console.log();
-    log.info("📦",
-        `${ck.hex("#5865F2").underline("discord.js")} ${ck.dim(djsVersion)}`,
-        "/",
-        `${ck.hex("#68a063").underline("NodeJs")} ${ck.dim(process.versions.node)}`,
+    
+    logger.log();
+    logger.log(ck.blue(`★ Constatic Base ${ck.reset.dim(BASE_VERSION)}`));
+    logger.log(
+        `${ck.hex("#5865F2")("◌ discord.js")} ${ck.dim(djsVersion)}`,
+        "|",
+        runtimeDisplay
     );
     
     baseRegisterEvents(client);
@@ -59,9 +61,7 @@ async function loadModules(workdir: string, directories: string[] = []){
         )
     ].flat(), { absolute: true, cwd: workdir });
 
-    await Promise.all(files.map(path => {
-        return import(`file://${path}`);
-    }));
+    await Promise.all(files.map(path => import(`file://${path}`)));
 }
 
 function createClient(token: string, options: BootstrapOptions) {
@@ -76,16 +76,17 @@ function createClient(token: string, options: BootstrapOptions) {
 
     client.token=token;
     client.on("ready", async (client) => {
-        await client.guilds.fetch().catch(() => null);
+        registerErrorHandlers(client);
 
-        log.log(ck.greenBright(`➝ Online as ${ck.hex("#57F287").underline(client.user.username)}`));
-        
+        await client.guilds.fetch().catch(() => null);;
+
+        logger.log(ck.green(`● ${ck.greenBright.underline(client.user.username)} online ✓`))
+
         await baseRegisterCommands(client);
-        
-        process.on("uncaughtException", err => baseErrorHandler(err, client));
-        process.on("unhandledRejection", err => baseErrorHandler(err, client));
-        
-        options.whenReady?.(client);
+
+        if (options.whenReady){
+            options.whenReady(client);
+        }
     });
 
     client.on("interactionCreate", async (interaction) => {
@@ -113,5 +114,20 @@ function loadLogs(){
         baseStorage.loadLogs.responders,
         baseStorage.loadLogs.events,
     ].flat();
-    logs.forEach(text => log.success(text));
+    logs.forEach(text => logger.log(text));
 }
+
+function registerErrorHandlers(client?: Client<true>){
+    if (client){
+        process.removeListener("uncaughtException", baseErrorHandler);
+        process.removeListener("unhandledRejection", baseErrorHandler);
+
+        process.on("uncaughtException", err => baseErrorHandler(err, client));
+        process.on("unhandledRejection", err => baseErrorHandler(err, client));
+        return;
+    }
+    process.on("uncaughtException", baseErrorHandler);
+    process.on("unhandledRejection", baseErrorHandler);
+}
+
+registerErrorHandlers();

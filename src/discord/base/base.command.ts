@@ -1,9 +1,11 @@
-import { ApplicationCommandType, AutocompleteInteraction, CacheType, ChatInputApplicationCommandData, ChatInputCommandInteraction, Client, CommandInteraction, MessageApplicationCommandData, MessageContextMenuCommandInteraction, UserApplicationCommandData, UserContextMenuCommandInteraction } from "discord.js";
+import { logger } from "#settings";
+import { brBuilder } from "@magicyan/discord";
+import ck from "chalk";
+import { ApplicationCommand, ApplicationCommandOptionChoiceData, ApplicationCommandType, AutocompleteInteraction, CacheType, ChatInputApplicationCommandData, ChatInputCommandInteraction, Client, Collection, CommandInteraction, MessageApplicationCommandData, MessageContextMenuCommandInteraction, UserApplicationCommandData, UserContextMenuCommandInteraction } from "discord.js";
 import { baseStorage } from "./base.storage.js";
 import { ContextName, SlashName } from "./base.types.js";
-import ck from "chalk";
-import { log } from "#settings";
-import { brBuilder } from "@magicyan/discord";
+
+type AutocompleteReturn = Promise<void | undefined | readonly ApplicationCommandOptionChoiceData[]>;
 
 export type CommandType = Exclude<ApplicationCommandType, ApplicationCommandType.PrimaryEntryPoint>;
 type Cache<D extends boolean> = D extends false ? "cached" : CacheType;
@@ -16,17 +18,17 @@ type ApplicationCommandData<
 T extends ApplicationCommandType.User ? 
     UserApplicationCommandData & {
         name: ContextName<N>,
-        run(interaction: UserContextMenuCommandInteraction<Cache<D>>): void;
+        run(interaction: UserContextMenuCommandInteraction<Cache<D>>): Promise<void>;
     } :
 T extends ApplicationCommandType.Message ? 
     MessageApplicationCommandData & {
         name: ContextName<N>,
-        run(interaction: MessageContextMenuCommandInteraction<Cache<D>>): void;
+        run(interaction: MessageContextMenuCommandInteraction<Cache<D>>): Promise<void>;
     } :
     ChatInputApplicationCommandData & {
         name: SlashName<N>,
-        run(interaction: ChatInputCommandInteraction<Cache<D>>): void;
-        autocomplete?(interaction: AutocompleteInteraction<Cache<D>>): void;
+        run(interaction: ChatInputCommandInteraction<Cache<D>>): Promise<void>;
+        autocomplete?(interaction: AutocompleteInteraction<Cache<D>>): AutocompleteReturn;
     }
 
 export type CommandData<
@@ -50,28 +52,25 @@ export async function baseCommandHandler(interaction: CommandInteraction){
         return;
     };
 
-    try {
-        let block = false;
-        if (middleware) await middleware(interaction, () => block=true);
-        if (block) return;
+    let block = false;
+    if (middleware) await middleware(interaction, () => block=true);
+    if (block) return;
 
-        const execution = command.run(interaction as never) as void | Promise<void>;
-        if (execution instanceof Promise && onError){
-            execution.catch(error => onError(error, interaction));
-        }
-    } catch(error){
-        if (onError){
-            onError(error, interaction);
-        } else {
-            throw error;
-        };
+    const execution = command.run(interaction as never);
+    if (onError){
+        await execution.catch(error => onError(error, interaction));
+    } else {
+        await execution;
     }
 }
 
 export async function baseAutocompleteHandler(interaction: AutocompleteInteraction){
     const command = baseStorage.commands.get(interaction.commandName);
     if (command && "autocomplete" in command && command.autocomplete){
-        command.autocomplete(interaction);
+        const choices = await command.autocomplete(interaction);
+        if (choices && Array.isArray(choices)){
+            interaction.respond(choices.slice(0, 25));
+        }
     };
 }
 
@@ -90,20 +89,27 @@ export async function baseRegisterCommands(client: Client<true>) {
             .map(c => Array.from(c.values()));
         
         await client.application.commands.set(globalCommands)
-            .then(({ size }) => Boolean(size) &&
-                messages.push(ck.greenBright(
-                    `⤿ ${size} command${plural(size)} successfully registered globally!`
-                ))
-            );
+        .then(commands => {
+            if (!commands.size) return;
+            messages.push(ck.greenBright(
+                `└ ${commands.size} command${plural(commands.size)} successfully registered globally!`
+            ));
+            if (baseStorage.config.commands.verbose){
+                messages.push(...verbooseLogs(commands));
+            }
+        });
         for (const guild of guilds.values()) {
             await guild.commands.set(guildCommands)
-            .then(({ size }) => Boolean(size) &&
+            .then(commands => {
                 messages.push(ck.greenBright(
-                    `⤿ ${size} command${plural(size)} registered in ${ck.underline(guild.name)} guild successfully!`
+                    `└ ${commands.size} command${plural(commands.size)} registered in ${ck.underline(guild.name)} guild successfully!`
                 ))
-            );
+                if (baseStorage.config.commands.verbose){
+                    messages.push(...verbooseLogs(commands));
+                }
+            });
         }
-        log.log(brBuilder(messages));
+        logger.log(brBuilder(messages));
         return;
     }
     for (const guild of client.guilds.cache.values()) {
@@ -111,16 +117,50 @@ export async function baseRegisterCommands(client: Client<true>) {
     }
     const commands = Array.from(baseStorage.commands.values());
     await client.application.commands.set(commands)
-    .then(({ size }) => 
+    .then(commands => {
         messages.push(ck.greenBright(
-            `⤿ ${size} command${plural(size)} successfully registered globally!`
-        ))
-    );
+            `└ ${commands.size} command${plural(commands.size)} successfully registered globally!`
+        ));
+        if (baseStorage.config.commands.verbose){
+            messages.push(...verbooseLogs(commands));
+        }
+    });
 
-    log.log(brBuilder(messages));
+    logger.log(brBuilder(messages));
+}
+
+function verbooseLogs(commands: Collection<string, ApplicationCommand>){
+    const u = ck.underline;
+    return commands.map(({ id, name, type: commandType, client, createdAt, guild }) => {
+        const [icon] = getCommandTitle(commandType);
+
+        return ck.dim.green(
+            [
+                ` └ ${icon}`,
+                u.cyan(id),
+                "CREATED",
+                u.blue(name),
+                ck.gray(">"),
+                guild 
+                ? `${u.blue(guild.name)} guild`
+                : `${u.blue(client.user.username)} application`,
+                ck.gray(">"),
+                "created at:",
+                u.greenBright(createdAt.toLocaleTimeString()),
+            ].join(" ")
+        )
+    });
 }
 
 export function baseCommandLog(data: GenericCommandData){
+    const [icon, type] = getCommandTitle(data.type);
+
     baseStorage.loadLogs.commands
-    .push(ck.green(`{/} ${ck.blue.underline(data.name)} command loaded!`))
+    .push(ck.green(`${icon} ${type} ${ck.gray(">")} ${ck.blue.underline(data.name)} ✓`))
 };
+
+function getCommandTitle(type: ApplicationCommandType){
+    return type === ApplicationCommandType.Message ? ["{☰}", "Message context menu"] :
+    type === ApplicationCommandType.User ? ["{☰}", "User context menu"] :
+    ["{/}", "Slash command"]
+}

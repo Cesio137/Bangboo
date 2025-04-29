@@ -1,17 +1,17 @@
 import { createEvent } from "#base";
+import { Events } from "discord.js";
 import { globalMessage } from "#functions";
-import { ChannelType, Events } from "discord.js";
 
 createEvent({
     name: "Member Added",
     event: "guildMemberAdd",
-    run(member) {
+    async run(member) {
         const { guild } = member;
-        const channel = guild.channels.cache.find((ch) => ch.name === "😏┊welcome");
-        if (channel?.type !== ChannelType.GuildText) {
+        const system_channel = guild.systemChannel;
+        if (typeof system_channel == null) {
             console.log("Channel not found");
             return;
         }
-        globalMessage(Events.GuildMemberAdd, member);
+        globalMessage(Events.GuildMemberAdd, member, system_channel!);
     },
 });

@@ -63,20 +63,34 @@ type InArray<T, X> =
 
 interface BaseStorageCommandConfig {
     guilds: string[];
+    verbose?: boolean;
     middleware?(interaction: CommandInteraction, block: ()=> void): Promise<void>;
     onNotFound?(interaction: CommandInteraction): void;
     onError?(error: unknown, interaction: CommandInteraction): void;
 }
 
 interface BaseStorageRespondersConfig {
-    middleware?(interaction: GenericResponderInteraction, params: object, block: ()=> void): Promise<void>;
+    middleware?(interaction: GenericResponderInteraction, block: ()=> void, params: object): Promise<void>;
     onNotFound?(interaction: GenericResponderInteraction): void;
     onError?(error: unknown, interaction: GenericResponderInteraction, params: object): void;
+}
+
+type EventPropData = {
+    [Key in keyof ClientEvents]: {
+        name: Key;
+        args: ClientEvents[Key]
+    }
+}[keyof ClientEvents]
+
+interface BaseStorageEventsConfig {
+    middleware?(event: EventPropData, block: (...tags: string[]) => void): Promise<void>;
+    onError?(error: unknown, event: EventPropData): void;
 }
 
 interface BaseStorageConfig {
     commands: BaseStorageCommandConfig
     responders: BaseStorageRespondersConfig;
+    events: BaseStorageEventsConfig;
 }
 
 interface BaseStorageLoadLogs {
