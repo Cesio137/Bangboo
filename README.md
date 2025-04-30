@@ -1,3 +1,11 @@
+# Bangboo Discord Bot
+
+An intelligent Discord bot built with Rust.
+
+Hi, I’m @NathanMiguel, and I’m developing a bot to help me moderate my community, play music, and streamline some tasks using AI.
+
+This project is currently for my personal use, but I hope to monetize it in the future. 😄
+
 # Awesome Bot Base
 
 > [!NOTE] 
@@ -21,3 +29,7 @@ This is the most complete discord bot base you've ever seen! Developed by [@rinc
 - [Commands](https://constatic-docs.vercel.app/docs/discord/commands)
 - [Responder](https://constatic-docs.vercel.app/docs/discord/responders)
 - [Events](https://constatic-docs.vercel.app/docs/discord/events)
+
+## Special Mentions
+
+- [Ravena Star](https://github.com/ravenastar-js/shortlinks-scams) by the scam message filter against messages like ```free steam gift card```.
