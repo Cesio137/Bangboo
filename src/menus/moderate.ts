@@ -1,4 +1,4 @@
-import { createEmbed, createModalInput, createRow } from "@magicyan/discord";
+import { createEmbed, createRow } from "@magicyan/discord";
 import { User, UserSelectMenuBuilder, StringSelectMenuBuilder, ButtonBuilder, ButtonStyle, InteractionReplyOptions } from "discord.js";
 
 export function loadMenu<R>(user: User): R {

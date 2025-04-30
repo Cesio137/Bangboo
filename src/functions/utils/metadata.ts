@@ -1,3 +1,4 @@
+/*
 import { GuildQueue } from "discord-player";
 import { Client, Guild, GuildTextBasedChannel, VoiceBasedChannel } from "discord.js";
 
@@ -15,3 +16,4 @@ export function createQueueMetadata(metadata: QueueMetadata) {
 export function getQueueMetadata(queue: GuildQueue): QueueMetadata {
   return queue.metadata as QueueMetadata;
 }
+*/
