@@ -5,6 +5,7 @@ import "./global.js";
 import { logger } from "./logger.js";
 import { validateEnv } from "./env.validate.js";
 export * from "./discordjs.js"
+export * from "./player.js"
 export * from "./error.js";
 
 const env = validateEnv(envSchema);

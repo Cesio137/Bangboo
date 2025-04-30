@@ -1,9 +1,10 @@
+/*
 import { createCommand } from "#base";
 import { createQueueMetadata, icon, res } from "#functions";
-import { settings } from "#settings";
+import { properties, settings } from "#settings";
 import { brBuilder, createEmbed } from "@magicyan/discord";
 import { multimenu } from "@magicyan/discord-ui";
-import { QueryType, SearchQueryType } from "discord-player";
+import { SearchQueryType } from "discord-player";
 import {
     ApplicationCommandOptionType,
     ApplicationCommandType,
@@ -29,7 +30,7 @@ createCommand({
                     name: "engine",
                     description: "Search engine(optional).",
                     type: ApplicationCommandOptionType.String,
-                    choices: Object.values(QueryType).map((type) => ({
+                    choices: Object.values(properties.queryType).map((type) => ({
                         name: type,
                         value: type,
                     })),
@@ -104,7 +105,7 @@ createCommand({
             case "add":
                 try {
                     const query = options.getString("search", true);
-                    const searchEngine = options.getString("engine") ?? QueryType.YOUTUBE;
+                    const searchEngine = options.getString("engine") ?? properties.defaultQuery;
 
                     const { track, searchResult } = await client.player.play(
                         voiceChannel as never,
@@ -205,3 +206,4 @@ createCommand({
         return;
     },
 });
+*/

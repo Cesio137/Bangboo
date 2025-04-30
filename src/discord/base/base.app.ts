@@ -8,7 +8,6 @@ import { baseResponderHandler } from "./base.responder.js";
 import { BASE_VERSION, runtimeDisplay } from "./base.version.js";
 import ck from "chalk";
 import glob from "fast-glob";
-import { baseLoadDiscordPlayerExtractors } from "./base.player.js";
 
 interface BootstrapOptions extends Partial<ClientOptions> {
     meta: ImportMeta;
@@ -71,8 +70,6 @@ function createClient(token: string, options: BootstrapOptions) {
         partials: options.partials ?? CustomPartials.All,
         failIfNotExists: options.failIfNotExists ?? false
     }));
-
-    baseLoadDiscordPlayerExtractors(client);
 
     client.token=token;
     client.on("ready", async (client) => {

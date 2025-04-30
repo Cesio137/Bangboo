@@ -1,11 +1,14 @@
-import { DefaultExtractors } from "@discord-player/extractor";
+/*
+import { properties } from "#settings";
 import { Player } from "discord-player";
-import { YoutubeiExtractor } from "discord-player-youtubei";
 import { Client } from "discord.js";
 
 
 export function baseLoadDiscordPlayerExtractors(client: Client<boolean>) {
-    client.player = new Player(client as never);
-    client.player.extractors.loadMulti(DefaultExtractors);
-    client.player.extractors.register(YoutubeiExtractor, {});
+    client.player = new Player(
+        client as never, 
+        { skipFFmpeg: true, lagMonitor: 0 }
+    );
+    client.player.extractors.loadMulti(properties.extractors);
 }
+*/
