@@ -7,12 +7,12 @@ createEvent({
     event: "guildMemberAdd",
     async run(member) {
         if (member.user.bot) {return}
-        const { guild } = member;
+        const { guild, user } = member;
         const system_channel = guild.systemChannel;
         if (!system_channel) {
             console.log("Channel not found");
             return;
         }
-        globalMessage(Events.GuildMemberAdd, member, system_channel);
+        globalMessage(Events.GuildMemberAdd, member, user, system_channel);
     },
 });

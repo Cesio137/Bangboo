@@ -1,5 +1,5 @@
 import { createEvent } from "#base";
-import { banMessage } from "#functions";
+import { globalMessage } from "#functions";
 import { Events } from "discord.js";
 
 createEvent({
@@ -12,6 +12,6 @@ createEvent({
             console.log("Channel not found");
              return;
         }
-        banMessage(Events.GuildMemberRemove, user, system_channel);
+        globalMessage(Events.GuildBanAdd, undefined, user, system_channel);
     }
 });

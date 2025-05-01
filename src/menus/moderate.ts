@@ -38,7 +38,7 @@ export function closeMenu<R>(user: User, timeout: boolean): R {
         } satisfies InteractionReplyOptions) as R;
 }
 
-export function timeoutMenu<R>(user: User, users: string[], duration: string): R {
+export function timeoutMenu<R>(user: User, ids: string[], duration: string): R {
     const embed = createEmbed({
         color: "Blue",
         author: {
@@ -54,7 +54,7 @@ export function timeoutMenu<R>(user: User, users: string[], duration: string): R
         new UserSelectMenuBuilder()
             .setCustomId(`mod/select-users`)
             .setPlaceholder("Select user(s)")
-            .setDefaultUsers(users)
+            .setDefaultUsers(ids)
             .setMinValues(0)
             .setMaxValues(25)
     );
@@ -81,7 +81,7 @@ export function timeoutMenu<R>(user: User, users: string[], duration: string): R
             .setCustomId("mod/btn-confirm")
             .setLabel("Confirm")
             .setStyle(ButtonStyle.Success)
-            .setDisabled(users.length < 1 || duration === "")
+            .setDisabled(ids.length < 1 || duration === "")
     );
 
     return ({
@@ -91,7 +91,7 @@ export function timeoutMenu<R>(user: User, users: string[], duration: string): R
         } satisfies InteractionReplyOptions) as R;
 }
 
-export function kickMenu<R>(user: User, users: string[]): R {
+export function kickMenu<R>(user: User, ids: string[]): R {
     const embed = createEmbed({
         color: "Blue",
         author: {
@@ -107,7 +107,7 @@ export function kickMenu<R>(user: User, users: string[]): R {
         new UserSelectMenuBuilder()
             .setCustomId(`mod/select-users`)
             .setPlaceholder("Select user(s)")
-            .setDefaultUsers(users)
+            .setDefaultUsers(ids)
             .setMinValues(0)
             .setMaxValues(25)
     );
@@ -121,7 +121,7 @@ export function kickMenu<R>(user: User, users: string[]): R {
             .setCustomId("mod/btn-confirm")
             .setLabel("Confirm")
             .setStyle(ButtonStyle.Success)
-            .setDisabled(users.length < 1)
+            .setDisabled(ids.length < 1)
     );
 
     return ({
@@ -131,7 +131,7 @@ export function kickMenu<R>(user: User, users: string[]): R {
         } satisfies InteractionReplyOptions) as R;
 }
 
-export function banMenu<R>(user: User, users: string[]): R {
+export function banMenu<R>(user: User, ids: string[]): R {
     const embed = createEmbed({
         color: "Blue",
         author: {
@@ -147,7 +147,7 @@ export function banMenu<R>(user: User, users: string[]): R {
         new UserSelectMenuBuilder()
             .setCustomId(`mod/select-users`)
             .setPlaceholder("Select user(s)")
-            .setDefaultUsers(users)
+            .setDefaultUsers(ids)
             .setMinValues(0)
             .setMaxValues(25)
     );
@@ -161,7 +161,7 @@ export function banMenu<R>(user: User, users: string[]): R {
             .setCustomId("mod/btn-confirm")
             .setLabel("Confirm")
             .setStyle(ButtonStyle.Success)
-            .setDisabled(users.length < 1)
+            .setDisabled(ids.length < 1)
     );
 
     return ({

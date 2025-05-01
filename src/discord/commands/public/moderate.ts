@@ -2,7 +2,7 @@ import { createCommand } from "#base";
 import { res } from "#functions";
 import { banMenu, closeMenu, kickMenu, loadMenu, timeoutMenu } from "#menus";
 import { createEmbed, createModalFields, modalFieldsToRecord } from "@magicyan/discord";
-import { ApplicationCommandOptionType, ApplicationCommandType, ChatInputCommandInteraction, ComponentType, Guild, InteractionContextType, InteractionReplyOptions, User } from "discord.js";
+import { ApplicationCommandOptionType, ApplicationCommandType, ButtonInteraction, CacheType, ChatInputCommandInteraction, ComponentType, Guild, InteractionContextType, InteractionReplyOptions, User } from "discord.js";
 
 createCommand({
     name: "moderate",
@@ -56,6 +56,33 @@ function filterUsers(ids: string[], guild: Guild): string[] {
     }
 
     return users;
+}
+
+async function showModal(interaction: ButtonInteraction<CacheType>): Promise<{isOk: boolean, reason: string}> {
+    let isOk = false;
+    let reason = "";
+    await interaction.showModal({
+        custom_id: "mod/modal-reason",
+        title: "What's the reason?",
+        components: createModalFields({
+            reason: {
+                label: "Reason",
+                placeholder: "Visible only in auditlogs",
+                maxLength: 300,
+                minLength: 0,
+            }
+        }).map(component => component.toJSON())
+    });
+    await interaction.awaitModalSubmit({ time: 120_000 })
+        .then(async modalInteraction => {
+            await modalInteraction.deferUpdate();
+            reason = modalFieldsToRecord(modalInteraction.fields).reason;
+            isOk = true;
+        })
+        .catch(() => {
+            interaction.followUp(res.danger("Modal submission timed out."));
+        })
+    return {isOk, reason};
 }
 
 // Timeout
@@ -166,39 +193,18 @@ async function timeoutCollector(interaction: ChatInputCommandInteraction<"cached
         switch(customId) {
             case "mod/btn-cancel":
                 timeout = false;
-                userCollector.stop()
-                durationCollector.stop();
-                btnCollector.stop();
-                return
+                userCollector.stop(); durationCollector.stop(); btnCollector.stop();
+                break;
 
             case "mod/btn-confirm":
-                timeout = false;
-                i.showModal({
-                    custom_id: "mod/modal-reason",
-                    title: "What's the reason?",
-                    components: createModalFields({
-                        reason: {
-                            label: "Reason",
-                            placeholder: "Visible only in auditlogs",
-                            maxLength: 300,
-                            minLength: 0,
-                        }
-                    }).map(component => component.toJSON())
-                });
-                i.awaitModalSubmit({ time: 120_000 })
-                    .then(async modalInteraction => {
-                        const reason = modalFieldsToRecord(modalInteraction.fields).reason;
-                        await modalInteraction.deferUpdate();
-                        modalInteraction.editReply(timeoutAction(user, ids, duration, reason, guild));
-                        isOk = true;
-                        userCollector.stop()
-                        durationCollector.stop();
-                        btnCollector.stop();
-                    })
-                    .catch(() => {
-                        interaction.followUp(res.danger("Modal submission timed out."));
-                    })
-                return
+                const res = await showModal(i);
+                if (res.isOk) {
+                    i.editReply(timeoutAction(user, ids, duration, res.reason, guild));
+                    timeout = false;
+                    isOk = true;
+                    userCollector.stop(); durationCollector.stop(); btnCollector.stop();
+                }
+                break;
         }
     });
 
@@ -296,37 +302,18 @@ async function kickCollector(interaction: ChatInputCommandInteraction<"cached">)
         switch(customId) {
             case "mod/btn-cancel":
                 timeout = false;
-                userCollector.stop()
-                btnCollector.stop();
-                return
+                userCollector.stop(); btnCollector.stop();
+                break;
 
             case "mod/btn-confirm":
-                timeout = false;
-                i.showModal({
-                    custom_id: "mod/modal-reason",
-                    title: "What's the reason?",
-                    components: createModalFields({
-                        reason: {
-                            label: "Reason",
-                            placeholder: "Visible only in auditlogs",
-                            maxLength: 300,
-                            minLength: 0,
-                        }
-                    }).map(component => component.toJSON())
-                });
-                i.awaitModalSubmit({ time: 120_000 })
-                    .then(async modalInteraction => {
-                        const reason = modalFieldsToRecord(modalInteraction.fields).reason;
-                        await modalInteraction.deferUpdate();
-                        modalInteraction.editReply(kickAction(user, ids, reason, guild));
-                        isOk = true;
-                        userCollector.stop()
-                        btnCollector.stop();
-                    })
-                    .catch(() => {
-                        interaction.editReply(res.danger("Modal submission timed out."));
-                    })
-                return
+                const res = await showModal(i);
+                if (res.isOk) {
+                    i.editReply(kickAction(user, ids, res.reason, guild));
+                    timeout = false;
+                    isOk = true;
+                    userCollector.stop(); btnCollector.stop();
+                }
+                break;
         }
     });
 
@@ -425,37 +412,18 @@ async function banCollector(interaction: ChatInputCommandInteraction<"cached">) 
         switch(customId) {
             case "mod/btn-cancel":
                 timeout = false;
-                userCollector.stop()
-                btnCollector.stop();
-                return
+                userCollector.stop(); btnCollector.stop();
+                break;
 
             case "mod/btn-confirm":
-                timeout = false;
-                i.showModal({
-                    custom_id: "mod/modal-reason",
-                    title: "What's the reason?",
-                    components: createModalFields({
-                        reason: {
-                            label: "Reason",
-                            placeholder: "Visible only in auditlogs",
-                            maxLength: 300,
-                            minLength: 0,
-                        }
-                    }).map(component => component.toJSON())
-                });
-                i.awaitModalSubmit({ time: 120_000 })
-                    .then(async modalInteraction => {
-                        const reason = modalFieldsToRecord(modalInteraction.fields).reason;
-                        await modalInteraction.deferUpdate();
-                        modalInteraction.editReply(banAction(user, ids, reason, guild));
-                        isOk = true;
-                        userCollector.stop()
-                        btnCollector.stop();
-                    })
-                    .catch(() => {
-                        interaction.editReply(res.danger("Modal submission timed out."));
-                    })
-                return
+                const res = await showModal(i);
+                if (res.isOk) {
+                    i.editReply(banAction(user, ids, res.reason, guild));
+                    timeout = false;
+                    isOk = true;
+                    userCollector.stop(); btnCollector.stop();
+                }
+                break;
         }
     });
 
