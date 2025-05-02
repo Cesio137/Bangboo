@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use async_trait::async_trait;
-use serenity::all::{ButtonStyle, CacheHttp, CommandInteraction, CommandOptionType, CommandType, ComponentInteraction, ComponentInteractionCollector, Context, CreateActionRow, CreateButton, CreateCommand, CreateCommandOption, CreateEmbed, CreateEmbedAuthor, CreateInteractionResponse, CreateInteractionResponseMessage, EditInteractionResponse, Guild, GuildId, InteractionContext, Member, ReactionType, User, UserId};
+use serenity::all::{ButtonStyle, CacheHttp, CommandInteraction, CommandOptionType, CommandType, ComponentInteraction, ComponentInteractionCollector, ComponentInteractionDataKind, Context, CreateActionRow, CreateButton, CreateCommand, CreateCommandOption, CreateEmbed, CreateEmbedAuthor, CreateInteractionResponse, CreateInteractionResponseMessage, EditInteractionResponse, Guild, GuildId, InteractionContext, Member, PartialGuild, ReactionType, User, UserId};
 use serenity::futures::StreamExt;
 use crate::discord::app::base::App;
 use crate::discord::app::creators::SlashCommandHandler;
@@ -69,7 +69,7 @@ impl SlashCommandHandler for Moderate {
     }
 }
 
-pub async fn filter_users(ctx: &Context, guild: &Guild, ids: Vec<UserId>) -> Vec<UserId> {
+pub async fn filter_users(ctx: &Context, guild: &PartialGuild, ids: Vec<UserId>) -> Vec<UserId> {
     let mut filtered_ids = Vec::new();
 
     for id in ids {
@@ -82,12 +82,10 @@ pub async fn filter_users(ctx: &Context, guild: &Guild, ids: Vec<UserId>) -> Vec
                 continue;
             }
 
-            if member.permissions.is_none() {
-                continue;
-            }
-
-            if !member.permissions.unwrap().administrator() {
-                continue;
+            if member.permissions.is_some() {
+                if member.permissions.unwrap().administrator() {
+                    continue;
+                }
             }
 
             filtered_ids.push(id);
@@ -99,7 +97,7 @@ pub async fn filter_users(ctx: &Context, guild: &Guild, ids: Vec<UserId>) -> Vec
 
 pub async fn timeout_collector(ctx: &Context, interaction: &CommandInteraction, member: &Box<Member>) {
     let guild = match interaction.guild_id.as_ref() {
-        Some(guild_id) => guild_id.to_guild_cached(&ctx.cache).unwrap().clone(),
+        Some(guild_id) => guild_id.to_partial_guild(ctx.http()).await.unwrap(),
         None => {
             let embed = res(EColor::Danger, "Guild id is none.");
             let _ = reply_with_embed(ctx, interaction, embed, false).await;
@@ -107,9 +105,13 @@ pub async fn timeout_collector(ctx: &Context, interaction: &CommandInteraction, 
         },
     };
 
+    let (embed, components) = timeout_menu(&member.user, &vec![], "");
     let res = interaction.create_response(
         ctx.http(), 
-        CreateInteractionResponse::Message(timeout_menu(&member.user, &vec![], ""))
+        CreateInteractionResponse::Message(
+            CreateInteractionResponseMessage::new()
+                .embed(embed).components(components).ephemeral(true)
+        )
     ).await;
 
     if res.is_err() {return}
@@ -119,7 +121,7 @@ pub async fn timeout_collector(ctx: &Context, interaction: &CommandInteraction, 
         Err(_) => return,
     };
     let user_id = member.user.id;
-    let filter = move |i: &ComponentInteraction| i.message.id == message_id && i.user.id == user_id;
+    let filter = move |i: &ComponentInteraction| i.message.id == message_id && i.member.as_ref().unwrap().user.id == user_id;
     let mut collector = ComponentInteractionCollector::new(&ctx.shard)
         .filter(filter)
         .author_id(interaction.user.id)
@@ -132,22 +134,23 @@ pub async fn timeout_collector(ctx: &Context, interaction: &CommandInteraction, 
     let mut timeout = true;
 
     while let Some(i) = collector.next().await {
-        i.defer_ephemeral(ctx.http()).await;
+        i.defer(ctx.http()).await;
 
         match &i.data.kind {
-            serenity::all::ComponentInteractionDataKind::StringSelect { values } => {
+            ComponentInteractionDataKind::StringSelect { values } => {
                 duration = values.first().cloned().unwrap_or("".to_string());
             },
-            serenity::all::ComponentInteractionDataKind::UserSelect { values } => {
+            ComponentInteractionDataKind::UserSelect { values } => {
                 ids = filter_users(ctx, &guild, values.clone()).await;
             },
             _ => {}
         }
 
-        ctx.http().edit_original_interaction_response(
-            &i.token, 
-            &CreateInteractionResponse::Message(timeout_menu(&member.user, &ids, &duration)), 
-            vec![]
+        let menu = timeout_menu(&member.user, &ids, &duration);
+        i.edit_response(
+            ctx.http(), 
+            EditInteractionResponse::new()
+                .add_embed(menu.0).components(menu.1)
         ).await;
     }
 }

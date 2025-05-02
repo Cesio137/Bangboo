@@ -1,7 +1,7 @@
 use crate::settings::global::EColor;
 use serenity::all::{ButtonStyle, CreateActionRow, CreateButton, CreateEmbed, CreateEmbedAuthor, CreateInteractionResponseMessage, CreateSelectMenu, CreateSelectMenuKind, CreateSelectMenuOption, InteractionResponseFlags, User, UserId};
 
-pub fn timeout_menu(user: &User, ids: &[UserId], duration: &str) -> CreateInteractionResponseMessage {
+pub fn timeout_menu(user: &User, ids: &[UserId], duration: &str) -> (CreateEmbed, Vec<CreateActionRow>) {
     let embed = CreateEmbed::new()
         .color(EColor::Royal as u32)
         .author(
@@ -48,18 +48,15 @@ pub fn timeout_menu(user: &User, ids: &[UserId], duration: &str) -> CreateIntera
     );
 
     let confirm_row = CreateActionRow::Buttons(vec![
+        CreateButton::new("moderate/btn-cancel")
+            .label("Cancel")
+            .style(ButtonStyle::Danger),
+
         CreateButton::new("moderate/btn-confirm")
             .label("Confirm")
             .style(ButtonStyle::Success)
-            .disabled(ids.is_empty() || duration.is_empty()),
-
-        CreateButton::new("moderate/btn-cancel")
-            .label("Cancel")
-            .style(ButtonStyle::Danger)
+            .disabled(ids.is_empty() || duration.is_empty())
     ]);
 
-    CreateInteractionResponseMessage::new()
-        .flags(InteractionResponseFlags::EPHEMERAL)
-        .add_embed(embed)
-        .components(vec![select_user_row, select_duration_row, confirm_row])
+    (embed, vec![select_user_row, select_duration_row, confirm_row])
 }
