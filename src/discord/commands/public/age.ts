@@ -19,7 +19,7 @@ createCommand({
         const user = options.getUser("user") || interaction.user;
         const { displayName, createdAt } = user;
         const date = createdAt.toUTCString().split(" ");
-        const age = `${(displayName)}'s account was created at ${date[1]}/${date[2]}/${date[3]} ${date[4]}`;
+        const age = `**${(displayName)}**'s account was created at ${date[1]}/${date[2]}/${date[3]} ${date[4]}`;
         interaction.reply(res.green(age));
     }
 });

@@ -11,7 +11,7 @@ export async function filterMessage(
     if (!regex.test(content)) return;
 
     const username = author.globalName || author.username;
-    let warning_message = `${username} sent a message that was flagged as a scam. Messages containing ***[text](hyperlink)*** are strictly prohibited. Bangboo (me) will presume his/her account has been compromised, leading to a server kick!`;
+    let warning_message = `**${username}** sent a message that was flagged as a scam. Messages containing ***[text](hyperlink)*** are strictly prohibited. Bangboo (me) will presume his/her account has been compromised, leading to a server kick!`;
     const embed = createEmbed({
         color: "Yellow",
         description: warning_message,
