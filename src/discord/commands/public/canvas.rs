@@ -20,32 +20,22 @@ impl SlashCommandHandler for Canvas {
     }
 
     async fn run(&self, app: &App, ctx: Context, interaction: CommandInteraction) {
-        if let Err(err) = interaction.defer(ctx.http()).await {
-            tracing::error!("{}", err);
-            return
-        }
+        if interaction.defer(ctx.http()).await.is_err() {return;}
 
         let user = match interaction.member.as_ref() {
-            None => {
-                tracing::error!("Error trying to responde /canvas command: Failed to get user from member");
-                return
-            }
             Some(member) => member.user.clone(),
+            None => {return;}
         };
 
         let canvas = global_message(EventType::MemberAdd, &user).await;
         if canvas.is_err() {
-            let embed = res(EColor::Danger, "Error trying to create canvas.".to_string());
-            if let Err(err) = reply_with_embed(&ctx, &interaction, embed, true).await {
-                tracing::error!("Error trying to responde /canvas command: {}", err);
-            };            
+            let embed = res(EColor::Danger, "Error trying to create canvas.");
+            let _ = reply_with_embed(&ctx, &interaction, embed, true).await;           
             return;
         }
         
         let canvas = canvas.unwrap();
-        let attachment = CreateAttachment::bytes(canvas.as_slice(), "Welcome.png");
-        if let Err(err) = reply_with_attachment(&ctx, &interaction, attachment, true).await {
-            tracing::error!("Error trying to responde /canvas command: {}", err);
-        }
+        let attachment = CreateAttachment::bytes(canvas.as_slice(), "card.png");
+        let _ = reply_with_attachment(&ctx, &interaction, attachment, true).await;
     }
 }

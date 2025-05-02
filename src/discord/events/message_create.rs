@@ -1,18 +1,10 @@
 use crate::discord::app::base::App;
-use crate::tools::automod::DangerLevel;
+use crate::tools::automod;
 use serenity::all::Message;
 use serenity::client::Context;
 
 pub async fn run(app: &App, ctx: Context, message: Message) {
-    let result = app.scam_filter.filter_message(&message.content);
-    match result {
-        DangerLevel::Safe => {}
-        DangerLevel::High => {
-            app.scam_filter.handle_spam(ctx.clone(), message.clone()).await;
-            return;
-        }
-    }
-    
+    automod::filter_message(&ctx, &message).await;
     if let Some(callback) = app.prefix_command_handlers.get(&message.content) {
         callback.run(app, ctx, message).await;
     }

@@ -11,7 +11,7 @@ pub const OFFICER_IMG: &[u8] = include_bytes!("../../assets/avatar/Officer.png")
 pub const ADD_ICON: &[u8] = include_bytes!("../../assets/icons/static/add.png");
 pub const MINUS_ICON: &[u8] = include_bytes!("../../assets/icons/static/minus.png");
 pub const HAMMER_ICON: &[u8] = include_bytes!("../../assets/icons/static/hammer.png");
-pub const REGEX: &str = r"\[([^\]]+)\]\((https?://[^\)]+)\)";
+//pub const REGEX: &str = r"\[([^\]]+)\]\((https?://[^\)]+)\)";
 
 // Rules
 pub const APP_RULE_ID: u64 = 1287814349372653660;

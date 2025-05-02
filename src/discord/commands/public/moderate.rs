@@ -1,7 +1,11 @@
+use std::time::Duration;
+
 use async_trait::async_trait;
-use serenity::all::{ButtonStyle, CommandInteraction, CommandType, Context, CreateActionRow, CreateButton, CreateCommand, CreateEmbed, CreateEmbedAuthor, CreateInteractionResponse, CreateInteractionResponseMessage, InteractionContext, ReactionType, User};
+use serenity::all::{ButtonStyle, CacheHttp, CommandInteraction, CommandOptionType, CommandType, ComponentInteraction, ComponentInteractionCollector, Context, CreateActionRow, CreateButton, CreateCommand, CreateCommandOption, CreateEmbed, CreateEmbedAuthor, CreateInteractionResponse, CreateInteractionResponseMessage, EditInteractionResponse, Guild, GuildId, InteractionContext, Member, ReactionType, User, UserId};
+use serenity::futures::StreamExt;
 use crate::discord::app::base::App;
 use crate::discord::app::creators::SlashCommandHandler;
+use crate::menus::moderate::timeout_menu;
 use crate::settings::global::EColor;
 use crate::utils::embeds::res;
 use crate::utils::interaction::reply_with_embed;
@@ -15,16 +19,21 @@ impl SlashCommandHandler for Moderate {
             .description("Equality before the law is the cornerstone of justice ⚖.")
             .kind(CommandType::ChatInput)
             .add_context(InteractionContext::Guild)
+            .add_option(
+                CreateCommandOption::new(CommandOptionType::String, "action", "Select an action.")
+                .required(true)
+                    .add_string_choice("timeout", "timeout")
+                    .add_string_choice("kick", "kick")
+                    .add_string_choice("ban", "ban")
+            )
     }
 
     async fn run(&self, app: &App, ctx: Context, interaction: CommandInteraction) {
         let member = match interaction.member.as_ref() {
             Some(member) => member,
             None => {
-                let embed = res(EColor::Danger, "Failed to fetch member info.".to_string());
-                if let Err(err) = reply_with_embed(&ctx, &interaction, embed, false).await {
-                    tracing::error!("Failed to reply /moderate command.\n{}", err);
-                }
+                let embed = res(EColor::Danger, "Interaction member is none.");
+                let _ = reply_with_embed(&ctx, &interaction, embed, false).await;
                 return;
             },
         };
@@ -32,78 +41,113 @@ impl SlashCommandHandler for Moderate {
         let permissions = match member.permissions.as_ref() {
             Some(permissions) => permissions,
             None => {
-                let embed = res(EColor::Danger, "Failed to fetch permissions from member.".to_string());
-                if let Err(err) = reply_with_embed(&ctx, &interaction, embed, false).await {
-                    tracing::error!("Failed to reply /moderate command.\n{}", err);
-                }
+                let embed = res(EColor::Danger, "Interaction member has no permission.");
+                let _ = reply_with_embed(&ctx, &interaction, embed, false).await;
                 return;
             }
         };
-        
+
         if !permissions.administrator() {
-            let embed = res(EColor::Danger, "You don't have **ADMINISTRATOR** permission.".to_string());
-            if let Err(err) = reply_with_embed(&ctx, &interaction, embed, false).await {
-                tracing::error!("Failed to reply /moderate command.\n{}", err);
-            }
-            return;
-        }
-        
-        let (embed, components) = main_components(&member.user);
-        let message = CreateInteractionResponseMessage::new()
-            .add_embed(embed)
-            .components(components)
-            .ephemeral(true);
-        let result = ctx.http.create_interaction_response(
-            interaction.id,
-            &interaction.token,
-            &CreateInteractionResponse::Message(message),
-            vec![]
-        ).await;
-        if let Err(err) = result {
-            tracing::error!("Failed to reply /moderate command.\n{}", err);
+            let embed = res(EColor::Danger, "You don't have **ADMINISTRATOR** permission.");
+            let _ = reply_with_embed(&ctx, &interaction, embed, false).await;
             return;
         }
 
-        if let Some(callback) = app.responder_handlers.get("moderate") {
-            callback.run(&ctx, &interaction).await;
+        if interaction.data.options.is_empty() {
+            let embed = res(EColor::Danger, "Interaction options is empty.");
+            let _ = reply_with_embed(&ctx, &interaction, embed, false).await;
+            return;
         }
+
+        let action = interaction.data.options[0].value.as_str().unwrap();
+        
+        match action {
+            "timeout" => timeout_collector(&ctx, &interaction, member).await,
+            _ => {}
+        }
+
     }
 }
 
-pub fn main_components(user: &User) -> (CreateEmbed, Vec<CreateActionRow>) {
-    let mut author = CreateEmbedAuthor::new(user.global_name.as_ref().unwrap_or(&user.name));
-    if let Some(avatar_url) = user.avatar_url().as_ref() {
-        author = author.icon_url(avatar_url);
+pub async fn filter_users(ctx: &Context, guild: &Guild, ids: Vec<UserId>) -> Vec<UserId> {
+    let mut filtered_ids = Vec::new();
+
+    for id in ids {
+        if let Ok(member) = guild.member(ctx.http(), id).await {
+            if member.user.bot {
+                continue;
+            }
+
+            if guild.owner_id == id {
+                continue;
+            }
+
+            if member.permissions.is_none() {
+                continue;
+            }
+
+            if !member.permissions.unwrap().administrator() {
+                continue;
+            }
+
+            filtered_ids.push(id);
+        }
     }
-    let embed = CreateEmbed::new()
-        .color(EColor::Royal as u32)
-        .author(author)
-        .title("**Officer Cui's panel**")
-        .thumbnail("https://raw.githubusercontent.com/Cesio137/Bangboo/refs/heads/master/assets/avatar/Officer.png")
-        .description("🖱️ ***Select an action!***");
 
-    let btn_timeout = CreateButton::new("moderate/btn-timeout")
-        .emoji(ReactionType::Unicode("⏰".to_string()))
-        .label("Timeout")
-        .style(ButtonStyle::Secondary);
+    filtered_ids
+}
 
-    let btn_kick = CreateButton::new("moderate/btn-kick")
-        .emoji(ReactionType::Unicode("👋".to_string()))
-        .label("Kick")
-        .style(ButtonStyle::Secondary);
+pub async fn timeout_collector(ctx: &Context, interaction: &CommandInteraction, member: &Box<Member>) {
+    let guild = match interaction.guild_id.as_ref() {
+        Some(guild_id) => guild_id.to_guild_cached(&ctx.cache).unwrap().clone(),
+        None => {
+            let embed = res(EColor::Danger, "Guild id is none.");
+            let _ = reply_with_embed(ctx, interaction, embed, false).await;
+            return;
+        },
+    };
 
-    let btn_ban = CreateButton::new("moderate/btn-ban")
-        .emoji(ReactionType::Unicode("🛡️".to_string()))
-        .label("Ban")
-        .style(ButtonStyle::Secondary);
+    let res = interaction.create_response(
+        ctx.http(), 
+        CreateInteractionResponse::Message(timeout_menu(&member.user, &vec![], ""))
+    ).await;
 
-    let action_row = CreateActionRow::Buttons(vec![btn_timeout, btn_kick, btn_ban]);
+    if res.is_err() {return}
 
-    let btn_close = CreateButton::new("moderate/btn-close")
-        .label("Close")
-        .style(ButtonStyle::Primary);
+    let message_id = match interaction.get_response(ctx.http()).await {
+        Ok(msg) => msg.id,
+        Err(_) => return,
+    };
+    let user_id = member.user.id;
+    let filter = move |i: &ComponentInteraction| i.message.id == message_id && i.user.id == user_id;
+    let mut collector = ComponentInteractionCollector::new(&ctx.shard)
+        .filter(filter)
+        .author_id(interaction.user.id)
+        .timeout(Duration::from_secs(300))
+        .stream();
 
-    let close_row = CreateActionRow::Buttons(vec![btn_close]);
+    // Data
+    let mut ids: Vec<UserId> = Vec::new();
+    let mut duration = String::new();
+    let mut timeout = true;
 
-    (embed, vec![action_row, close_row])
+    while let Some(i) = collector.next().await {
+        i.defer_ephemeral(ctx.http()).await;
+
+        match &i.data.kind {
+            serenity::all::ComponentInteractionDataKind::StringSelect { values } => {
+                duration = values.first().cloned().unwrap_or("".to_string());
+            },
+            serenity::all::ComponentInteractionDataKind::UserSelect { values } => {
+                ids = filter_users(ctx, &guild, values.clone()).await;
+            },
+            _ => {}
+        }
+
+        ctx.http().edit_original_interaction_response(
+            &i.token, 
+            &CreateInteractionResponse::Message(timeout_menu(&member.user, &ids, &duration)), 
+            vec![]
+        ).await;
+    }
 }

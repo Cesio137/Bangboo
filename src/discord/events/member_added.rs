@@ -38,7 +38,7 @@ pub async fn run(app: &App, ctx: Context, member_added: Member) {
 
     let id = member_added.user.id.to_string();
     let message = format!("<@{}> join the server!", id);
-    let embed = res(EColor::Success, message);
+    let embed = res(EColor::Success, &message);
     let message = CreateMessage::new().embed(embed); 
 
     if let Err(err) = system_channel_id.send_message(&ctx.http, message).await {

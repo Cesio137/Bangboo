@@ -21,25 +21,18 @@ impl SlashCommandHandler for Age {
     }
 
     async fn run(&self, app: &App, ctx: Context, interaction: CommandInteraction) {
-        let user_id = match interaction.data.options.first() {
-            None => interaction.user.id,
-            Some(option) => {
-                if let CommandDataOptionValue::User(user_id) = option.value {
-                    user_id.clone()
-                } else {
-                    interaction.user.id.clone()
-                }
-            }
-        };
+        let options = &interaction.data.options;
+        let user_id = if let Some(option) = options.get(0) {
+            if let CommandDataOptionValue::User(ref user_id) = option.value {
+                user_id.clone()
+            } else { interaction.user.id }
+        } else { interaction.user.id };
 
         let user = match ctx.http.get_user(user_id).await {
             Ok(user) => user,
-            Err(err) => {
-                let embed = res(EColor::Danger, "An error occured while fetching the user.".to_string());
-                if let Err(err) = reply_with_embed(&ctx, &interaction, embed, false).await {
-                    tracing::error!("Failed to reply /age command.\n{}", err);
-                }
-                tracing::error!("{}", err);
+            Err(_) => {
+                let embed = res(EColor::Danger, "An error occured while fetching the user.");
+                let _ = reply_with_embed(&ctx, &interaction, embed, false).await;
                 return
             }
         };
@@ -48,14 +41,12 @@ impl SlashCommandHandler for Age {
         let formatted_date = user.created_at().format("%a, %Hh%Mmin, %d/%b/%Y").to_string();
 
         let content = format!(
-            "***{}***'s account was created at {}.",
+            "**{}**'s account was created at {}.",
             user_name,
             formatted_date,
         );
 
-        let embed = res(EColor::Green, content);
-        if let Err(err) = reply_with_embed(&ctx, &interaction, embed, false).await {
-            tracing::error!("Failed to reply /age command.\n{}", err);
-        }
+        let embed = res(EColor::Green, &content);
+        let _ = reply_with_embed(&ctx, &interaction, embed, false).await;
     }
 }

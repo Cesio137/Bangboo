@@ -1,6 +1,5 @@
 use crate::discord::app::creators::{PrefixCommandHandler, ResponderHandler, SlashCommandHandler};
 use crate::discord::commands::{prefix_commands, slash_commands};
-use crate::tools::automod::ScamFilter;
 use serenity::builder::CreateCommand;
 use std::collections::HashMap;
 use crate::discord::responders::responders;
@@ -10,7 +9,6 @@ pub struct App {
     pub prefix_command_handlers: HashMap<String, Box<dyn PrefixCommandHandler + Send + Sync>>,
     pub slash_command_handlers: HashMap<String, Box<dyn SlashCommandHandler + Send + Sync>>,
     pub responder_handlers: HashMap<String, Box<dyn ResponderHandler + Send + Sync>>,
-    pub scam_filter: ScamFilter
 }
 
 impl App {
@@ -37,16 +35,14 @@ impl App {
         let mut responder_handlers = HashMap::new();
         for responder in responders {
             let custom_id = responder.custom_id();
-            responder_handlers.insert(custom_id, responder);       
+            responder_handlers.insert(custom_id, responder);
         }
-        
-        let scam_filter = ScamFilter::new().unwrap();
+
         Self {
             commands,
             prefix_command_handlers,
             slash_command_handlers,
             responder_handlers,
-            scam_filter
         }
     }
 }

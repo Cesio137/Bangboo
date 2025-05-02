@@ -1,4 +1,5 @@
 mod discord;
+mod menus;
 mod settings;
 mod tools;
 mod utils;
