@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
-    "@magicyan/discord": "^1.4.3",
+    "@magicyan/discord": "^1.4.6",
     "@magicyan/discord-ui": "^0.2.0",
     "@napi-rs/canvas": "^0.1.70",
     "chalk": "5.4.1",
