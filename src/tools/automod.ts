@@ -7,7 +7,7 @@ const regex = new RegExp("\\[([^\\]]+)\\]\\((https?:\\/\\/[^\\)]+)\\)");
 export async function filterMessage(
     message: OmitPartialGroupDMChannel<Message<boolean>>
 ) {
-    const { author, content, channel, guild, member } = message;
+    const { author, content, guild, member } = message;
     if (!regex.test(content)) return;
 
     const username = author.globalName || author.username;
@@ -16,8 +16,8 @@ export async function filterMessage(
         color: "Yellow",
         description: warning_message,
     });
-    channel.send({ embeds: [embed] });
-    message.delete();
+    await message.reply({ embeds: [embed] });
+    await message.delete();
 
     if (!guild) {
         logger.error("Failed to fetch guild.");
