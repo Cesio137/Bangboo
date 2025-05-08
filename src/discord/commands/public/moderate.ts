@@ -100,10 +100,10 @@ function timeoutAction<R>(user: User, ids: string[], duration: string, reason: s
         sucess.push(id);
     }
 
-    let description = `***Timeouted users:***\n${sucess.map(id => `<@${id}>`).join("\n")}`;
+    let description = `**Timeouted users:**\n${sucess.map(id => `<@${id}>`).join("\n")}`;
     if (failed.length > 0) {
         description = `${description}\n`
-        description = `***Untimeouted users:***\n${failed.map(id => `<@${id}>`).join("\n")}`
+        description = `**Failed to timeout user(s):**\n${failed.map(id => `<@${id}>`).join("\n")}`
     }
 
     const embed = createEmbed({
@@ -114,7 +114,8 @@ function timeoutAction<R>(user: User, ids: string[], duration: string, reason: s
         },
         title: "**Officer Cui's panel**",
         thumbnail: "https://raw.githubusercontent.com/Cesio137/Bangboo/refs/heads/master/assets/avatar/Officer.png",
-        description: description
+        description: description,
+        footer: `Reason: ${reason}`
     });
 
     return ({
@@ -228,10 +229,10 @@ function kickAction<R>(user: User, ids: string[], reason: string, guild: Guild):
         sucess.push(id);
     }
 
-    let description = `***Kicked users:***\n${sucess.map(id => `<@${id}>`).join("\n")}`;
+    let description = `**Kicked users:**\n${sucess.map(id => `<@${id}>`).join("\n")}`;
     if (failed.length > 0) {
         description = `${description}\n`
-        description = `***Unkicked users:***\n${failed.map(id => `<@${id}>`).join("\n")}`
+        description = `**Failed to kick user(s):**\n${failed.map(id => `<@${id}>`).join("\n")}`
     }
 
     const embed = createEmbed({
@@ -242,7 +243,8 @@ function kickAction<R>(user: User, ids: string[], reason: string, guild: Guild):
         },
         title: "**Officer Cui's panel**",
         thumbnail: "https://raw.githubusercontent.com/Cesio137/Bangboo/refs/heads/master/assets/avatar/Officer.png",
-        description: description
+        description: description,
+        footer: `Reason: ${reason}`
     });
 
     return ({
@@ -338,10 +340,10 @@ function banAction<R>(user: User, ids: string[], reason: string, guild: Guild): 
         sucess.push(id);
     }
 
-    let description = `***Banned users:***\n${sucess.map(id => `<@${id}>`).join("\n")}`;
+    let description = `**Banned users:**\n${sucess.map(id => `<@${id}>`).join("\n")}`;
     if (failed.length > 0) {
         description = `${description}\n`
-        description = `***Unbanned users:***\n${failed.map(id => `<@${id}>`).join("\n")}`
+        description = `**Failed to ban user(s):**\n${failed.map(id => `<@${id}>`).join("\n")}`
     }
 
     const embed = createEmbed({
@@ -352,7 +354,8 @@ function banAction<R>(user: User, ids: string[], reason: string, guild: Guild): 
         },
         title: "**Officer Cui's panel**",
         thumbnail: "https://raw.githubusercontent.com/Cesio137/Bangboo/refs/heads/master/assets/avatar/Officer.png",
-        description: description
+        description: description,
+        footer: `Reason: ${reason}`
     });
 
     return ({

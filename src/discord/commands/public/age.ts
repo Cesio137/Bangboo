@@ -14,7 +14,7 @@ createCommand({
             description: "Selected user.",
         },
     ],
-    async run(interaction){
+    async run(interaction) {
         const { options } = interaction;
         const user = options.getUser("user") || interaction.user;
         const { displayName, createdAt } = user;

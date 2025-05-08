@@ -76,5 +76,15 @@ export async function globalMessage( event: Events, member: GuildMember | Partia
     const buffer = await canvas.encode("png");
     const attachment = new AttachmentBuilder(buffer, { name: "card.png" });
 
-    channel.send({ files: [attachment] });
+    let utc  = "";
+    if (typeof member !== "undefined") {
+        const { joinedTimestamp } = member;
+        if (joinedTimestamp) {
+            const timesptamp = new Date(joinedTimestamp);
+            const date = timesptamp.toUTCString().split(" ");
+            utc = `**${date[0]} ${date[1]}/${date[2]}/${date[3]} ${date[4]}**`;
+        }
+    }
+
+    channel.send({ content: utc, files: [attachment] });
 }

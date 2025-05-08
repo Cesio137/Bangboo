@@ -10,7 +10,7 @@ export function loadMenu<R>(user: User): R {
         },
         title: "**Officer Cui's panel**",
         thumbnail: "https://raw.githubusercontent.com/Cesio137/Bangboo/refs/heads/master/assets/avatar/Officer.png",
-        description: "👥 ***Filtering selected users...***"
+        description: "👥 **Filtering selected users...**"
     });
 
     return ({
@@ -28,7 +28,7 @@ export function closeMenu<R>(user: User, timeout: boolean): R {
         },
         title: "**Officer Cui's panel**",
         thumbnail: "https://raw.githubusercontent.com/Cesio137/Bangboo/refs/heads/master/assets/avatar/Officer.png",
-        description: timeout ? "⏰ ***Timeout!***" : "👋 ***Bye!***"
+        description: timeout ? "⏰ **Timeout!**" : "👋 **Bye!**"
     });
 
     return ({
@@ -47,7 +47,7 @@ export function timeoutMenu<R>(user: User, ids: string[], duration: string): R {
         },
         title: "**Officer Cui's panel**",
         thumbnail: "https://raw.githubusercontent.com/Cesio137/Bangboo/refs/heads/master/assets/avatar/Officer.png",
-        description: "🖱️ ***Select user(s) and timeout duration!***"
+        description: "🖱️ **Select user(s) and timeout duration!**"
     });
 
     const userRow = createRow<UserSelectMenuBuilder>().addComponents(
@@ -100,7 +100,7 @@ export function kickMenu<R>(user: User, ids: string[]): R {
         },
         title: "**Officer Cui's panel**",
         thumbnail: "https://raw.githubusercontent.com/Cesio137/Bangboo/refs/heads/master/assets/avatar/Officer.png",
-        description: "🖱️ ***Select user(s) to kick!***"
+        description: "🖱️ **Select user(s) to kick!**"
     });
 
     const userRow = createRow<UserSelectMenuBuilder>().addComponents(
@@ -140,7 +140,7 @@ export function banMenu<R>(user: User, ids: string[]): R {
         },
         title: "**Officer Cui's panel**",
         thumbnail: "https://raw.githubusercontent.com/Cesio137/Bangboo/refs/heads/master/assets/avatar/Officer.png",
-        description: "🖱️ ***Select user(s) to ban!***"
+        description: "🖱️ **Select user(s) to ban!**"
     });
 
     const userRow = createRow<UserSelectMenuBuilder>().addComponents(
