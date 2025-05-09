@@ -2,4 +2,5 @@
 export * from "./utils/embed.js"
 export * from "./utils/emoji.js"
 export * from "./utils/global.js"
+export * from "./utils/guild.js"
 export * from "./utils/metadata.js"

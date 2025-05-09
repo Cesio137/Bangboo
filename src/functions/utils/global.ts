@@ -1,3 +1,4 @@
+import { createEmbed } from "@magicyan/discord";
 import { Canvas, loadImage } from "@napi-rs/canvas";
 import {
     AttachmentBuilder,
@@ -8,6 +9,8 @@ import {
     User,
 } from "discord.js";
 import { join } from "path";
+import { channels, icon, roles } from "#functions";
+import { settings } from "#settings";
 
 export async function globalMessage( event: Events, member: GuildMember | PartialGuildMember | undefined, user: User, channel: TextChannel) {
     const canvas = new Canvas(1024, 260);
@@ -87,4 +90,25 @@ export async function globalMessage( event: Events, member: GuildMember | Partia
     }
     
     channel.send({ content: utc, files: [attachment] });
+}
+
+export async function globalBoost(member: GuildMember) {
+    const { guild, id, user } = member;
+    const { globalName, username } = user;
+    const guild_channel = await guild.channels.fetch(channels.announcement);
+    if (!guild_channel) return;
+    const avatarURL = user.avatarURL({size: 256});
+    const embed = createEmbed({
+        color: settings.colors.nitro,
+        author: {
+            name: globalName || username,
+            iconURL: avatarURL || undefined
+        },
+        description: `**${icon.boost} <@${id}> became a <@&${roles.boosters}>**\n\n🚀 Thanks for boosting the server!`,
+        thumbnail: avatarURL || undefined
+    });
+    const channel = await guild_channel.fetch();
+    if (channel.isTextBased()) {
+        channel.send({content: "||@everyone @here||", embeds: [embed]});
+    }
 }
