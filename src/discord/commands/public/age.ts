@@ -17,9 +17,13 @@ createCommand({
     async run(interaction) {
         const { options } = interaction;
         const user = options.getUser("user") || interaction.user;
-        const { displayName, createdAt } = user;
-        const date = createdAt.toUTCString().split(" ");
-        const age = `**${(displayName)}**'s account was created at ${date[1]}/${date[2]}/${date[3]} ${date[4]}`;
+        const { displayName, createdTimestamp,  } = user;
+        let age = "";
+        if (interaction.locale == "pt-BR") {
+            age = `**${(displayName)}** criou a conta <t:${Math.floor(createdTimestamp / 1000)}:R> em um(a) <t:${Math.floor(createdTimestamp / 1000)}:F>`;
+        } else {
+            age = `**${(displayName)}**'s account was created <t:${Math.floor(createdTimestamp / 1000)}:R> on <t:${Math.floor(createdTimestamp / 1000)}:F>`;
+        }
         interaction.reply(res.green(age));
     }
 });
