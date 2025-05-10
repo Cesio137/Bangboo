@@ -18,6 +18,7 @@
     "@magicyan/discord-ui": "^0.2.0",
     "@napi-rs/canvas": "^0.1.70",
     "chalk": "5.4.1",
+    "discloud.app": "^0.14.12",
     "discord.js": "14.19.3",
     "fast-glob": "3.3.3",
     "rou3": "0.6.1",

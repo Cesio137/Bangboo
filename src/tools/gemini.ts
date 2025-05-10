@@ -1,3 +1,4 @@
+import { env } from "#settings";
 import {
     EnhancedGenerateContentResponse,
     GoogleGenerativeAI,
@@ -6,7 +7,7 @@ import {
     SafetySetting,
 } from "@google/generative-ai";
 
-const geminiAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+const geminiAI = new GoogleGenerativeAI(env.GEMINI_API_KEY);
 const threshold = HarmBlockThreshold.BLOCK_NONE;
 const safetySettings: SafetySetting[] = [
     { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold },
