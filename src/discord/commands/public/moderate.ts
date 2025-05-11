@@ -58,7 +58,7 @@ function filterUsers(ids: string[], guild: Guild): string[] {
     return users;
 }
 
-async function showModal(interaction: ButtonInteraction<CacheType>): Promise<{isOk: boolean, reason: string}> {
+async function showModal(interaction: ButtonInteraction<CacheType>, time: number): Promise<{isOk: boolean, reason: string}> {
     let isOk = false;
     let reason = "";
     await interaction.showModal({
@@ -73,7 +73,7 @@ async function showModal(interaction: ButtonInteraction<CacheType>): Promise<{is
             }
         }).map(component => component.toJSON())
     });
-    await interaction.awaitModalSubmit({ time: 120_000 })
+    await interaction.awaitModalSubmit({ time: time - Date.now() })
         .then(async modalInteraction => {
             await modalInteraction.deferUpdate();
             reason = modalFieldsToRecord(modalInteraction.fields).reason;
@@ -143,11 +143,13 @@ async function timeoutCollector(interaction: ChatInputCommandInteraction<"cached
     let messageID = (await interaction.fetchReply()).id;
     interaction.editReply(timeoutMenu(user, ids, duration));
 
+    const time = Date.now() + 300000;
+
     const userCollector = channel.createMessageComponentCollector(
         {
             componentType: ComponentType.UserSelect,
             filter: (componentInteraction) => componentInteraction.user.id === interaction.user.id && componentInteraction.message.id === messageID,
-            time: 300_000,
+            time: time - Date.now(),
         }
     );
 
@@ -155,7 +157,7 @@ async function timeoutCollector(interaction: ChatInputCommandInteraction<"cached
         {
             componentType: ComponentType.StringSelect,
             filter: (componentInteraction) => componentInteraction.user.id === interaction.user.id && componentInteraction.message.id === messageID,
-            time: 300_000,
+            time: time - Date.now(),
         }
     );
 
@@ -163,7 +165,7 @@ async function timeoutCollector(interaction: ChatInputCommandInteraction<"cached
         {
             componentType: ComponentType.Button,
             filter: (componentInteraction) => componentInteraction.user.id === interaction.user.id && componentInteraction.message.id === messageID,
-            time: 300_000,
+            time: time - Date.now(),
         }
     );
     
@@ -198,7 +200,7 @@ async function timeoutCollector(interaction: ChatInputCommandInteraction<"cached
                 break;
 
             case "mod/btn-confirm":
-                const res = await showModal(i);
+                const res = await showModal(i, time);
                 if (res.isOk) {
                     i.editReply(timeoutAction(user, ids, duration, res.reason, guild));
                     timeout = false;
@@ -271,11 +273,13 @@ async function kickCollector(interaction: ChatInputCommandInteraction<"cached">)
     let messageID = (await interaction.fetchReply()).id;
     interaction.editReply(kickMenu(user, ids));
 
+    const time = Date.now() + 300000;
+
     const userCollector = channel.createMessageComponentCollector(
         {
             componentType: ComponentType.UserSelect,
             filter: (componentInteraction) => componentInteraction.user.id === interaction.user.id && componentInteraction.message.id === messageID,
-            time: 300_000,
+            time: time - Date.now(),
         }
     );
 
@@ -283,7 +287,7 @@ async function kickCollector(interaction: ChatInputCommandInteraction<"cached">)
         {
             componentType: ComponentType.Button,
             filter: (componentInteraction) => componentInteraction.user.id === interaction.user.id && componentInteraction.message.id === messageID,
-            time: 300_000,
+            time: time - Date.now(),
         }
     );
     
@@ -308,7 +312,7 @@ async function kickCollector(interaction: ChatInputCommandInteraction<"cached">)
                 break;
 
             case "mod/btn-confirm":
-                const res = await showModal(i);
+                const res = await showModal(i, time);
                 if (res.isOk) {
                     i.editReply(kickAction(user, ids, res.reason, guild));
                     timeout = false;
@@ -382,18 +386,20 @@ async function banCollector(interaction: ChatInputCommandInteraction<"cached">) 
     let messageID = (await interaction.fetchReply()).id;
     interaction.editReply(banMenu(user, ids));
 
+    const time = Date.now() + 300000;
+
     const userCollector = channel.createMessageComponentCollector(
         {
             componentType: ComponentType.UserSelect,
             filter: (componentInteraction) => componentInteraction.user.id === interaction.user.id && componentInteraction.message.id === messageID,
-            time: 300_000,
+            time: time - Date.now(),
         }
     );
     const btnCollector = channel.createMessageComponentCollector(
         {
             componentType: ComponentType.Button,
             filter: (componentInteraction) => componentInteraction.user.id === interaction.user.id && componentInteraction.message.id === messageID,
-            time: 300_000,
+            time: time - Date.now(),
         }
     );
     
@@ -419,7 +425,7 @@ async function banCollector(interaction: ChatInputCommandInteraction<"cached">) 
                 break;
 
             case "mod/btn-confirm":
-                const res = await showModal(i);
+                const res = await showModal(i, time);
                 if (res.isOk) {
                     i.editReply(banAction(user, ids, res.reason, guild));
                     timeout = false;

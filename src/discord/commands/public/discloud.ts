@@ -1,8 +1,8 @@
 import { createCommand } from "#base";
-import { ApplicationCommandOptionType, ApplicationCommandType, ChatInputCommandInteraction } from "discord.js";
-import { user } from "#tools";
-import { createEmbed } from "@magicyan/discord";
 import { icon, res } from "#functions";
+import { user } from "#tools";
+import { ApplicationCommandOptionType, ApplicationCommandType, ChatInputCommandInteraction } from "discord.js";
+import { createEmbed } from "@magicyan/discord";
 
 createCommand({
     name: "discloud",
