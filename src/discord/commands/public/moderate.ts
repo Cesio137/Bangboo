@@ -1,5 +1,5 @@
 import { createCommand } from "#base";
-import { res } from "#functions";
+import { res, roles } from "#functions";
 import { banMenu, closeMenu, kickMenu, loadMenu, timeoutMenu } from "#menus";
 import { createEmbed, createModalFields, modalFieldsToRecord } from "@magicyan/discord";
 import { ApplicationCommandOptionType, ApplicationCommandType, ButtonInteraction, CacheType, ChatInputCommandInteraction, ComponentType, Guild, InteractionContextType, InteractionReplyOptions, User } from "discord.js";
@@ -50,7 +50,7 @@ function filterUsers(ids: string[], guild: Guild): string[] {
     for (const id of ids) {
         const member = guild.members.cache.get(id);
         if (!member) {continue}
-        if (!member.user.bot && !member.permissions.has("Administrator")) {
+        if (!member.user.bot && !member.permissions.has("Administrator") && !member.roles.cache.has(roles.stf)) {
             users.push(member.id);
         }
     }
