@@ -80,13 +80,15 @@ export async function globalMessage( event: Events, member: GuildMember | Partia
     const attachment = new AttachmentBuilder(buffer, { name: "card.png" });
 
     let utc  = "";
-    if (typeof member !== "undefined" && Events.GuildMemberAdd) {
+    if (event === Events.GuildMemberAdd && typeof member !== "undefined") {
         const { joinedTimestamp } = member;
         if (joinedTimestamp) {
-            utc = `<t:${joinedTimestamp}:F>`;
+            const timestamp = Math.floor(joinedTimestamp / 1000);
+            utc = `<t:${timestamp}:F>`;
         }
     } else {
-        utc = `<t:${Math.floor(Date.now() / 1000)}:F>`
+        const timestamp = Math.floor(Date.now() / 1000);
+        utc = `<t:${timestamp}:F>`
     }
     
     channel.send({ content: utc, files: [attachment] });
