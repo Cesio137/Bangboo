@@ -52,7 +52,7 @@ async function status(interaction: ChatInputCommandInteraction<"cached">) {
         `${icon.ssd}\`SSD:\` **${appStatus.ssd}**`,
         `${icon.wifi}\`Network:\` \`⬆\`**${appStatus.netIO.up} \`⬇\`${appStatus.netIO.down}**`,
         `${icon.refresh}\`Latest restart:\` **<t:${Math.floor(appStatus.startedAtTimestamp / 1000)}:R>**`,
-    ]
+    ];
     const embed = createEmbed({
         author: {
             name: app.name,
