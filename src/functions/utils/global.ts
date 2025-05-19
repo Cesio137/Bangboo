@@ -35,7 +35,7 @@ export async function globalMessage( event: Events, member: GuildMember | Partia
 
     const actionIconPath = join(
         __rootname,
-        `assets/icons/static/${
+        `assets/icons/static/Card/${
             event === Events.GuildMemberAdd ? "add" : event === Events.GuildMemberRemove ? "minus" : "hammer"
         }.png`
     );
