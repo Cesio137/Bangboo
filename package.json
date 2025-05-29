@@ -1,16 +1,16 @@
 {
   "name": "bangboo",
   "type": "module",
-  "main": "src/index.ts",
+  "main": "build/index.js",
   "scripts": {
     "check": "tsc --noEmit && echo ✔ Ok",
-    "build": "tsc",
-    "dev": "bun --env-file .env ./src/index.ts",
-    "dev:dev": "bun --env-file .env.dev ./src/index.ts",
-    "watch": "bun --watch --env-file .env ./src/index.ts",
-    "watch:dev": "bun --watch --env-file .env.dev ./src/index.ts",
-    "start": "bun --env-file .env .",
-    "start:dev": "bun --env-file .env.dev ."
+    "build": "tsup",
+    "dev": "tsx --env-file .env ./src/index.ts",
+    "dev:dev": "tsx --env-file .env.dev ./src/index.ts",
+    "watch": "tsx --watch --env-file .env ./src/index.ts",
+    "watch:dev": "tsx --watch --env-file .env.dev ./src/index.ts",
+    "start": "node --env-file .env .",
+    "start:dev": "node --env-file .env.dev ."
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
@@ -20,13 +20,14 @@
     "chalk": "5.4.1",
     "discloud.app": "^0.14.12",
     "discord.js": "14.19.3",
-    "fast-glob": "3.3.3",
+    "fast-glob": "^3.3.3",
     "rou3": "0.6.1",
     "zod": "^3.25.36"
   },
   "devDependencies": {
-    "@types/bun": "^1.2.15",
+    "@types/node": "^22.15.24",
     "tsup": "^8.5.0",
+    "tsx": "^4.19.4",
     "typescript": "^5.8.3"
   },
   "imports": {

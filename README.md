@@ -15,7 +15,7 @@ This project is currently for my personal use, but I hope to monetize it in the 
 This is the most complete discord bot base you've ever seen! Developed by [@rinckodev](https://github.com/rinckodev), this project uses typescript in an incredible way to provide complete structures and facilitate the development of your discord bot.
 
 > [!WARNING]
-> [Bun](https://bun.sh/) version required: 1.2.x or higher
+> [NodeJs](https://nodejs.org/en) version required: 20.12 or higher
 
 ## Scripts
 
