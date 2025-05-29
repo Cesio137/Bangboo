@@ -1,31 +1,30 @@
 # Essential structure
-# - /assets
 # - /src
 # - /.env
 # - /.discloudignore
 # - /discloud.config
-# - /Cargo.toml
+# - /package.json
+# - /tsconfig.json
 
 # Ignored structure
 
 # Folders
-/.git
 /.vscode
-/.idea
-/target
+/deprecated
 /discloud
+/node_modules
 
 # Files
 /.env.development
 /.env.dev
 /.env.example
+/.eslintrc.json
 /.gitignore
-/LICENSE
+/package-lock.json
 /README.md
 
 # Extensions
 *.fig
-*.lock
 *.md
 *.zip
 *.exe

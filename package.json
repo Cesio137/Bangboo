@@ -1,0 +1,59 @@
+{
+  "name": "bangboo",
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "check": "tsc --noEmit && echo ✔ Ok",
+    "build": "tsc",
+    "dev": "bun --env-file .env ./src/index.ts",
+    "dev:dev": "bun --env-file .env.dev ./src/index.ts",
+    "watch": "bun --watch --env-file .env ./src/index.ts",
+    "watch:dev": "bun --watch --env-file .env.dev ./src/index.ts",
+    "start": "bun --env-file .env .",
+    "start:dev": "bun --env-file .env.dev ."
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "@magicyan/discord": "^1.4.9",
+    "@magicyan/discord-ui": "^0.2.0",
+    "@napi-rs/canvas": "^0.1.70",
+    "chalk": "5.4.1",
+    "discloud.app": "^0.14.12",
+    "discord.js": "14.19.3",
+    "fast-glob": "3.3.3",
+    "rou3": "0.6.1",
+    "zod": "^3.25.36"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.2.15",
+    "tsup": "^8.5.0",
+    "typescript": "^5.8.3"
+  },
+  "imports": {
+    "#database": [
+      "./build/database/index.js"
+    ],
+    "#base": [
+      "./build/discord/base/index.js"
+    ],
+    "#functions": [
+      "./build/functions/index.js"
+    ],
+    "#menus": [
+      "./build/menus/index.js"
+    ],
+    "#settings": [
+      "./build/settings/index.js"
+    ],
+    "#tools": [
+      "./build/tools/index.js"
+    ],
+    "#server": [
+      "./build/server/index.js"
+    ],
+    "#lib": [
+      "./build/lib/index.js"
+    ]
+  },
+  "baseVersion": "1.2.7"
+}
