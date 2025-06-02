@@ -1,7 +1,7 @@
 import { createEmbed, createRow } from "@magicyan/discord";
 import { User, UserSelectMenuBuilder, StringSelectMenuBuilder, ButtonBuilder, ButtonStyle, InteractionReplyOptions } from "discord.js";
 
-export function loadMenu<R>(user: User): R {
+export function loadMenu<R>(user: User, description: string): R {
     const embed = createEmbed({
         color: "Blue",
         author: {
@@ -10,7 +10,7 @@ export function loadMenu<R>(user: User): R {
         },
         title: "**Officer Cui's panel**",
         thumbnail: "https://raw.githubusercontent.com/Cesio137/Bangboo/refs/heads/master/assets/avatar/Officer.png",
-        description: "👥 **Filtering selected users...**"
+        description
     });
 
     return ({
@@ -34,6 +34,46 @@ export function closeMenu<R>(user: User, timeout: boolean): R {
     return ({
             flags: ["Ephemeral"],
             components: [],
+            embeds: [embed]
+        } satisfies InteractionReplyOptions) as R;
+}
+
+export function deleteMessageMenu<R>(user: User, ids: string[]): R {
+    const embed = createEmbed({
+        color: "Blue",
+        author: {
+            name: user.globalName || user.username,
+            iconURL: user.avatarURL() || undefined
+        },
+        title: "**Officer Cui's panel**",
+        thumbnail: "https://raw.githubusercontent.com/Cesio137/Bangboo/refs/heads/master/assets/avatar/Officer.png",
+        description: "🖱️ **Select user(s) to delete message(s) from this channel!**"
+    });
+
+    const userRow = createRow<UserSelectMenuBuilder>().addComponents(
+        new UserSelectMenuBuilder()
+            .setCustomId(`mod/select-users`)
+            .setPlaceholder("Select user(s)")
+            .setDefaultUsers(ids)
+            .setMinValues(0)
+            .setMaxValues(25)
+    );
+
+    const confirmRow = createRow<ButtonBuilder>().addComponents(
+        new ButtonBuilder()
+            .setCustomId("mod/btn-cancel")
+            .setLabel("Cancel")
+            .setStyle(ButtonStyle.Danger),
+        new ButtonBuilder()
+            .setCustomId("mod/btn-confirm")
+            .setLabel("Confirm")
+            .setStyle(ButtonStyle.Success)
+            .setDisabled(ids.length < 1)
+    );
+
+    return ({
+            flags: ["Ephemeral"],
+            components: [userRow, confirmRow],
             embeds: [embed]
         } satisfies InteractionReplyOptions) as R;
 }
