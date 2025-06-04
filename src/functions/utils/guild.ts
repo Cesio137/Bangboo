@@ -1,18 +1,18 @@
-import { settings } from "#settings";
+import { guild } from "#settings";
 
-type ChannelList = typeof settings.channels;
+type GuildList = typeof guild.channels;
 
-const channels: ChannelList = Object.create({});
+const channels: GuildList = Object.create({});
 
-for (const [name, id] of Object.entries(settings.channels)) {
+for (const [name, id] of Object.entries(guild.channels)) {
     Object.assign(channels, { [name]: id });
 }
 
-type RoleList = typeof settings.roles;
+type RoleList = typeof guild.roles;
 
 const roles: RoleList = Object.create({});
 
-for (const [name, id] of Object.entries(settings.roles)) {
+for (const [name, id] of Object.entries(guild.roles)) {
     Object.assign(roles, { [name]: id });
 }
 

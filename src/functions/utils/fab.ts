@@ -1,10 +1,10 @@
-import { settings } from "#settings";
+import { fab } from "#settings";
 
-type ChannelList = typeof settings.fab;
+type ProductList = typeof fab;
 
-const products: ChannelList = Object.create({});
+const products: ProductList = Object.create({});
 
-for (const [name, id] of Object.entries(settings.fab)) {
+for (const [name, id] of Object.entries(fab)) {
     Object.assign(products, { [name]: id });
 }
 

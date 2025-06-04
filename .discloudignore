@@ -10,6 +10,8 @@
 
 # Folders
 /.vscode
+/assets/avatar
+/assets/icons
 /src
 /deprecated
 /discloud

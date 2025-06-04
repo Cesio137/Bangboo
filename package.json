@@ -14,15 +14,15 @@
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
-    "@magicyan/discord": "^1.4.9",
+    "@magicyan/discord": "^1.4.10",
     "@magicyan/discord-ui": "^0.2.0",
     "@napi-rs/canvas": "^0.1.70",
     "chalk": "5.4.1",
     "discloud.app": "^0.14.12",
     "discord.js": "14.19.3",
     "fast-glob": "^3.3.3",
-    "rou3": "0.6.2",
-    "zod": "^3.25.49"
+    "rou3": "0.6.3",
+    "zod": "^3.25.51"
   },
   "devDependencies": {
     "@types/node": "^22.15.29",
@@ -56,5 +56,5 @@
       "./build/lib/index.js"
     ]
   },
-  "baseVersion": "1.2.7"
+  "baseVersion": "1.2.8"
 }

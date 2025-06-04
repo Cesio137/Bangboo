@@ -1,13 +1,13 @@
-import { settings } from "#settings";
+import { emojis } from "#settings";
 import { formatEmoji } from "discord.js";
 
-type EmojiList = typeof settings.emojis;
+type EmojiList = typeof emojis;
 type EmojiKey = keyof EmojiList["animated"] | keyof EmojiList["static"];
 type IconInfo = { id: string; animated: boolean; toString(): string };
 type Icon = Record<EmojiKey, IconInfo>;
 
 const icon: Icon = Object.create({});
-for (const [name, id] of Object.entries(settings.emojis.static)) {
+for (const [name, id] of Object.entries(emojis.static)) {
     const data = {
         id,
         animated: false,
@@ -18,7 +18,7 @@ for (const [name, id] of Object.entries(settings.emojis.static)) {
     Object.assign(icon, { [name]: data });
 }
 
-for (const [name, id] of Object.entries(settings.emojis.animated)) {
+for (const [name, id] of Object.entries(emojis.animated)) {
     const data = {
         id,
         animated: true,
