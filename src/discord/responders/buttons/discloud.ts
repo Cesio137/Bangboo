@@ -45,8 +45,8 @@ createResponder({
         const appLogs = await user.apps.terminal(id);
         let logs = appLogs.small.length > 3000 ? appLogs.small.slice(0, 3000) : appLogs.small; 
         logs = logs.replace(/\[[0-9;]+m/g, '');
-        
-        const component = logsComponent(appLogs.small);
+
+        const component = logsComponent(logs);
         
         interaction.editReply({ flags: ["IsComponentsV2"], components: [component] });
     },
