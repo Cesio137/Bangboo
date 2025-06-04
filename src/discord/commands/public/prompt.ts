@@ -19,7 +19,7 @@ createCommand({
     async run(interaction){
         const { options } = interaction;
 
-        interaction.deferReply();
+        interaction.deferReply({ flags: [ "Ephemeral" ] });
 
         const text = options.getString("text", true);
 

@@ -2,7 +2,7 @@ import { createCommand } from "#base";
 import { icon, res } from "#functions";
 import { user } from "#tools";
 import { ApplicationCommandOptionType, ApplicationCommandType, ChatInputCommandInteraction } from "discord.js";
-import { createEmbed } from "@magicyan/discord";
+import { logsComponent, statusComponent } from "#menus";
 
 createCommand({
     name: "discloud",
@@ -41,7 +41,7 @@ async function status(interaction: ChatInputCommandInteraction<"cached">) {
         return;
     }
 
-    await interaction.deferReply();
+    await interaction.deferReply({ flags: ["Ephemeral"] });
 
     const app = await user.apps.fetch(id);
     const appStatus = await user.apps.status(id);
@@ -53,17 +53,10 @@ async function status(interaction: ChatInputCommandInteraction<"cached">) {
         `${icon.wifi}\`Network:\` \`⬆\`**${appStatus.netIO.up} \`⬇\`${appStatus.netIO.down}**`,
         `${icon.refresh}\`Latest restart:\` **<t:${Math.floor(appStatus.startedAtTimestamp / 1000)}:R>**`,
     ];
-    const embed = createEmbed({
-        author: {
-            name: app.name,
-            iconURL: app.avatarURL
-        },
-        color: "Green",
-        thumbnail: app.avatarURL,
-        description: `${infos.join("\n")}`
-    })
 
-    interaction.editReply({ embeds: [embed] });
+    const component = statusComponent(infos);
+
+    interaction.editReply({ flags: ["IsComponentsV2"], components: [component] });
 }
 
 async function logs(interaction: ChatInputCommandInteraction<"cached">) {
@@ -73,19 +66,13 @@ async function logs(interaction: ChatInputCommandInteraction<"cached">) {
         return;
     }
 
-    await interaction.deferReply();
-    
-    const app = await user.apps.fetch(id);
-    const appLogs = await user.apps.terminal(id);
-    
-    const embed = createEmbed({
-        author: {
-            name: app.name,
-            iconURL: app.avatarURL
-        },
-        color: "Green",
-        description: `\`\`\`bash\n${appLogs.small}\n\`\`\``
-    })
+    await interaction.deferReply({ flags: ["Ephemeral"] });
 
-    interaction.editReply({ embeds: [embed] });
+    const appLogs = await user.apps.terminal(id);
+    let logs = appLogs.small.length > 3000 ? appLogs.small.slice(0, 3000) : appLogs.small; 
+    logs = logs.replace(/\[[0-9;]+m/g, '');
+
+    const component = logsComponent(logs);
+
+    interaction.editReply({ flags: ["IsComponentsV2"], components: [component] });
 }
