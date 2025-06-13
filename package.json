@@ -22,12 +22,12 @@
     "discord.js": "^14.19.3",
     "fast-glob": "^3.3.3",
     "rou3": "0.6.3",
-    "zod": "^3.25.56"
+    "zod": "^3.25.64"
   },
   "devDependencies": {
-    "@types/node": "^22.15.30",
+    "@types/node": "^22.15.31",
     "tsup": "^8.5.0",
-    "tsx": "^4.19.4",
+    "tsx": "^4.20.3",
     "typescript": "^5.8.3"
   },
   "imports": {
