@@ -19,13 +19,13 @@
     "@napi-rs/canvas": "^0.1.71",
     "chalk": "5.4.1",
     "discloud.app": "^0.14.12",
-    "discord.js": "^14.19.3",
+    "discord.js": "^14.20.0",
     "fast-glob": "^3.3.3",
-    "rou3": "0.6.3",
-    "zod": "^3.25.64"
+    "rou3": "^0.7.0",
+    "zod": "^3.25.65"
   },
   "devDependencies": {
-    "@types/node": "^22.15.31",
+    "@types/node": "^22.15.32",
     "tsup": "^8.5.0",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3"
