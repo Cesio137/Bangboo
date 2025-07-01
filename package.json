@@ -16,7 +16,7 @@
     "@google/generative-ai": "^0.24.1",
     "@magicyan/discord": "^1.4.10",
     "@magicyan/discord-ui": "^0.2.0",
-    "@napi-rs/canvas": "^0.1.72",
+    "@napi-rs/canvas": "^0.1.73",
     "chalk": "5.4.1",
     "discloud.app": "^1.0.7",
     "discord.js": "^14.21.0",
