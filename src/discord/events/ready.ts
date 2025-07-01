@@ -17,9 +17,9 @@ createEvent({
         });
 
         const status: ActivitiesOptions[] = [
-            { name: "Whatching Nathan's server!", type:ActivityType.Playing },
-            { name: "Join in: .gg/DBNATxA6Jx", type:ActivityType.Playing },
-            { name: "Zenless Zone Zero!", type:ActivityType.Playing },
+            { name: "Whatching Nathan's server!", type:ActivityType.Custom },
+            { name: "Join in: .gg/DBNATxA6Jx", type:ActivityType.Custom },
+            { name: "Zenless Zone Zero!", type:ActivityType.Custom },
         ];
 
         let i = 0;
@@ -31,7 +31,7 @@ createEvent({
                 });
                 i++;
             },
-            20_000
+            20000
         );        
     },
 });
