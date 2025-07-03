@@ -12,6 +12,11 @@ export function socialComponent(): ContainerBuilder {
             createRow<MessageActionRowComponentBuilder>().addComponents(
                 [
                     createLinkButton({
+                        label: "Portifolio",
+                        emoji: icon.icons_p,
+                        url: "https://nathan-miguel.vercel.app/"
+                    }),
+                    createLinkButton({
                         label: "Youtube",
                         emoji: icon.icons_youtube,
                         url: "https://www.youtube.com/@NathanMiguel1"
@@ -27,9 +32,9 @@ export function socialComponent(): ContainerBuilder {
                         url: "https://github.com/Cesio137"
                     }),
                     createLinkButton({
-                        label: "Linkedin",
-                        emoji: icon.icons_linked,
-                        url: "https://www.linkedin.com/in/nathan-miguel-488b462b1/"
+                        label: "X/Twitter",
+                        emoji: icon.icons_x,
+                        url: "https://x.com/NathanCmig"
                     }),
                 ]
             ),

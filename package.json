@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
-    "@magicyan/discord": "^1.4.10",
+    "@magicyan/discord": "^1.4.11",
     "@magicyan/discord-ui": "^0.2.0",
     "@napi-rs/canvas": "^0.1.73",
     "chalk": "5.4.1",
@@ -22,10 +22,10 @@
     "discord.js": "^14.21.0",
     "fast-glob": "^3.3.3",
     "rou3": "^0.7.3",
-    "zod": "^3.25.67"
+    "zod": "^3.25.71"
   },
   "devDependencies": {
-    "@types/node": "^22.15.34",
+    "@types/node": "^22.15.35",
     "tsup": "^8.5.0",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3"
