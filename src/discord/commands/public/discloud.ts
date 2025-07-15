@@ -6,7 +6,7 @@ import { logsComponent, statusComponent } from "#menus";
 
 createCommand({
     name: "discloud",
-    description: "app command",
+    description: "Show the bot status on discloud host",
     type: ApplicationCommandType.ChatInput,
     options: [
         {

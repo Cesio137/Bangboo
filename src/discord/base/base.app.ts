@@ -1,28 +1,19 @@
 import { baseErrorHandler, env, logger } from "#settings";
-import { Client, ClientOptions, version as djsVersion } from "discord.js";
+import { Client, ClientOptions, Collection, version as djsVersion } from "discord.js";
 import { CustomItents, CustomPartials } from "@magicyan/discord";
 import { baseAutocompleteHandler, baseCommandHandler, baseRegisterCommands } from "./base.command.js";
 import { baseStorage } from "./base.storage.js";
-import { baseRegisterEvents } from "./base.event.js";
+import { baseEventHandler, baseRegisterEvents } from "./base.event.js";
 import { baseResponderHandler } from "./base.responder.js";
 import { BASE_VERSION, runtimeDisplay } from "./base.version.js";
+import { glob } from "@reliverse/reglob";
 import ck from "chalk";
-import glob from "fast-glob";
 
 interface BootstrapOptions extends Partial<ClientOptions> {
     meta: ImportMeta;
-	/**
-	 * A list of paths that will be imported to load the project's structure classes
-	 * 
-	 * The paths are relative to the **workdir** folder
-	 */
     directories?: string[];
-    /** Send load logs in terminal */
     loadLogs?: boolean;
-    /** Run before load directories */
-    beforeLoad?(client: Client): void
-    /** Run when client is ready */
-    whenReady?(client: Client<true>): void;
+    beforeLoad?(client: Client): void;
 }
 export async function bootstrap(options: BootstrapOptions){
     const client = createClient(env.BOT_TOKEN, options);
@@ -64,42 +55,38 @@ async function loadModules(workdir: string, directories: string[] = []){
 }
 
 function createClient(token: string, options: BootstrapOptions) {
-
-    const client = new Client(Object.assign(options, {
+    const client = new Client({ ...options,
         intents: options.intents ?? CustomItents.All,
         partials: options.partials ?? CustomPartials.All,
-        failIfNotExists: options.failIfNotExists ?? false
-    }));
+        failIfNotExists: options.failIfNotExists ?? false,
+    });
 
     client.token=token;
     client.on("ready", async (client) => {
         registerErrorHandlers(client);
-
-        await client.guilds.fetch().catch(() => null);;
-
+        await client.guilds
+            .fetch()
+            .catch(() => null);
+            
         logger.log(ck.green(`● ${ck.greenBright.underline(client.user.username)} online ✓`))
-
+        
         await baseRegisterCommands(client);
 
-        if (options.whenReady){
-            options.whenReady(client);
+        const events = baseStorage.events.get("ready") ?? new Collection();
+
+        for(const data of events.values()){
+            baseEventHandler(data, [client]);
         }
     });
 
     client.on("interactionCreate", async (interaction) => {
-        switch(true){
-            case interaction.isAutocomplete():{
-                baseAutocompleteHandler(interaction);
-                return;
-            }
-            case interaction.isCommand(): {
-                baseCommandHandler(interaction);
-                return;
-            }
-            default: 
-                baseResponderHandler(interaction);
-                return;
+        if (interaction.isAutocomplete()){
+            return baseAutocompleteHandler(interaction);
         }
+        if (interaction.isCommand()){
+            return baseCommandHandler(interaction);
+        }
+        return baseResponderHandler(interaction);
     });
 
     return client;
@@ -107,11 +94,11 @@ function createClient(token: string, options: BootstrapOptions) {
 
 function loadLogs(){
     const logs = [
-        baseStorage.loadLogs.commands,
-        baseStorage.loadLogs.responders,
-        baseStorage.loadLogs.events,
-    ].flat();
-    logs.forEach(text => logger.log(text));
+        ...baseStorage.loadLogs.commands,
+        ...baseStorage.loadLogs.responders,
+        ...baseStorage.loadLogs.events,
+    ];
+    for(const text of logs) logger.log(text);
 }
 
 function registerErrorHandlers(client?: Client<true>){
