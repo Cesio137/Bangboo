@@ -18,6 +18,7 @@
 /node_modules
 
 # Files
+/.git
 /.env.development
 /.env.dev
 /.env.example
