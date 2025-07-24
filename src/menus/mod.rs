@@ -1,1 +1,1 @@
-pub mod moderate;
+pub mod components;

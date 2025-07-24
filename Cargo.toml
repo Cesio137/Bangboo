@@ -1,6 +1,6 @@
 [package]
 name = "Bangboo"
-version = "0.3.0"
+version = "0.4.0"
 edition = "2024"
 
 [profile.release]
@@ -8,6 +8,10 @@ opt-level = 3
 lto = true
 codegen-units = 1
 panic = "abort"
+
+[build-dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1" }
 
 [dependencies]
 serenity = { version = "0.12", features = ["collector"] }
@@ -21,8 +25,8 @@ regex = { version = "1.11" }
 reqwest = { version = "0.12" }
 serde = { version = "1.0" }
 serde_json = { version = "1.0" }
-skia-safe = { version = "0.84", features = ["textlayout"] }
+skia-safe = { version = "0.87", features = ["textlayout"] }
 tracing-subscriber = { version = "0.3" }
 tracing = { version = "0.1" }
-tokio = { version = "1.44", features = ["rt-multi-thread", "signal"] }
+tokio = { version = "1.46", features = ["rt-multi-thread", "signal"] }
 chrono = { version = "0.4" }

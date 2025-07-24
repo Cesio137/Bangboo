@@ -1,12 +1,14 @@
-mod message_create;
+mod ban_added;
 mod interaction_create;
 mod member_added;
 mod member_removed;
-mod ban_added;
+mod message_create;
 
 use super::app::base::App;
 use colored::Colorize;
-use serenity::all::{async_trait, Context, EventHandler, GuildId, Interaction, Member, Message, Ready, User};
+use serenity::all::{
+    async_trait, Context, EventHandler, GuildId, Interaction, Member, Message, Ready, User,
+};
 use serenity::model::application;
 
 #[async_trait]
@@ -32,12 +34,17 @@ impl EventHandler for App {
                     "✖".bright_red(),
                     "Failed to register global commands!".red(),
                 );
-            },
+            }
         };
         let name = &data.user.name;
         println!("\n{} {}", "➡ Online as".green(), name.bright_green());
         if len > 0 {
-            println!("{} {} {}", "⤿".bright_green(), len.to_string().green(), "command(s) successfully registered globally!".green());
+            println!(
+                "{} {} {}",
+                "⤿".bright_green(),
+                len.to_string().green(),
+                "command(s) successfully registered globally!".green()
+            );
         }
     }
 
@@ -47,7 +54,13 @@ impl EventHandler for App {
         }
     }
 
-    async fn guild_member_removal(&self, ctx: Context, guild_id: GuildId, user: User, member_data_if_available: Option<Member>) {
+    async fn guild_member_removal(
+        &self,
+        ctx: Context,
+        guild_id: GuildId,
+        user: User,
+        member_data_if_available: Option<Member>,
+    ) {
         if !user.bot {
             member_removed::run(self, ctx, guild_id, user).await;
         }
@@ -58,7 +71,7 @@ impl EventHandler for App {
             ban_added::run(self, ctx, guild_id, banned_user).await;
         }
     }
-    
+
     async fn message(&self, ctx: Context, new_message: Message) {
         if !new_message.author.bot || new_message.guild_id.is_some() {
             message_create::run(self, ctx, new_message).await;

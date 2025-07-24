@@ -1,17 +1,20 @@
-use async_trait::async_trait;
-use crate::discord::app::creators::SlashCommandHandler;
-use crate::settings::global::EColor;
-use crate::utils::{embeds::res, interaction::reply_with_embed};
-use serenity::all::{CommandDataOptionValue, CommandInteraction, CommandOptionType, CommandType, Context, CreateCommand, InteractionContext};
-use serenity::builder::CreateCommandOption;
+use crate::data::settings::EColors;
 use crate::discord::app::base::App;
+use crate::discord::app::creators::SlashCommandHandler;
+use crate::utils::interaction::reply_with_embed;
+use async_trait::async_trait;
+use serenity::all::{
+    CacheHttp, CommandInteraction, CommandOptionType, CommandType, Context, CreateCommand,
+    InteractionContext,
+};
+use serenity::builder::CreateCommandOption;
 
 pub struct Age;
 
 #[async_trait]
 impl SlashCommandHandler for Age {
     fn command(&self) -> CreateCommand {
-        let option = CreateCommandOption::new(CommandOptionType::User, "user", "Select an user.")
+        let option = CreateCommandOption::new(CommandOptionType::User, "user", "Selected user.")
             .required(false);
         CreateCommand::new("age")
             .description("Displays your or another user's account creation date.")
@@ -23,30 +26,51 @@ impl SlashCommandHandler for Age {
     async fn run(&self, app: &App, ctx: Context, interaction: CommandInteraction) {
         let options = &interaction.data.options;
         let user_id = if let Some(option) = options.get(0) {
-            if let CommandDataOptionValue::User(ref user_id) = option.value {
-                user_id.clone()
-            } else { interaction.user.id }
-        } else { interaction.user.id };
-
-        let user = match ctx.http.get_user(user_id).await {
-            Ok(user) => user,
-            Err(_) => {
-                let embed = res(EColor::Danger, "An error occured while fetching the user.");
-                let _ = reply_with_embed(&ctx, &interaction, embed, false).await;
-                return
-            }
+            option.value.as_user_id().unwrap()
+        } else {
+            interaction.user.id
         };
 
-        let user_name = user.global_name.as_ref().unwrap_or(&user.name);
-        let formatted_date = user.created_at().format("%a, %Hh%Mmin, %d/%b/%Y").to_string();
+        let guild_id = match interaction.guild_id {
+            Some(id) => id,
+            None => {
+                reply_with_embed(&ctx, &interaction, EColors::danger, "Guild id not found.").await;
+                return;
+            }
+        };
+        if ctx.cache.guild(guild_id).is_none() {
+            reply_with_embed(
+                &ctx,
+                &interaction,
+                EColors::danger,
+                "Failed to fetch guild data.",
+            )
+            .await;
+            return;
+        }
+        let guild = ctx.cache.guild(guild_id).unwrap().clone();
 
-        let content = format!(
-            "**{}**'s account was created at {}.",
-            user_name,
-            formatted_date,
-        );
+        let member = guild.member(ctx.http(), user_id).await.unwrap();
+        let user = &member.user;
 
-        let embed = res(EColor::Green, &content);
-        let _ = reply_with_embed(&ctx, &interaction, embed, false).await;
+        let timestamp = user.created_at().timestamp();
+        let mut age = String::from("");
+        if (interaction.locale == "pt-BR") {
+            age = format!(
+                "**{}** criou a conta <t:{}:R> em um(a) <t:{}:F> ",
+                user.global_name.as_ref().unwrap_or(&user.name),
+                timestamp,
+                timestamp
+            );
+        } else {
+            age = format!(
+                "**{}** account was created <t:{}:R> on <t:{}:F> ",
+                user.global_name.as_ref().unwrap_or(&user.name),
+                timestamp,
+                timestamp
+            );
+        }
+
+        reply_with_embed(&ctx, &interaction, EColors::green, &age).await;
     }
 }

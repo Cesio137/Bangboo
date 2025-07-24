@@ -1,2 +1,4 @@
+pub mod assets;
 pub mod env;
-pub mod global;
+pub mod logger;
+pub mod malloc;

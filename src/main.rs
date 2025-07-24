@@ -1,3 +1,4 @@
+mod data;
 mod discord;
 mod menus;
 mod settings;
@@ -5,20 +6,21 @@ mod tools;
 mod utils;
 
 #[cfg(target_env = "gnu")]
-use utils::malloc::malloc::configure_malloc;
-use discord::app::base::App;
-use settings::env::ENV_SCHEMA;
-use std::sync::Arc;
-use serenity::prelude::*;
-use tokio::signal;
+use settings::malloc::malloc::configure_malloc;
+
+use crate::settings::env::ENV_SCHEMA;
 use anyhow::Result;
+use discord::app::base::App;
+use serenity::{all::GatewayIntents, Client};
+use std::sync::Arc;
 
 #[tokio::main]
-async fn main() -> Result<()> { 
+async fn main() -> Result<()> {
     #[cfg(target_env = "gnu")]
     configure_malloc();
 
     let intents = GatewayIntents::GUILD_MESSAGES
+        | GatewayIntents::GUILDS
         | GatewayIntents::DIRECT_MESSAGES
         | GatewayIntents::MESSAGE_CONTENT
         | GatewayIntents::GUILD_MEMBERS
@@ -28,10 +30,10 @@ async fn main() -> Result<()> {
     let mut client = Client::builder(&ENV_SCHEMA.bot_token, intents)
         .event_handler_arc(app)
         .await
-        .expect("Err creating client");
+        .expect("Error when trying to create gateway client");
 
     if let Err(err) = client.start_autosharded().await {
-        println!("Client error: {err:?}");
+        eprint!("Client error: {err:?}");
     }
 
     Ok(())

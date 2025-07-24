@@ -1,8 +1,8 @@
 use crate::discord::app::creators::{PrefixCommandHandler, ResponderHandler, SlashCommandHandler};
 use crate::discord::commands::{prefix_commands, slash_commands};
+use crate::discord::responders::responders;
 use serenity::builder::CreateCommand;
 use std::collections::HashMap;
-use crate::discord::responders::responders;
 
 pub struct App {
     pub commands: Vec<CreateCommand>,
@@ -22,7 +22,7 @@ impl App {
             commands.push(command_handler.command());
             slash_command_handlers.insert(name, command_handler);
         }
-        
+
         let prefix_commands = prefix_commands();
         let mut prefix_command_handlers = HashMap::new();
         for command in prefix_commands {
@@ -30,7 +30,7 @@ impl App {
             let name = format!("!{}", command_handler.name());
             prefix_command_handlers.insert(name, command_handler);
         }
-        
+
         let responders = responders();
         let mut responder_handlers = HashMap::new();
         for responder in responders {
