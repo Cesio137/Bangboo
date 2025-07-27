@@ -2,7 +2,7 @@
 
 An intelligent Discord bot built with Rust.
 
-Hi, I’m @NathanMiguel, and I’m developing a bot to help me moderate my community, play music, and streamline some tasks using AI.
+Hi, I’m @NathanMiguel, and I’m developing a bot to help me moderate my community and streamline some tasks using AI.
 
 This project is currently for my personal use, but I hope to monetize it in the future. 😄
 
