@@ -5,7 +5,7 @@ use serenity::builder::CreateCommand;
 use std::collections::HashMap;
 
 pub struct App {
-    pub commands: Vec<CreateCommand>,
+    pub commands: Vec<CreateCommand<'static>>,
     pub prefix_command_handlers: HashMap<String, Box<dyn PrefixCommandHandler + Send + Sync>>,
     pub slash_command_handlers: HashMap<String, Box<dyn SlashCommandHandler + Send + Sync>>,
     pub responder_handlers: HashMap<String, Box<dyn ResponderHandler + Send + Sync>>,
@@ -17,18 +17,17 @@ impl App {
         let mut commands = Vec::new();
         let mut slash_command_handlers = HashMap::new();
         for slash_command in slash_commands {
-            let command_handler = slash_command;
-            let name = extract_command_name(&command_handler.command());
-            commands.push(command_handler.command());
-            slash_command_handlers.insert(name, command_handler);
+            let cmd = slash_command.command();
+            let name = extract_command_name(&cmd);
+            commands.push(cmd);
+            slash_command_handlers.insert(name, slash_command);
         }
 
         let prefix_commands = prefix_commands();
         let mut prefix_command_handlers = HashMap::new();
         for command in prefix_commands {
-            let command_handler = command;
-            let name = format!("!{}", command_handler.name());
-            prefix_command_handlers.insert(name, command_handler);
+            let name = format!("!{}", command.name());
+            prefix_command_handlers.insert(name, command);
         }
 
         let responders = responders();

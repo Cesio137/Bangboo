@@ -1,7 +1,7 @@
-use colored::Colorize;
+use colored::{ColoredString, Colorize};
 
 pub fn success(message: &str) {
-    println!("{} {message}", "✔".bright_green());
+    println!("{} {}", "✔".bright_green(), message.bright_green());
 }
 
 pub fn error(message: &str) {
@@ -13,5 +13,9 @@ pub fn warn(message: &str) {
 }
 
 pub fn log(message: &str) {
+    println!("{message}");
+}
+
+pub fn colored_log(message: ColoredString) {
     println!("{message}");
 }

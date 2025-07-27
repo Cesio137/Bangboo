@@ -3,13 +3,16 @@ use crate::settings::logger::error;
 use crate::utils::global::{global_message, EventType};
 use serenity::all::{Context, Member};
 
-pub async fn run(app: &App, ctx: Context, member_added: Member) {
-    let guild_id = member_added.guild_id.as_ref();
-    if ctx.cache.guild(guild_id).is_none() {
-        error("Failed to load guild data from cache.");
-        return;
-    }
-    let guild = ctx.cache.guild(guild_id).unwrap().clone();
+pub async fn run(app: &App, ctx: &Context, member_added: &Member) {
+    if member_added.user.bot() { return }
+    
+    let guild = match member_added.guild_id.to_guild_cached(&ctx.cache) {
+        Some(guild) => guild.clone(),
+        None => {
+            error("Failed to load guild data from cache.");
+            return;
+        }
+    };
 
     let system_channel_id = match guild.system_channel_id {
         Some(channel_id) => channel_id,
@@ -20,6 +23,7 @@ pub async fn run(app: &App, ctx: Context, member_added: Member) {
     };
 
     let user = member_added.user.clone();
+    
     global_message(
         &ctx,
         &system_channel_id,

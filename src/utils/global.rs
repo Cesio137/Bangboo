@@ -19,7 +19,7 @@ pub enum EventType {
 
 pub async fn global_message(
     ctx: &Context,
-    system_channel: &ChannelId,
+    channel_id: &ChannelId,
     event: EventType,
     member: Option<&Member>,
     user: &User,
@@ -47,7 +47,7 @@ pub async fn global_message(
             let duration = now.duration_since(UNIX_EPOCH)
                 .expect("Time went backwards!");
             let joined_at = member.unwrap().joined_at.unwrap().timestamp_millis();
-            let account_age = duration.as_millis() - user.created_at().timestamp_millis() as u128;
+            let account_age = duration.as_millis() - user.id.created_at().timestamp_millis() as u128;
             const TIME_LIMIT: u16 = 60 * 1000;
             if joined_at < TIME_LIMIT as i64 && account_age > TIME_LIMIT as u128 {
                 CARD_NEW
@@ -106,8 +106,10 @@ pub async fn global_message(
             return;
         }
 
-        let undefined_nick = "Undefined".to_string();
-        let nickname = user.global_name.as_ref().unwrap_or(&undefined_nick);
+        let nickname = match user.global_name.as_ref() {
+            Some(nickname) => nickname,
+            None => "Undefined",
+        };
         if !draw_text_with_font(canvas, &format!("@{}", nickname), FONT_ROBOTO, 96.0, 530.0, 380.0) {
             error("Failed to resize user avatar image.");
             return;
@@ -131,7 +133,7 @@ pub async fn global_message(
         .content(utc)
         .add_files(vec![attachment]);
 
-    if let Err(err) = system_channel.send_message(ctx.http(), message).await {
+    if let Err(err) = channel_id.widen().send_message(ctx.http(), message).await {
         error(&format!(
             "Error trying to send card to system channel\nʟ {:?}",
             err

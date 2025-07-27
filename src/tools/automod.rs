@@ -1,10 +1,8 @@
 use crate::data::settings::EColors;
-use crate::settings::logger;
+use crate::settings::logger::error;
 use once_cell::sync::Lazy;
 use regex::Regex;
-use serenity::all::{CacheHttp, CreateEmbed, CreateMessage, Message};
-use serenity::client::Context;
-use crate::settings::logger::error;
+use serenity::all::{CacheHttp, Context, CreateEmbed, CreateMessage, Message};
 
 static REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"\[([^]]+)]\((https?://[^)]+)\)").unwrap());
 
@@ -29,19 +27,14 @@ pub async fn filter_message(ctx: &Context, message: &Message) -> bool {
     let server_embed = CreateEmbed::new()
         .color(EColors::warning as u32)
         .description(warning);
-    if let Err(err) =  channel_id
+    if let Err(err) = channel_id
         .send_message(ctx.http(), CreateMessage::new().embed(server_embed))
-        .await {
-        error(&format!(
-            "Failed to send warning message\nʟ {:?}",
-            err
-        ));
+        .await
+    {
+        error(&format!("Failed to send warning message\nʟ {:?}", err));
     }
-    if let Err(err) = message.delete(ctx.http()).await {
-        error(&format!(
-            "Failed to delete scan message\nʟ {:?}",
-            err
-        ));
+    if let Err(err) = message.delete(ctx.http(), Some("Scam message")).await {
+        error(&format!("Failed to delete scan message\nʟ {:?}", err));
     }
 
     let guild_id = match message.guild_id.as_ref() {
@@ -52,7 +45,7 @@ pub async fn filter_message(ctx: &Context, message: &Message) -> bool {
         }
     };
 
-    let guild = match guild_id.to_guild_cached(&ctx) {
+    let guild = match guild_id.to_guild_cached(&ctx.cache) {
         Some(guild) => guild.clone(),
         None => {
             error("Guild is none.");
@@ -61,25 +54,27 @@ pub async fn filter_message(ctx: &Context, message: &Message) -> bool {
     };
 
     if guild.owner_id == message.author.id {
-        error("Tried to kick the owner of the guild");
+        error("Tried to kick the owner of the guild.");
         return true;
     }
 
-    let _ = guild
-        .kick_with_reason(
+    if let Err(err) = guild
+        .id
+        .kick(
             ctx.http(),
             message.author.id,
-            "Sent a message that was flagged as a scam.",
+            Some("Sent a message that was flagged as a scam."),
         )
-        .await;
+        .await
+    {
+        error("Failed to kick the owner of the scam message.");
+        return true;
+    }
 
     let private_channel = match message.author.id.create_dm_channel(ctx.http()).await {
         Ok(channel) => channel,
         Err(err) => {
-            error(&format!(
-                "Failed to create DM channel.\nʟ {:?}",
-                err
-            ));
+            error(&format!("Failed to create DM channel.\nʟ {:?}", err));
             return true;
         }
     };
@@ -88,13 +83,14 @@ pub async fn filter_message(ctx: &Context, message: &Message) -> bool {
     let dm_embed = CreateEmbed::new()
         .color(EColors::warning as u32)
         .description(dm_warning);
+
     if let Err(err) = private_channel
+        .id
+        .widen()
         .send_message(ctx.http(), CreateMessage::new().embed(dm_embed))
-        .await {
-        error(&format!(
-            "Failed to send DM warning.\nʟ {:?}",
-            err
-        ));
+        .await
+    {
+        error(&format!("Failed to send DM warning.\nʟ {:?}", err));
         return true;
     }
 

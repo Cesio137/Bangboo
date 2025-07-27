@@ -12,9 +12,9 @@ impl PrefixCommandHandler for Canvas {
         "canvas".to_string()
     }
 
-    async fn run(&self, app: &App, ctx: Context, message: Message) {
+    async fn run(&self, app: &App, ctx: &Context, message: &Message) {
         let member = message.member(&ctx.http).await.unwrap();
         let user = member.user.clone();
-        global_message(&ctx, &message.channel_id, EventType::MemberAdd, Some(&member), &user).await;
+        global_message(&ctx, &message.channel_id.expect_channel(), EventType::MemberAdd, Some(&member), &user).await;
     }
 }

@@ -3,82 +3,36 @@ mod interaction_create;
 mod member_added;
 mod member_removed;
 mod message_create;
+mod ready;
 
 use super::app::base::App;
 use colored::Colorize;
-use serenity::all::{
-    async_trait, Context, EventHandler, GuildId, Interaction, Member, Message, Ready, User,
-};
+use serenity::all::{async_trait, Context, Event, EventHandler, FullEvent, GuildId, Interaction, Member, Message, RatelimitInfo, Ready, User};
 use serenity::model::application;
 
 #[async_trait]
 impl EventHandler for App {
-    async fn ready(&self, ctx: Context, data: Ready) {
-        let mut len = self.commands.len();
-        match application::Command::set_global_commands(&ctx.http, self.commands.clone()).await {
-            Ok(commands) => {
-                for command in commands {
-                    println!(
-                        "{} {} {} {}",
-                        "✔".bright_green(),
-                        "[/]".green(),
-                        command.name.bright_cyan(),
-                        "command loaded!".bright_green()
-                    );
-                }
-            }
-            Err(_) => {
-                len = 0;
-                println!(
-                    "{} {}",
-                    "✖".bright_red(),
-                    "Failed to register global commands!".red(),
-                );
-            }
-        };
-        let name = &data.user.name;
-        println!("\n{} {}", "➡ Online as".green(), name.bright_green());
-        if len > 0 {
-            println!(
-                "{} {} {}",
-                "⤿".bright_green(),
-                len.to_string().green(),
-                "command(s) successfully registered globally!".green()
-            );
+    async fn dispatch(&self, _context: &Context, _event: &FullEvent) {
+        match _event {
+            FullEvent::Ready { data_about_bot, .. } =>
+                ready::run(self, _context, data_about_bot).await,
+            
+            FullEvent::GuildBanAddition { guild_id, banned_user, .. } => 
+                ban_added::run(self, _context, guild_id, banned_user).await,
+            
+            FullEvent::InteractionCreate { interaction, .. } =>
+                interaction_create::run(self, _context, interaction).await,
+            
+            FullEvent::GuildMemberAddition { new_member, ..} =>
+                member_added::run(self, _context, new_member).await,
+            
+            FullEvent::GuildMemberRemoval { guild_id, user, member_data_if_available, .. } =>
+                member_removed::run(self, _context, guild_id, user).await,
+            
+            FullEvent::Message { new_message, .. } =>
+                message_create::run(self, _context, new_message).await,
+            
+            _ => {}
         }
-    }
-
-    async fn guild_member_addition(&self, ctx: Context, new_member: Member) {
-        if !new_member.user.bot {
-            member_added::run(self, ctx, new_member).await;
-        }
-    }
-
-    async fn guild_member_removal(
-        &self,
-        ctx: Context,
-        guild_id: GuildId,
-        user: User,
-        member_data_if_available: Option<Member>,
-    ) {
-        if !user.bot {
-            member_removed::run(self, ctx, guild_id, user).await;
-        }
-    }
-
-    async fn guild_ban_addition(&self, ctx: Context, guild_id: GuildId, banned_user: User) {
-        if !banned_user.bot {
-            ban_added::run(self, ctx, guild_id, banned_user).await;
-        }
-    }
-
-    async fn message(&self, ctx: Context, new_message: Message) {
-        if !new_message.author.bot || new_message.guild_id.is_some() {
-            message_create::run(self, ctx, new_message).await;
-        }
-    }
-
-    async fn interaction_create(&self, ctx: Context, interaction: Interaction) {
-        interaction_create::run(self, ctx, interaction).await;
     }
 }

@@ -5,6 +5,7 @@ mod settings;
 mod tools;
 mod utils;
 
+
 #[cfg(target_env = "gnu")]
 use settings::malloc::malloc::configure_malloc;
 
@@ -12,29 +13,23 @@ use crate::settings::env::ENV_SCHEMA;
 use anyhow::Result;
 use discord::app::base::App;
 use serenity::{all::GatewayIntents, Client};
+use serenity::all::Token;
+use std::str::FromStr;
 use std::sync::Arc;
+use crate::discord::app::bootstrap;
 
 #[tokio::main]
-async fn main() -> Result<()> {
+async fn main() {
     #[cfg(target_env = "gnu")]
     configure_malloc();
-
+/*
     let intents = GatewayIntents::GUILD_MESSAGES
         | GatewayIntents::GUILDS
         | GatewayIntents::DIRECT_MESSAGES
         | GatewayIntents::MESSAGE_CONTENT
         | GatewayIntents::GUILD_MEMBERS
-        | GatewayIntents::GUILD_MODERATION;
+        | GatewayIntents::GUILD_MODERATION;*/
 
-    let app = Arc::new(App::new());
-    let mut client = Client::builder(&ENV_SCHEMA.bot_token, intents)
-        .event_handler_arc(app)
-        .await
-        .expect("Error when trying to create gateway client");
-
-    if let Err(err) = client.start_autosharded().await {
-        eprint!("Client error: {err:?}");
-    }
-
-    Ok(())
+    let intents = GatewayIntents::all();
+    bootstrap(intents).await;
 }

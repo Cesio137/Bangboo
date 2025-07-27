@@ -1,22 +1,22 @@
 pub mod prefix;
 pub mod public;
 
+use serenity::all::FullEvent;
 use crate::discord::app::creators::{PrefixCommandHandler, SlashCommandHandler};
-use public::*;
-use crate::discord::commands::prefix::canvas;
 
 pub fn prefix_commands() -> Vec<Box<dyn PrefixCommandHandler + Send + Sync>> {
-    let mut commands: Vec<Box<dyn PrefixCommandHandler + Send + Sync>> = Vec::new();
-
-    commands.push(Box::new(canvas::Canvas));
+    let commands: Vec<Box<dyn PrefixCommandHandler + Send + Sync>> = vec![
+        //Box::new(prefix::canvas::Canvas),
+    ];
 
     commands
 }
 
 pub fn slash_commands() -> Vec<Box<dyn SlashCommandHandler + Send + Sync>> {
-    let mut commands: Vec<Box<dyn SlashCommandHandler + Send + Sync>> = Vec::new();
-
-    commands.push(Box::new(age::Age));
+    let commands: Vec<Box<dyn SlashCommandHandler + Send + Sync>> = vec![
+        Box::new(public::age::Age),
+        Box::new(public::moderate::Moderate),
+    ];
 
     commands
 }

@@ -1,19 +1,19 @@
+use std::borrow::Cow;
 use crate::discord::app::base::App;
 use async_trait::async_trait;
-use serenity::all::{CommandInteraction, Message};
+use serenity::all::{CommandInteraction, Context, Message};
 use serenity::builder::CreateCommand;
-use serenity::client::Context;
 
 #[async_trait]
 pub trait PrefixCommandHandler: Send + Sync {
     fn name(&self) -> String;
-    async fn run(&self, app: &App, ctx: Context, message: Message);
+    async fn run(&self, app: &App, ctx: &Context, message: &Message);
 }
 
 #[async_trait]
 pub trait SlashCommandHandler: Send + Sync {
-    fn command(&self) -> CreateCommand;
-    async fn run(&self, app: &App, ctx: Context, interaction: CommandInteraction);
+    fn command(&self) -> CreateCommand<'static>;
+    async fn run(&self, app: &App, ctx: &Context, interaction: &CommandInteraction);
 }
 
 #[async_trait]

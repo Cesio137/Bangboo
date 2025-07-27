@@ -1,0 +1,26 @@
+use crate::discord::app::base::App;
+use colored::Colorize;
+use serenity::all::{Activity, ActivityData, Context, Ready};
+use serenity::model::application::Command;
+use crate::settings::logger::{colored_log, error, log, success};
+
+pub async fn run(app: &App, ctx: &Context, ready: &Ready) {
+    colored_log(format!("● {} online ✓", ready.user.name.underline()).bright_green());
+    let result = Command::set_global_commands(&ctx.http, &app.commands).await;
+    let mut commands_len: usize = 0;
+    match result {
+        Ok(commands) => {
+            commands_len = commands.len();
+            colored_log(format!("└ {} command(s) successfully registered globally!", commands_len).bright_green());
+            for command in commands {
+                colored_log(format!("{{/}} Slash command > {} ✓", command.name.bright_blue()).bright_green());
+            }
+        }
+        Err(err) => {
+            colored_log(format!("└ {} command(s) successfully registered globally!", commands_len).bright_red());
+            error(&format!("{:?}", err));
+        }
+    }
+
+    ctx.set_activity(Some(ActivityData::custom("Rust-powered app. Memory safety without sacrifice. Performance without compromise.")));
+}
