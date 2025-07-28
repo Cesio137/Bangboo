@@ -1,4 +1,4 @@
-use anyhow::{anyhow, Result};
+use anyhow::Result;
 use skia_safe::{
     scalar, surfaces, textlayout::{
         FontCollection, ParagraphBuilder, ParagraphStyle, TextStyle, TypefaceFontProvider,
@@ -45,7 +45,7 @@ pub fn load_image_from_bytes(slice: &[u8]) -> Option<Image> {
 pub fn resize_image(image: Image, new_width: u32, new_height: u32) -> Option<Image> {
     let mut surface = match surfaces::raster_n32_premul((new_width as i32, new_height as i32)) {
         Some(surface) => surface,
-        None => return None
+        None => return None,
     };
     let canvas = surface.canvas();
 
@@ -77,7 +77,7 @@ pub fn draw_text_with_font(
     let font_mrg = FontMgr::new();
     let typeface = match font_mrg.new_from_data(font, None) {
         Some(typeface) => typeface,
-        None => return false
+        None => return false,
     };
     font_provider.register_typeface(typeface, Some("CanvasFont"));
 

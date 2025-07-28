@@ -1,3 +1,78 @@
-pub fn social_component() {
+use crate::data::emojis::EStatic;
+use crate::data::settings::EColors;
+use serenity::all::{
+    Colour, CreateActionRow, CreateButton, CreateComponent, CreateContainer,
+    CreateSeparator, CreateTextDisplay, EmojiId, ReactionType, Spacing,
+};
+use std::borrow::Cow;
 
+pub fn social_component<'a>() -> CreateComponent<'a> {
+    let accent_color = Colour::new(EColors::green as u32);
+    let text_display = CreateTextDisplay::new("**FOLLOW ME ON SOCIAL MEDIA**");
+    let separator = CreateSeparator::new(false).spacing(Spacing::Small);
+
+    let social_row = CreateActionRow::Buttons(Cow::Owned(vec![
+        CreateButton::new_link("https://nathan-miguel.vercel.app/")
+            .label("Portifolio")
+            .emoji(ReactionType::Custom {
+                id: EmojiId::from(EStatic::icons_p as u64),
+                name: None,
+                animated: false,
+            }),
+        CreateButton::new_link("https://www.youtube.com/@NathanMiguel1")
+            .label("Youtube")
+            .emoji(ReactionType::Custom {
+                id: EmojiId::from(EStatic::icons_youtube as u64),
+                name: None,
+                animated: false,
+            }),
+        CreateButton::new_link("https://www.instagram.com/nathan_cmiguel/")
+            .label("Instagram")
+            .emoji(ReactionType::Custom {
+                id: EmojiId::from(EStatic::icons_instagram as u64),
+                name: None,
+                animated: false,
+            }),
+        CreateButton::new_link("https://github.com/Cesio137")
+            .label("GitHub")
+            .emoji(ReactionType::Custom {
+                id: EmojiId::from(EStatic::icons_instagram as u64),
+                name: None,
+                animated: false,
+            }),
+        CreateButton::new_link("https://x.com/NathanCmig")
+            .label("X/Twitter")
+            .emoji(ReactionType::Custom {
+                id: EmojiId::from(EStatic::icons_x as u64),
+                name: None,
+                animated: false,
+            }),
+    ]));
+
+    let fab_separator = CreateSeparator::new(true).spacing(Spacing::Large);
+    let fab_text_display = CreateTextDisplay::new("**VISIT MY FAB STORE**");
+
+    let fab_row = CreateActionRow::Buttons(Cow::Owned(vec![
+        CreateButton::new_link("https://www.fab.com/sellers/Nathan%20Miguel")
+            .label("Fab")
+            .emoji(ReactionType::Custom {
+                id: EmojiId::from(EStatic::icons_f as u64),
+                name: None,
+                animated: false,
+            }),
+    ]));
+
+    CreateComponent::Container(
+        CreateContainer::new(vec![
+            CreateComponent::TextDisplay(text_display),
+            CreateComponent::Separator(separator.clone()),
+            CreateComponent::ActionRow(social_row),
+
+            CreateComponent::Separator(fab_separator.clone()),
+            CreateComponent::TextDisplay(fab_text_display),
+            CreateComponent::Separator(fab_separator.divider(false).spacing(Spacing::Small)),
+            CreateComponent::ActionRow(fab_row),
+        ])
+        .accent_color(accent_color)
+    )
 }

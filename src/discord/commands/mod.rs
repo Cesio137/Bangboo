@@ -15,7 +15,11 @@ pub fn prefix_commands() -> Vec<Box<dyn PrefixCommandHandler + Send + Sync>> {
 pub fn slash_commands() -> Vec<Box<dyn SlashCommandHandler + Send + Sync>> {
     let commands: Vec<Box<dyn SlashCommandHandler + Send + Sync>> = vec![
         Box::new(public::age::Age),
+        Box::new(public::discloud::Discloud),
+        Box::new(public::fab::Fab),
         Box::new(public::moderate::Moderate),
+        Box::new(public::prompt::Prompt),
+        Box::new(public::social::Social),
     ];
 
     commands

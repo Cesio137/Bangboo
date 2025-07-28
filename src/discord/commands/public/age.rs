@@ -1,14 +1,15 @@
-use std::borrow::Cow;
 use crate::data::settings::EColors;
 use crate::discord::app::base::App;
 use crate::discord::app::creators::SlashCommandHandler;
 use crate::utils::interaction::reply_with_embed;
 use async_trait::async_trait;
-use serenity::all::{CommandInteraction, CommandOptionType, CommandType, Context, CreateCommand, InteractionContext};
+use serenity::all::{
+    CommandInteraction, CommandOptionType, CommandType, Context, CreateCommand, InteractionContext,
+    MessageFlags,
+};
 use serenity::builder::CreateCommandOption;
 
 pub struct Age;
-
 
 #[async_trait]
 impl SlashCommandHandler for Age {
@@ -36,9 +37,9 @@ impl SlashCommandHandler for Age {
                 reply_with_embed(
                     &ctx,
                     &interaction,
-                    false,
+                    MessageFlags::empty(),
                     EColors::danger,
-                    "Guild id not found."
+                    "Guild id not found.",
                 )
                 .await;
                 return;
@@ -49,9 +50,9 @@ impl SlashCommandHandler for Age {
             reply_with_embed(
                 &ctx,
                 &interaction,
-                false,
+                MessageFlags::empty(),
                 EColors::danger,
-                "Failed to fetch guild data."
+                "Failed to fetch guild data.",
             )
             .await;
             return;
@@ -80,6 +81,13 @@ impl SlashCommandHandler for Age {
             );
         }
 
-        reply_with_embed(&ctx, &interaction, false, EColors::green, &age).await;
+        reply_with_embed(
+            &ctx,
+            &interaction,
+            MessageFlags::empty(),
+            EColors::green,
+            &age,
+        )
+        .await;
     }
 }

@@ -2,13 +2,12 @@ use super::skia::{draw_circle, draw_text_with_font, resize_image};
 use crate::settings::assets::{
     CARD_BACK, CARD_LEFT, CARD_MOD, CARD_NEW, FONT_FREDOKA, FONT_ROBOTO, IMG_DEFAULT_AVATAR,
 };
-use crate::utils::skia::load_image_from_bytes;
-use serenity::all::{CacheHttp, ChannelId, CommandInteraction, Context, CreateAttachment, CreateMessage, Member, User};
-use skia_safe::{EncodedImageFormat, ISize, Image, Point};
-use std::time::{SystemTime, UNIX_EPOCH};
 use crate::settings::logger::error;
 use crate::utils::cdn::display_avatar_url;
-use crate::utils::interaction::reply;
+use crate::utils::skia::load_image_from_bytes;
+use serenity::all::{CacheHttp, ChannelId, Context, CreateAttachment, CreateMessage, Member, User};
+use skia_safe::{EncodedImageFormat, ISize, Point};
+use std::time::{SystemTime, UNIX_EPOCH};
 
 #[derive(Eq, PartialEq)]
 pub enum EventType {
@@ -26,7 +25,7 @@ pub async fn global_message(
 ) {
     // Fetch avatar
     let mut user_avatar: Vec<u8> = vec![];
-    
+
     if let Some(avatar_hash) = user.avatar {
         let avatar_url = display_avatar_url(user.id.get(), &avatar_hash.to_string(), 512);
         if let Ok(res) = reqwest::get(avatar_url).await {
@@ -40,14 +39,16 @@ pub async fn global_message(
     } else {
         user_avatar = IMG_DEFAULT_AVATAR.to_vec();
     }
-    
+
     let background = match event {
         EventType::MemberAdd => {
             let now = SystemTime::now();
-            let duration = now.duration_since(UNIX_EPOCH)
+            let duration = now
+                .duration_since(UNIX_EPOCH)
                 .expect("Time went backwards!");
             let joined_at = member.unwrap().joined_at.unwrap().timestamp_millis();
-            let account_age = duration.as_millis() - user.id.created_at().timestamp_millis() as u128;
+            let account_age =
+                duration.as_millis() - user.id.created_at().timestamp_millis() as u128;
             const TIME_LIMIT: u16 = 60 * 1000;
             if joined_at < TIME_LIMIT as i64 && account_age > TIME_LIMIT as u128 {
                 CARD_NEW
@@ -110,7 +111,14 @@ pub async fn global_message(
             Some(nickname) => nickname,
             None => "Undefined",
         };
-        if !draw_text_with_font(canvas, &format!("@{}", nickname), FONT_ROBOTO, 96.0, 530.0, 380.0) {
+        if !draw_text_with_font(
+            canvas,
+            &format!("@{}", nickname),
+            FONT_ROBOTO,
+            96.0,
+            530.0,
+            380.0,
+        ) {
             error("Failed to resize user avatar image.");
             return;
         }

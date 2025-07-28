@@ -1,23 +1,23 @@
 mod ban;
+mod delete_message;
 mod filter;
 mod kick;
 mod modal;
 mod timeout;
-mod delete_message;
 
 use crate::data::settings::EColors;
 use crate::discord::app::base::App;
 use crate::discord::app::creators::SlashCommandHandler;
+use crate::discord::commands::public::moderate::delete_message::delete_message_collector;
 use crate::utils::interaction::reply_with_embed;
 use async_trait::async_trait;
 use ban::ban_collector;
 use kick::kick_collector;
 use serenity::all::{
     CacheHttp, CommandInteraction, CommandOptionType, CommandType, Context, CreateCommand,
-    CreateCommandOption, InteractionContext,
+    CreateCommandOption, InteractionContext, MessageFlags,
 };
 use timeout::timeout_collector;
-use crate::discord::commands::public::moderate::delete_message::delete_message_collector;
 
 pub struct Moderate;
 
@@ -45,7 +45,7 @@ impl SlashCommandHandler for Moderate {
                 reply_with_embed(
                     &ctx,
                     &interaction,
-                    false,
+                    MessageFlags::EPHEMERAL,
                     EColors::danger,
                     "Interaction member is none.",
                 )
@@ -54,13 +54,13 @@ impl SlashCommandHandler for Moderate {
             }
         };
 
-        let _ = match member.permissions.as_ref() {
+        _ = match member.permissions.as_ref() {
             Some(permissions) => {
                 if !permissions.administrator() {
                     reply_with_embed(
                         &ctx,
                         &interaction,
-                        false,
+                        MessageFlags::empty(),
                         EColors::danger,
                         "You don't have **ADMINISTRATOR** permission.",
                     )
@@ -72,7 +72,7 @@ impl SlashCommandHandler for Moderate {
                 reply_with_embed(
                     &ctx,
                     &interaction,
-                    false,
+                    MessageFlags::empty(),
                     EColors::danger,
                     "Interaction member has no permission.",
                 )

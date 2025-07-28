@@ -54,15 +54,6 @@ pub fn timeout_menu<'a>(
         .placeholder("Select duration"),
     );
 
-    CreateComponent::ActionRow(CreateActionRow::Buttons(Cow::Owned(vec![
-        CreateButton::new("mod/btn-cancel")
-            .label("Cancel")
-            .style(ButtonStyle::Danger),
-        CreateButton::new("mod/btn-confirm")
-            .label("Confirm")
-            .style(ButtonStyle::Success)
-            .disabled(ids.is_empty() || duration.is_empty()),
-    ])));
     let confirm_row = CreateActionRow::Buttons(Cow::Owned(vec![
         CreateButton::new("mod/btn-cancel")
             .label("Cancel")

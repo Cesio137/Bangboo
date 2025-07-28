@@ -5,13 +5,12 @@ use crate::menus::moderate::ban::ban_menu;
 use crate::menus::moderate::close::close_menu;
 use crate::menus::moderate::load::load_menu;
 use crate::settings::logger::error;
-use crate::utils::interaction::{
-    edit_component_reply, edit_reply, reply, reply_component, reply_with_embed,
-};
+use crate::utils::components::{edit_component, update_component};
+use crate::utils::interaction::{edit, reply, reply_with_embed, ReplyPayload};
 use serenity::all::{
     CacheHttp, CommandInteraction, ComponentInteraction, ComponentInteractionCollector,
-    ComponentInteractionDataKind, Context, CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter
-    , GuildId, Member, UserId,
+    ComponentInteractionDataKind, Context, CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter,
+    GuildId, Member, MessageFlags, UserId,
 };
 use serenity::futures::StreamExt;
 use std::time::{Duration, SystemTime};
@@ -26,13 +25,19 @@ pub async fn ban_action(
     let mut success = Vec::new();
     let mut failed = Vec::new();
 
-    match guild_id.bulk_ban(ctx.http(), ids, 2592000, Some(reason)).await {
+    match guild_id
+        .bulk_ban(ctx.http(), ids, 2592000, Some(reason))
+        .await
+    {
         Ok(response) => {
             success = response.banned_users;
             failed = response.failed_users;
         }
         Err(err) => {
-            error(&format!("None of the users got ban or I(Bangboo) do not have the required BAN_MEMBERS and MANAGE_GUILD permissions.\n└ {:?}", err));
+            error(&format!(
+                "None of the users got ban or I(Bangboo) do not have the required BAN_MEMBERS and MANAGE_GUILD permissions.\n└ {:?}",
+                err
+            ));
             failed.extend(ids);
         }
     }
@@ -67,7 +72,12 @@ pub async fn ban_action(
         .description(description)
         .footer(embed_footer);
 
-    edit_component_reply(ctx, interaction, None, Some(vec![embed]), Some(vec![])).await;
+    let payload = ReplyPayload {
+        embeds: Some(vec![embed]),
+        components: Some(vec![]),
+        ..Default::default()
+    };
+    edit_component(ctx, interaction, MessageFlags::EPHEMERAL, &payload).await;
 }
 
 pub async fn ban_collector(ctx: &Context, interaction: &CommandInteraction, member: &Box<Member>) {
@@ -77,7 +87,7 @@ pub async fn ban_collector(ctx: &Context, interaction: &CommandInteraction, memb
             reply_with_embed(
                 &ctx,
                 &interaction,
-                false,
+                MessageFlags::EPHEMERAL,
                 EColors::danger,
                 "Guild id is none.",
             )
@@ -86,20 +96,12 @@ pub async fn ban_collector(ctx: &Context, interaction: &CommandInteraction, memb
         }
     };
 
+    let mut payload = ReplyPayload::default();
     let empty_slice: Vec<UserId> = Vec::new();
     let (embed, components) = ban_menu(&member.user, &empty_slice);
-    if !reply(
-        ctx,
-        interaction,
-        true,
-        false,
-        None,
-        Some(vec![embed]),
-        Some(components),
-        None,
-    )
-    .await
-    {
+    payload.embeds = Some(vec![embed]);
+    payload.components = Some(vec![]);
+    if !reply(ctx, interaction, MessageFlags::EPHEMERAL, &payload).await {
         return;
     }
 
@@ -115,12 +117,6 @@ pub async fn ban_collector(ctx: &Context, interaction: &CommandInteraction, memb
         i.message.id == message_id && i.member.as_ref().unwrap().user.id == user_id
     };
 
-    let mut collector = ComponentInteractionCollector::new(&ctx)
-        .filter(filter)
-        .author_id(interaction.user.id)
-        .timeout(Duration::from_secs(300))
-        .stream();
-
     let time = match SystemTime::now().duration_since(SystemTime::UNIX_EPOCH) {
         Ok(duration) => duration.as_secs() + 300,
         Err(err) => {
@@ -134,8 +130,15 @@ pub async fn ban_collector(ctx: &Context, interaction: &CommandInteraction, memb
     let mut cancel = false;
     let mut timeout = true;
 
+    let mut collector = ComponentInteractionCollector::new(&ctx)
+        .filter(filter)
+        .author_id(interaction.user.id)
+        .timeout(Duration::from_secs(300))
+        .stream();
+
     while let Some(i) = collector.next().await {
         let mut edit = false;
+        payload = ReplyPayload::default();
 
         match &i.data.kind {
             ComponentInteractionDataKind::Button => {
@@ -154,7 +157,9 @@ pub async fn ban_collector(ctx: &Context, interaction: &CommandInteraction, memb
             }
             ComponentInteractionDataKind::UserSelect { values } => {
                 let load = load_menu(&member.user, "👥 **Filtering selected users...**");
-                reply_component(ctx, &i, true, None, Some(vec![load]), None).await;
+                payload.embeds = Some(vec![load]);
+                update_component(ctx, &i, MessageFlags::EPHEMERAL, &payload).await;
+                payload = ReplyPayload::default();
                 ids = filter_users(ctx, guild_id, values.to_vec()).await;
                 edit = true;
             }
@@ -162,21 +167,19 @@ pub async fn ban_collector(ctx: &Context, interaction: &CommandInteraction, memb
         }
 
         let (embed, components) = ban_menu(&member.user, &ids);
+        payload.embeds = Some(vec![embed]);
+        payload.components = Some(components);
         if edit {
-            edit_component_reply(ctx, &i, None, Some(vec![embed]), Some(components)).await;
+            edit_component(ctx, &i, MessageFlags::EPHEMERAL, &payload).await;
             continue;
         }
-        reply_component(ctx, &i, true, None, Some(vec![embed]), Some(components)).await;
+        update_component(ctx, &i, MessageFlags::EPHEMERAL, &payload).await;
     }
     if timeout || cancel {
+        payload = ReplyPayload::default();
         let close_embed = close_menu(&member.user, timeout);
-        edit_reply(
-            ctx,
-            interaction,
-            None,
-            Some(vec![close_embed]),
-            Some(vec![]),
-        )
-        .await;
+        payload.embeds = Some(vec![close_embed]);
+        payload.components = Some(vec![]);
+        edit(ctx, interaction, MessageFlags::EPHEMERAL, &payload).await;
     }
 }

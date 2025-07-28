@@ -2,12 +2,12 @@ use crate::data::settings::EColors;
 use crate::menus::moderate::close::close_menu;
 use crate::menus::moderate::message_delete::message_delete_menu;
 use crate::settings::logger::error;
-use crate::utils::interaction::{
-    edit_component_reply, edit_reply, reply, reply_component, reply_with_embed,
-};
+use crate::utils::components::update_component;
+use crate::utils::interaction::{edit, reply, reply_with_embed, ReplyPayload};
 use serenity::all::{
     CacheHttp, CommandInteraction, ComponentInteraction, ComponentInteractionCollector,
-    ComponentInteractionDataKind, Context, CreateEmbed, CreateEmbedAuthor, Member, UserId,
+    ComponentInteractionDataKind, Context, CreateEmbed, CreateEmbedAuthor, Member, MessageFlags,
+    UserId,
 };
 use serenity::futures::StreamExt;
 use serenity::nonmax::NonMaxU8;
@@ -18,6 +18,9 @@ pub async fn delete_message_action(
     interaction: &ComponentInteraction,
     ids: &[UserId],
 ) {
+    let mut payload = ReplyPayload::default();
+    payload.components = Some(vec![]);
+
     let mut success: Vec<UserId> = Vec::new();
     let mut failed: Vec<UserId> = Vec::new();
 
@@ -47,7 +50,8 @@ pub async fn delete_message_action(
                 .thumbnail("https://raw.githubusercontent.com/Cesio137/Bangboo/refs/heads/rust/assets/avatar/Officer.png")
                 .description("**Failed to delete message(s): No user(s) selected**");
 
-            edit_component_reply(ctx, interaction, None, Some(vec![embed]), Some(vec![])).await;
+            payload.embeds = Some(vec![embed]);
+            update_component(ctx, interaction, MessageFlags::EPHEMERAL, &payload).await;
             return;
         }
     };
@@ -88,16 +92,8 @@ pub async fn delete_message_action(
         .title("**Officer Cui's panel**")
         .thumbnail("https://raw.githubusercontent.com/Cesio137/Bangboo/refs/heads/rust/assets/avatar/Officer.png")
         .description(description);
-
-    reply_component(
-        ctx,
-        &interaction,
-        true,
-        None,
-        Some(vec![embed]),
-        Some(vec![]),
-    )
-    .await;
+    payload.embeds = Some(vec![embed]);
+    update_component(ctx, &interaction, MessageFlags::EPHEMERAL, &payload).await;
 }
 
 pub async fn delete_message_collector(
@@ -111,7 +107,7 @@ pub async fn delete_message_collector(
             reply_with_embed(
                 &ctx,
                 &interaction,
-                false,
+                MessageFlags::EPHEMERAL,
                 EColors::danger,
                 "Guild id is none.",
             )
@@ -120,20 +116,12 @@ pub async fn delete_message_collector(
         }
     };
 
+    let mut payload = ReplyPayload::default();
     let empty_slice: Vec<UserId> = Vec::new();
     let (embed, components) = message_delete_menu(&member.user, &empty_slice);
-    if !reply(
-        ctx,
-        interaction,
-        true,
-        false,
-        None,
-        Some(vec![embed]),
-        Some(components),
-        None,
-    )
-    .await
-    {
+    payload.embeds = Some(vec![embed]);
+    payload.components = Some(components);
+    if !reply(ctx, interaction, MessageFlags::EPHEMERAL, &payload).await {
         return;
     }
 
@@ -149,19 +137,19 @@ pub async fn delete_message_collector(
         i.message.id == message_id && i.member.as_ref().unwrap().user.id == user_id
     };
 
+    // Data
+    let mut ids: Vec<UserId> = Vec::new();
+    let mut cancel = false;
+    let mut timeout = true;
+
     let mut collector = ComponentInteractionCollector::new(&ctx)
         .filter(filter)
         .author_id(interaction.user.id)
         .timeout(Duration::from_secs(300))
         .stream();
 
-    // Data
-    let mut ids: Vec<UserId> = Vec::new();
-    let mut cancel = false;
-    let mut timeout = true;
-
     while let Some(i) = collector.next().await {
-        let mut edit = false;
+        payload = ReplyPayload::default();
 
         match &i.data.kind {
             ComponentInteractionDataKind::Button => {
@@ -170,7 +158,7 @@ pub async fn delete_message_collector(
                     cancel = true;
                     break;
                 }
-                _ = i.defer(ctx.http());
+                _ = i.defer_ephemeral(ctx.http());
                 delete_message_action(ctx, &i, &ids).await;
                 timeout = false;
                 break;
@@ -182,21 +170,15 @@ pub async fn delete_message_collector(
         }
 
         let (embed, components) = message_delete_menu(&member.user, &ids);
-        if edit {
-            edit_component_reply(ctx, &i, None, Some(vec![embed]), Some(components)).await;
-            continue;
-        }
-        reply_component(ctx, &i, true, None, Some(vec![embed]), Some(components)).await;
+        payload.embeds = Some(vec![embed]);
+        payload.components = Some(components);
+        update_component(ctx, &i, MessageFlags::EPHEMERAL, &payload).await;
     }
     if timeout || cancel {
+        payload = ReplyPayload::default();
         let close_embed = close_menu(&member.user, timeout);
-        edit_reply(
-            ctx,
-            interaction,
-            None,
-            Some(vec![close_embed]),
-            Some(vec![]),
-        )
-        .await;
+        payload.embeds = Some(vec![close_embed]);
+        payload.components = Some(vec![]);
+        edit(ctx, interaction, MessageFlags::EPHEMERAL, &payload).await;
     }
 }
