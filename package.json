@@ -23,7 +23,7 @@
     "discord.js": "^14.21.0",
     "fast-glob": "^3.3.3",
     "rou3": "^0.7.3",
-    "zod": "^4.0.5"
+    "zod": "^4.0.10"
   },
   "devDependencies": {
     "@types/node": "^22.16.5",
