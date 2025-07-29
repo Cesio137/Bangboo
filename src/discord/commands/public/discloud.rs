@@ -2,9 +2,9 @@ use crate::data::emojis::EStatic;
 use crate::data::settings::EColors;
 use crate::discord::app::base::App;
 use crate::discord::app::creators::SlashCommandHandler;
-use crate::menus::components::discloud::discloud_component;
+use crate::menus::components::discloud::{logs_component, status_component};
 use crate::settings::logger::error;
-use crate::tools::discloud::DISCLOUD;
+use crate::tools::discloud::{ASCII_REGEX, DISCLOUD};
 use crate::utils::interaction::{followup, followup_with_embed, ReplyPayload};
 use async_trait::async_trait;
 use serenity::all::{
@@ -38,7 +38,7 @@ impl SlashCommandHandler for Discloud {
         _ = interaction.defer_ephemeral(ctx.http()).await;
         match option {
             "status" => status(ctx, interaction).await,
-            //"logs" => ,
+            "logs" => logs(ctx, interaction).await,
             _ => {}
         }
     }
@@ -78,37 +78,81 @@ async fn status(ctx: &Context, interaction: &CommandInteraction) {
     };
     let mut infos = Vec::new();
     infos.push(format!(
-        "{}`Nome(ID):` **{}({})**",
-        EmojiId::from(EStatic::icons_id as u64).to_string(),
+        "<:icons_id:{}>`Nome(ID):` **{}({})**",
+        EmojiId::from(EStatic::icons_id as u64),
         app.name,
         app.id
     ));
     infos.push(format!(
-        "{}`CPU:` **{}**",
+        "<:cpu:{}>`CPU:` **{}**",
         EmojiId::from(EStatic::cpu as u64).to_string(),
         status.cpu
     ));
     infos.push(format!(
-        "{}`RAM:` **{}**",
+        "<:ram:{}>`RAM:` **{}**",
         EmojiId::from(EStatic::ram as u64).to_string(),
         status.memory
     ));
     infos.push(format!(
-        "{}`Network:`  `⬆`**{}** `⬇`**{}**",
+        "<:wifi:{}>`Network:`  `⬆`**{}** `⬇`**{}**",
         EmojiId::from(EStatic::wifi as u64).to_string(),
         status.net_io.up,
         status.net_io.down
     ));
     infos.push(format!(
-        "{}`Latest restart:` **<t:{}:R>**",
+        "<:refresh:{}>`Latest restart:` **<t:{}:R>**",
         EmojiId::from(EStatic::refresh as u64).to_string(),
         status.last_restart
     ));
 
-    let component = discloud_component(infos);
+    let component = status_component(infos);
     let payload = ReplyPayload {
         components: Some(vec![component]),
         ..ReplyPayload::default()
     };
-    followup(ctx, interaction, MessageFlags::empty(), &payload).await;
+    followup(ctx, interaction, MessageFlags::IS_COMPONENTS_V2 | MessageFlags::EPHEMERAL, &payload).await;
+}
+
+async fn logs(ctx: &Context, interaction: &CommandInteraction) {
+    let app = match DISCLOUD.get_all_apps().await {
+        Ok(apps) => apps[0].clone(),
+        Err(err) => {
+            followup_with_embed(
+                ctx,
+                interaction,
+                MessageFlags::EPHEMERAL,
+                EColors::danger,
+                "Failed to fetch app.",
+            )
+                .await;
+            error(&format!("Failed to fetch app.\n└ {:?}", err));
+            return;
+        }
+    };
+
+    let app_logs = match app.get_logs(&DISCLOUD).await {
+        Ok(status) => status,
+        Err(err) => {
+            followup_with_embed(
+                ctx,
+                interaction,
+                MessageFlags::EPHEMERAL,
+                EColors::danger,
+                "Failed to fetch app logs.",
+            )
+                .await;
+            error(&format!("Failed to fetch app logs.\n└ {:?}", err));
+            return;
+        }
+    };
+
+    let mut logs = app_logs.terminal.small.unwrap_or("".to_string());
+    logs = ASCII_REGEX.replace_all(&logs, "").to_string();
+
+    let component = logs_component(&logs);
+    let payload = ReplyPayload {
+        components: Some(vec![component]),
+        ..ReplyPayload::default()
+    };
+    followup(ctx, interaction, MessageFlags::IS_COMPONENTS_V2 | MessageFlags::EPHEMERAL, &payload).await;
 }
