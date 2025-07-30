@@ -20,7 +20,7 @@ serenity = { git = "https://github.com/serenity-rs/serenity.git", branch = "next
 async-trait = { version = "0.1" }
 anyhow = { version = "1.0" }
 colored = { version = "3" }
-discloud-rs = { git = "https://github.com/Cesio137/discloud-rs.git", branch = "main" }
+discloud-rs = { version = "0.3.0-alpha" }
 dotenvy = { version = "0.15" }
 genai = { version = "0.3.5"}
 once_cell = { version = "1.21" }
