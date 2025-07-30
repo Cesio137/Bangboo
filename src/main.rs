@@ -22,13 +22,14 @@ use crate::discord::app::bootstrap;
 async fn main() {
     #[cfg(target_env = "gnu")]
     configure_malloc();
-/*
+    /*
     let intents = GatewayIntents::GUILD_MESSAGES
         | GatewayIntents::GUILDS
         | GatewayIntents::DIRECT_MESSAGES
         | GatewayIntents::MESSAGE_CONTENT
         | GatewayIntents::GUILD_MEMBERS
-        | GatewayIntents::GUILD_MODERATION;*/
+        | GatewayIntents::GUILD_MODERATION;
+        */
 
     let intents = GatewayIntents::all();
     bootstrap(intents).await;

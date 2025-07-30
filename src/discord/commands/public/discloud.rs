@@ -4,13 +4,10 @@ use crate::discord::app::base::App;
 use crate::discord::app::creators::SlashCommandHandler;
 use crate::menus::components::discloud::{logs_component, status_component};
 use crate::settings::logger::error;
-use crate::tools::discloud::{ASCII_REGEX, DISCLOUD};
+use crate::tools::discloud::{APPID, ASCII_REGEX, DISCLOUD};
 use crate::utils::interaction::{followup, followup_with_embed, ReplyPayload};
 use async_trait::async_trait;
-use serenity::all::{
-    CacheHttp, CommandInteraction, CommandOptionType, CommandType, Context, CreateCommand,
-    CreateCommandOption, EmojiId, InteractionContext, MessageFlags,
-};
+use serenity::all::{CacheHttp, CommandInteraction, CommandOptionType, CommandType, Context, CreateCommand, CreateCommandOption, EmojiId, InteractionContext, MessageFlags, Timestamp};
 
 pub struct Discloud;
 
@@ -45,8 +42,8 @@ impl SlashCommandHandler for Discloud {
 }
 
 async fn status(ctx: &Context, interaction: &CommandInteraction) {
-    let app = match DISCLOUD.get_all_apps().await {
-        Ok(apps) => apps[0].clone(),
+    let app = match DISCLOUD.get_app(APPID).await {
+        Ok(apps) => apps.clone(),
         Err(err) => {
             followup_with_embed(
                 ctx,
@@ -102,7 +99,7 @@ async fn status(ctx: &Context, interaction: &CommandInteraction) {
     infos.push(format!(
         "<:refresh:{}>`Latest restart:` **<t:{}:R>**",
         EmojiId::from(EStatic::refresh as u64).to_string(),
-        status.last_restart
+        Timestamp::parse(&status.started_at).unwrap_or_default().timestamp()
     ));
 
     let component = status_component(infos);
@@ -110,12 +107,18 @@ async fn status(ctx: &Context, interaction: &CommandInteraction) {
         components: Some(vec![component]),
         ..ReplyPayload::default()
     };
-    followup(ctx, interaction, MessageFlags::IS_COMPONENTS_V2 | MessageFlags::EPHEMERAL, &payload).await;
+    followup(
+        ctx,
+        interaction,
+        MessageFlags::IS_COMPONENTS_V2 | MessageFlags::EPHEMERAL,
+        &payload,
+    )
+    .await;
 }
 
 async fn logs(ctx: &Context, interaction: &CommandInteraction) {
-    let app = match DISCLOUD.get_all_apps().await {
-        Ok(apps) => apps[0].clone(),
+    let app = match DISCLOUD.get_app(APPID).await {
+        Ok(apps) => apps.clone(),
         Err(err) => {
             followup_with_embed(
                 ctx,
@@ -124,7 +127,7 @@ async fn logs(ctx: &Context, interaction: &CommandInteraction) {
                 EColors::danger,
                 "Failed to fetch app.",
             )
-                .await;
+            .await;
             error(&format!("Failed to fetch app.\n└ {:?}", err));
             return;
         }
@@ -140,7 +143,7 @@ async fn logs(ctx: &Context, interaction: &CommandInteraction) {
                 EColors::danger,
                 "Failed to fetch app logs.",
             )
-                .await;
+            .await;
             error(&format!("Failed to fetch app logs.\n└ {:?}", err));
             return;
         }
@@ -154,5 +157,11 @@ async fn logs(ctx: &Context, interaction: &CommandInteraction) {
         components: Some(vec![component]),
         ..ReplyPayload::default()
     };
-    followup(ctx, interaction, MessageFlags::IS_COMPONENTS_V2 | MessageFlags::EPHEMERAL, &payload).await;
+    followup(
+        ctx,
+        interaction,
+        MessageFlags::IS_COMPONENTS_V2 | MessageFlags::EPHEMERAL,
+        &payload,
+    )
+    .await;
 }

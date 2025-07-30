@@ -10,7 +10,11 @@ pub async fn run(app: &App, ctx: &Context, interaction: &Interaction) {
             }
         }
         Interaction::Autocomplete(_) => {}
-        Interaction::Component(_) => {}
+        Interaction::Component(component) => {
+            if let Some(callback) = app.responder_handlers.get(component.data.custom_id.as_str()) {
+                callback.run(ctx, component).await
+            }
+        }
         Interaction::Modal(_) => {}
         _ => {}
     }
