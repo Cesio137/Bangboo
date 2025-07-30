@@ -12,7 +12,7 @@
 /.git
 /.vscode
 /.idea
-/data
+/assets
 /target
 /discloud
 
