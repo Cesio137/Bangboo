@@ -9,13 +9,7 @@ mod utils;
 #[cfg(target_env = "gnu")]
 use settings::malloc::malloc::configure_malloc;
 
-use crate::settings::env::ENV_SCHEMA;
-use anyhow::Result;
-use discord::app::base::App;
-use serenity::{all::GatewayIntents, Client};
-use serenity::all::Token;
-use std::str::FromStr;
-use std::sync::Arc;
+use serenity::{all::GatewayIntents};
 use crate::discord::app::bootstrap;
 
 #[tokio::main]

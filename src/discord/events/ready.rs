@@ -1,8 +1,8 @@
 use crate::discord::app::base::App;
 use colored::Colorize;
-use serenity::all::{Activity, ActivityData, Context, Ready};
+use serenity::all::{ActivityData, Context, Ready};
 use serenity::model::application::Command;
-use crate::settings::logger::{colored_log, error, log, success};
+use crate::settings::logger::{colored_log, error};
 
 pub async fn run(app: &App, ctx: &Context, ready: &Ready) {
     colored_log(format!("● {} online ✓", ready.user.name.underline()).bright_green());

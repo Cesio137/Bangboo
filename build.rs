@@ -15,7 +15,7 @@ fn to_pascal_case(s: &str) -> String {
 }
 
 fn main() {
-    const out_dir: &str = "./src/data";
+    const OUT_DIR: &str = "./src/data";
 
     // Parse settings.json as enum
     if let Ok(settings_json) = fs::read_to_string("settings.json") {
@@ -43,7 +43,7 @@ fn main() {
         enum_def.push_str("}\n");
 
 
-        let dest_path = Path::new(&out_dir).join("settings.rs");
+        let dest_path = Path::new(&OUT_DIR).join("settings.rs");
 
         fs::write(dest_path, enum_def).expect("Failed to write output");
         println!("cargo:rerun-if-changed=data.json");
@@ -90,7 +90,7 @@ fn main() {
             enum_def.push_str("}\n");
         }
 
-        let dest_path = Path::new(&out_dir).join("emojis.rs");
+        let dest_path = Path::new(&OUT_DIR).join("emojis.rs");
 
         fs::write(dest_path, enum_def).expect("Failed to write output");
         println!("cargo:rerun-if-changed=data.json");
@@ -137,7 +137,7 @@ fn main() {
             enum_def.push_str("}\n");
         }
 
-        let dest_path = Path::new(&out_dir).join("guild.rs");
+        let dest_path = Path::new(&OUT_DIR).join("guild.rs");
 
         fs::write(dest_path, enum_def).expect("Failed to write output");
         println!("cargo:rerun-if-changed=data.json");
@@ -185,7 +185,7 @@ fn main() {
 
         let output = format!("{}\n{}{}", struct_def, enum_def, match_body);
 
-        let dest_path = Path::new(&out_dir).join("fab.rs");
+        let dest_path = Path::new(&OUT_DIR).join("fab.rs");
 
         fs::write(dest_path, output).expect("Failed to write output");
         println!("cargo:rerun-if-changed=data.json");

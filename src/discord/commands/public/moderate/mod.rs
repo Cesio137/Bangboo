@@ -14,7 +14,7 @@ use async_trait::async_trait;
 use ban::ban_collector;
 use kick::kick_collector;
 use serenity::all::{
-    CacheHttp, CommandInteraction, CommandOptionType, CommandType, Context, CreateCommand,
+    CommandInteraction, CommandOptionType, CommandType, Context, CreateCommand,
     CreateCommandOption, InteractionContext, MessageFlags,
 };
 use timeout::timeout_collector;

@@ -58,14 +58,14 @@ pub async fn filter_message(ctx: &Context, message: &Message) -> bool {
         return true;
     }
 
-    if let Err(err) = guild
+    if guild
         .id
         .kick(
             ctx.http(),
             message.author.id,
             Some("Sent a message that was flagged as a scam."),
         )
-        .await
+        .await.is_err()
     {
         error("Failed to kick the owner of the scam message.");
         return true;

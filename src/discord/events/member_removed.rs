@@ -1,10 +1,12 @@
 use crate::discord::app::base::App;
 use crate::settings::logger::error;
-use crate::utils::global::{global_message, EventType};
+use crate::utils::global::{EventType, global_message};
 use serenity::all::{Context, GuildId, User};
 
 pub async fn run(app: &App, ctx: &Context, guild_id: &GuildId, user: &User) {
-    if user.bot() { return }
+    if user.bot() {
+        return;
+    }
 
     let guild = match guild_id.to_guild_cached(&ctx.cache) {
         Some(guild) => guild.clone(),

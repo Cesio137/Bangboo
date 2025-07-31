@@ -2,13 +2,12 @@ mod ban_added;
 mod interaction_create;
 mod member_added;
 mod member_removed;
+mod member_update;
 mod message_create;
 mod ready;
 
 use super::app::base::App;
-use colored::Colorize;
-use serenity::all::{async_trait, Context, Event, EventHandler, FullEvent, GuildId, Interaction, Member, Message, RatelimitInfo, Ready, User};
-use serenity::model::application;
+use serenity::all::{async_trait, Context, EventHandler, FullEvent};
 
 #[async_trait]
 impl EventHandler for App {
@@ -26,8 +25,11 @@ impl EventHandler for App {
             FullEvent::GuildMemberAddition { new_member, ..} =>
                 member_added::run(self, _context, new_member).await,
             
-            FullEvent::GuildMemberRemoval { guild_id, user, member_data_if_available, .. } =>
+            FullEvent::GuildMemberRemoval { guild_id, user, .. } =>
                 member_removed::run(self, _context, guild_id, user).await,
+
+            FullEvent::GuildMemberUpdate { old_if_available, new, event, .. } =>
+                member_update::run(_context, old_if_available, new, event).await,
             
             FullEvent::Message { new_message, .. } =>
                 message_create::run(self, _context, new_message).await,

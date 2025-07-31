@@ -1,11 +1,17 @@
 use super::skia::{draw_circle, draw_text_with_font, resize_image};
+use crate::data::emojis::EAnimated;
+use crate::data::guild::{EChannels, ERoles};
+use crate::data::settings::EColors;
 use crate::settings::assets::{
     CARD_BACK, CARD_LEFT, CARD_MOD, CARD_NEW, FONT_FREDOKA, FONT_ROBOTO, IMG_DEFAULT_AVATAR,
 };
 use crate::settings::logger::error;
 use crate::utils::cdn::display_avatar_url;
 use crate::utils::skia::load_image_from_bytes;
-use serenity::all::{CacheHttp, ChannelId, Context, CreateAttachment, CreateMessage, Member, User};
+use serenity::all::{
+    CacheHttp, ChannelId, Colour, Context, CreateAttachment, CreateEmbed, CreateEmbedAuthor,
+    CreateMessage, GuildId, Member, User,
+};
 use skia_safe::{EncodedImageFormat, ISize, Point};
 use std::time::{SystemTime, UNIX_EPOCH};
 
@@ -146,5 +152,47 @@ pub async fn global_message(
             "Error trying to send card to system channel\nʟ {:?}",
             err
         ));
+    }
+}
+
+pub async fn global_boost(ctx: &Context, user: &User, guild_id: &GuildId) {
+    let color = Colour::new(EColors::nitro as u32);
+    let avatar_url = user.avatar_url().unwrap_or_default();
+    let username = user.global_name.clone().unwrap_or(user.name.clone());
+    let description = format!(
+        "**<a:boost:{}> <@${}> became a <@&${}>**\n\n🚀 Thanks for boosting the server!",
+        EAnimated::boost as u64,
+        user.id,
+        ERoles::boosters as u64
+    );
+
+    let author = CreateEmbedAuthor::new(username.as_str()).icon_url(&avatar_url);
+    let embed = CreateEmbed::new()
+        .color(color)
+        .author(author)
+        .description(description)
+        .thumbnail(&avatar_url);
+
+    let channel = match guild_id.channels(ctx.http()).await {
+        Ok(channels) => {
+            let id = ChannelId::new(EChannels::announcement as u64);
+            if let Some(channel) = channels.get(&id).cloned() {
+                channel
+            } else {
+                error(&format!("Guild channel not found!"));
+                return;
+            }
+        }
+        Err(err) => {
+            error(&format!("Failed to remove member role!\n└ {:?}", err));
+            return;
+        }
+    };
+
+    let payload = CreateMessage::new()
+        .content("||@everyone @here||")
+        .embed(embed);
+    if let Err(err) = channel.send_message(ctx.http(), payload).await {
+        error(&format!("Failed to send message!\n└ {:?}", err));
     }
 }

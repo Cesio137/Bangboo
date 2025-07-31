@@ -15,7 +15,6 @@ serde_json = { version = "1" }
 
 [dependencies]
 serenity = { git = "https://github.com/serenity-rs/serenity.git", branch = "next", features = ["collector", "model"] }
-#serenity = { version = "0.12", features = ["collector"] }
 # THIRDPARTY
 async-trait = { version = "0.1" }
 anyhow = { version = "1.0" }

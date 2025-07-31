@@ -1,12 +1,13 @@
 use crate::discord::app::base::App;
 use crate::settings::logger::error;
-use crate::utils::global::{global_message, EventType};
-use serenity::all::{Context, GuildId, GuildRef, User};
-
+use crate::utils::global::{EventType, global_message};
+use serenity::all::{Context, GuildId, User};
 
 pub async fn run(app: &App, ctx: &Context, guild_id: &GuildId, banned_user: &User) {
-    if banned_user.bot() { return }
-    
+    if banned_user.bot() {
+        return;
+    }
+
     let guild = match guild_id.to_guild_cached(&ctx.cache) {
         Some(guild) => guild.clone(),
         None => {
@@ -22,7 +23,7 @@ pub async fn run(app: &App, ctx: &Context, guild_id: &GuildId, banned_user: &Use
             return;
         }
     };
-    
+
     global_message(
         &ctx,
         &system_channel_id,
@@ -31,5 +32,4 @@ pub async fn run(app: &App, ctx: &Context, guild_id: &GuildId, banned_user: &Use
         &banned_user,
     )
     .await;
-    
 }
