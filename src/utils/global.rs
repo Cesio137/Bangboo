@@ -106,7 +106,7 @@ pub async fn global_message(
                 return;
             }
         };
-        draw_circle(canvas, avatar, 204.0, 200.0 + 160.0, 200.0);
+        draw_circle(canvas, avatar, 204.0, 360.0, 200.0);
 
         if !draw_text_with_font(canvas, &user.name, FONT_FREDOKA, 200.0, 530.0, 140.0) {
             error("Failed to resize user avatar image.");
@@ -139,7 +139,7 @@ pub async fn global_message(
 
     let mut utc = String::new();
     if event == EventType::MemberAdd {
-        let joined_at = member.unwrap().joined_at.unwrap().timestamp();
+        let joined_at = member.unwrap().joined_at.unwrap_or_default().timestamp();
         utc.push_str(&format!("<t:{}:F>", joined_at));
     }
     let attachment = CreateAttachment::bytes(data, "card.png");

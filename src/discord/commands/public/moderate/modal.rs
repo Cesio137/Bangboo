@@ -36,7 +36,7 @@ pub async fn show_modal(
     match interaction.quick_modal(ctx, modal).await {
         Ok(response) => {
             if let Some(res) = response {
-                let _ = res
+                _ = res
                     .interaction
                     .create_response(ctx.http(), CreateInteractionResponse::Acknowledge)
                     .await;

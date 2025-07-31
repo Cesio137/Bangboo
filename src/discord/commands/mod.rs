@@ -1,7 +1,6 @@
 pub mod prefix;
 pub mod public;
 
-use serenity::all::FullEvent;
 use crate::discord::app::creators::{PrefixCommandHandler, SlashCommandHandler};
 
 pub fn prefix_commands() -> Vec<Box<dyn PrefixCommandHandler + Send + Sync>> {

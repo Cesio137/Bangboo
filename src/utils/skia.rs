@@ -1,25 +1,10 @@
-use anyhow::Result;
 use skia_safe::{
     scalar, surfaces, textlayout::{
         FontCollection, ParagraphBuilder, ParagraphStyle, TextStyle, TypefaceFontProvider,
-    }, Canvas, CubicResampler, Data, FilterMode, FontMgr, Image, Paint,
-    Path, Point, Rect, SamplingOptions,
-    Size,
+    }, Canvas, CubicResampler, Data, FilterMode, FontMgr, Image, Paint, Path, Point, Rect, SamplingOptions, Size
 };
 
-pub fn draw_image(canvas: &Canvas, image: Image, x: f32, y: f32) -> Result<()> {
-    canvas.draw_image(&image, Point { x, y }, None);
-    canvas.save();
-
-    Ok(())
-}
-
 pub fn draw_circle(canvas: &Canvas, image: Image, x: f32, y: f32, radius: f32) {
-    let mut paint = Paint::default();
-    paint.set_anti_alias(true);
-    paint.set_color(0xFFFFFFFF);
-    paint.set_style(skia_safe::PaintStyle::Fill);
-
     let mut clip_path = Path::new();
     clip_path.add_circle(Point { x, y }, radius, None);
 

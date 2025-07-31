@@ -3,7 +3,7 @@ use crate::menus::moderate::close::close_menu;
 use crate::menus::moderate::message_delete::message_delete_menu;
 use crate::settings::logger::error;
 use crate::utils::components::update_component;
-use crate::utils::interaction::{edit, reply, reply_with_embed, ReplyPayload};
+use crate::utils::interaction::{edit, reply, ReplyPayload};
 use serenity::all::{
     CacheHttp, CommandInteraction, ComponentInteraction, ComponentInteractionCollector,
     ComponentInteractionDataKind, Context, CreateEmbed, CreateEmbedAuthor, Member, MessageFlags,
@@ -101,21 +101,6 @@ pub async fn delete_message_collector(
     interaction: &CommandInteraction,
     member: &Box<Member>,
 ) {
-    let guild_id = match interaction.guild_id.as_ref() {
-        Some(guild_id) => guild_id,
-        None => {
-            reply_with_embed(
-                &ctx,
-                &interaction,
-                MessageFlags::EPHEMERAL,
-                EColors::danger,
-                "Guild id is none.",
-            )
-            .await;
-            return;
-        }
-    };
-
     let mut payload = ReplyPayload::default();
     let empty_slice: Vec<UserId> = Vec::new();
     let (embed, components) = message_delete_menu(&member.user, &empty_slice);

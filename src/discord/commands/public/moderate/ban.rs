@@ -100,7 +100,7 @@ pub async fn ban_collector(ctx: &Context, interaction: &CommandInteraction, memb
     let empty_slice: Vec<UserId> = Vec::new();
     let (embed, components) = ban_menu(&member.user, &empty_slice);
     payload.embeds = Some(vec![embed]);
-    payload.components = Some(vec![]);
+    payload.components = Some(components);
     if !reply(ctx, interaction, MessageFlags::EPHEMERAL, &payload).await {
         return;
     }

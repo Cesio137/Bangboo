@@ -64,8 +64,8 @@ impl SlashCommandHandler for Age {
         let user = &member.user;
 
         let timestamp = user.id.created_at().timestamp();
-        let mut age = String::from("");
-        if (interaction.locale == "pt-BR") {
+        let mut age = String::new();
+        if interaction.locale == "pt-BR" {
             age = format!(
                 "**{}** criou a conta <t:{}:R> em um(a) <t:{}:F> ",
                 user.global_name.as_ref().unwrap_or(&user.name),

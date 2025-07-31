@@ -154,7 +154,7 @@ fn main() {
         let mut match_body = String::from("impl EProduct {\n    pub fn info(&self) -> ProductInfo {\n        match self {\n");
 
         // Define struct ProductInfo
-        let mut struct_def = String::from(
+        let struct_def = String::from(
             "#[derive(Debug)]\npub struct ProductInfo {\n    pub product_name: &'static str,\n    pub product_desc: &'static str,\n    pub thumb_link: &'static str,\n    pub product_url: &'static str,\n    pub doc_url: &'static str,\n}\n\n",
         );
 
