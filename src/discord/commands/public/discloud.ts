@@ -40,7 +40,7 @@ async function status(interaction: ChatInputCommandInteraction<"cached">) {
         interaction.reply(res.warning("Failed to fetch app status."));
         return;
     }
-
+    
     await interaction.deferReply({ flags: ["Ephemeral"] });
 
     const app = await user.apps.fetch(id);
