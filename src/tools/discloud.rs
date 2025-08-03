@@ -3,7 +3,7 @@ use once_cell::sync::Lazy;
 use regex::Regex;
 use std::env;
 
-pub const APPID: &str = "1753838917006";
+pub const APPID: &str = "1754170923281";
 
 pub static ASCII_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"\[[0-9;]+m").unwrap());
 
