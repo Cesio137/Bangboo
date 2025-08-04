@@ -96,6 +96,8 @@ export async function banCollector(interaction: ChatInputCommandInteraction<"cac
         switch(customId) {
             case "mod/btn-cancel":
                 timeout = false;
+                isOk = true;
+                await i.update(closeMenu(i.user, timeout));
                 userCollector.stop(); btnCollector.stop();
                 break;
 

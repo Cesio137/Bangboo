@@ -96,6 +96,8 @@ export async function kickCollector(interaction: ChatInputCommandInteraction<"ca
         switch(customId) {
             case "mod/btn-cancel":
                 timeout = false;
+                isOk = true;
+                await i.update(closeMenu(i.user, timeout));
                 userCollector.stop(); btnCollector.stop();
                 break;
 

@@ -115,6 +115,8 @@ export async function timeoutCollector(interaction: ChatInputCommandInteraction<
         switch(customId) {
             case "mod/btn-cancel":
                 timeout = false;
+                isOk = true;
+                await i.update(closeMenu(i.user, timeout));
                 userCollector.stop(); durationCollector.stop(); btnCollector.stop();
                 break;
 
