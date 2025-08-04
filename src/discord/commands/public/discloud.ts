@@ -1,5 +1,5 @@
 import { createCommand } from "#base";
-import { icon, res } from "#functions";
+import { icon } from "#functions";
 import { appID, user } from "#tools";
 import { ApplicationCommandOptionType, ApplicationCommandType, ChatInputCommandInteraction } from "discord.js";
 import { logsComponent, statusComponent } from "#menus";
