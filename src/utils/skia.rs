@@ -1,7 +1,9 @@
 use skia_safe::{
     scalar, surfaces, textlayout::{
         FontCollection, ParagraphBuilder, ParagraphStyle, TextStyle, TypefaceFontProvider,
-    }, Canvas, CubicResampler, Data, FilterMode, FontMgr, Image, Paint, Path, Point, Rect, SamplingOptions, Size
+    }, Canvas, CubicResampler, Data, FilterMode, FontMgr, Image, Paint,
+    Path, Point, Rect, SamplingOptions,
+    Size,
 };
 
 pub fn draw_circle(canvas: &Canvas, image: Image, x: f32, y: f32, radius: f32) {

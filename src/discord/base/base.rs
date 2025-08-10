@@ -1,6 +1,4 @@
-use crate::discord::app::creators::{PrefixCommandHandler, ResponderHandler, SlashCommandHandler};
-use crate::discord::commands::{prefix_commands, slash_commands};
-use crate::discord::responders::responders;
+use crate::discord::*;
 use serenity::builder::CreateCommand;
 use std::collections::HashMap;
 

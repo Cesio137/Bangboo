@@ -5,19 +5,19 @@ mod kick;
 mod modal;
 mod timeout;
 
-use crate::data::settings::EColors;
-use crate::discord::app::base::App;
-use crate::discord::app::creators::SlashCommandHandler;
-use crate::discord::commands::public::moderate::delete_message::delete_message_collector;
-use crate::utils::interaction::reply_with_embed;
-use async_trait::async_trait;
+use crate::discord::*;
+use crate::data::*;
+use crate::utils::*;
 use ban::ban_collector;
 use kick::kick_collector;
+use timeout::timeout_collector;
+use delete_message::delete_message_collector;
 use serenity::all::{
     CommandInteraction, CommandOptionType, CommandType, Context, CreateCommand,
     CreateCommandOption, InteractionContext, MessageFlags,
 };
-use timeout::timeout_collector;
+use async_trait::async_trait;
+
 
 pub struct Moderate;
 
@@ -46,7 +46,7 @@ impl SlashCommandHandler for Moderate {
                     &ctx,
                     &interaction,
                     MessageFlags::EPHEMERAL,
-                    EColors::danger,
+                    str_hex_to_u32(&CONSTANTS.colors.danger),
                     "Interaction member is none.",
                 )
                 .await;
@@ -61,7 +61,7 @@ impl SlashCommandHandler for Moderate {
                         &ctx,
                         &interaction,
                         MessageFlags::empty(),
-                        EColors::danger,
+                        str_hex_to_u32(&CONSTANTS.colors.danger),
                         "You don't have **ADMINISTRATOR** permission.",
                     )
                     .await;
@@ -73,7 +73,7 @@ impl SlashCommandHandler for Moderate {
                     &ctx,
                     &interaction,
                     MessageFlags::empty(),
-                    EColors::danger,
+                    str_hex_to_u32(&CONSTANTS.colors.danger),
                     "Interaction member has no permission.",
                 )
                 .await;

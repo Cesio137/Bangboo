@@ -1,6 +1,6 @@
 [package]
 name = "Bangboo"
-version = "0.4.0"
+version = "0.4.1"
 edition = "2024"
 
 [profile.release]
@@ -9,13 +9,8 @@ lto = true
 codegen-units = 1
 panic = "abort"
 
-[build-dependencies]
-#serde = { version = "1", features = ["derive"] }
-serde_json = { version = "1.0" }
-
 [dependencies]
 serenity = { git = "https://github.com/serenity-rs/serenity.git", branch = "next", features = ["collector", "model"] }
-# THIRDPARTY
 async-trait = { version = "0.1" }
 anyhow = { version = "1.0" }
 colored = { version = "3" }
@@ -25,7 +20,7 @@ genai = { version = "0.3.5"}
 once_cell = { version = "1.21" }
 regex = { version = "1.11" }
 reqwest = { version = "0.12" }
-#serde = { version = "1.0" }
+serde = { version = "1.0" }
 serde_json = { version = "1.0" }
 skia-safe = { version = "0.87", features = ["textlayout"] }
 #tracing-subscriber = { version = "0.3" }

@@ -1,643 +1,1300 @@
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[repr(u64)]
-pub enum EStatic {
-    action_check = 1374026380899127296,
-    action_help = 1374026382408941598,
-    action_info = 1374026383696859166,
-    action_warning = 1374026391334682777,
-    action_x = 1374026392714477650,
-    add = 1374026434988736512,
-    arrow_down = 1374026398301290607,
-    arrow_left = 1374026399509254184,
-    arrow_refresh = 1374026400629133343,
-    arrow_right = 1374026401858191413,
-    arrow_up = 1374026403376271430,
-    back = 1374026405343400026,
-    bell = 1374026421126561842,
-    bell_dot = 1374026416068231178,
-    bell_minus = 1374026417204887572,
-    bell_off = 1374026418463178812,
-    bell_plus = 1374026419658821784,
-    book = 1374026414592102541,
-    book_check = 1374026408652963910,
-    book_minus = 1374026409852538952,
-    book_plus = 1374026411194449952,
-    book_x = 1374026413291737171,
-    calendar_check = 1374026422330458152,
-    calendar_cog = 1374026423890870332,
-    calendar_days = 1374026424733929595,
-    calendar_minus = 1374026426793201764,
-    calendar_plus = 1374026428479442946,
-    calendar_x = 1374026429942988863,
-    camera = 1374026432509906966,
-    camera_off = 1374026431230771220,
-    check = 1374026394589331478,
-    clipboard = 1374026445638078488,
-    clipboard_check = 1374026441062219878,
-    clipboard_minus = 1374026442194812959,
-    clipboard_plus = 1374026443075358843,
-    clipboard_x = 1374026444644028606,
-    clock = 1374026452764332102,
-    clock_check = 1374026447605207110,
-    clock_minus = 1374026448784064633,
-    clock_off = 1374026450071584888,
-    clock_plus = 1374026451447316592,
-    close = 1374026396661448835,
-    cloud = 1374026459269562368,
-    cloud_cog = 1374026453938868254,
-    cloud_download = 1374026455301885972,
-    cloud_upload = 1374026458057543871,
-    code_braces = 1374026460481851654,
-    code_brackets = 1374026461622567002,
-    code_bug = 1374026462826598511,
-    code_file_binary = 1374026464411910284,
-    code_parentheses = 1374026465615806506,
-    code_server = 1374026469902254301,
-    code_server_cog = 1374026466974503075,
-    code_server_off = 1374026468740300984,
-    code_terminal = 1374026470967476255,
-    code_window = 1374026472066383963,
-    code_wrench = 1374026473295581194,
-    cpu = 1374026504408793110,
-    database = 1374026475547791522,
-    database_backup = 1374026474394353786,
-    device_laptop = 1374026476713803806,
-    device_pc = 1374026478127284356,
-    device_smartphone = 1374026479473791106,
-    device_tablet = 1374026480597860443,
-    eg_addemoji = 1379809719274963008,
-    eg_addfile = 1379809720474407085,
-    eg_addons = 1379809721992871986,
-    eg_announcement = 1379809723250905199,
-    eg_art = 1379809724681424976,
-    eg_ask = 1379809727147540564,
-    eg_ban = 1379809728691175537,
-    eg_book = 1379809730142142475,
-    eg_bot = 1379809731480387835,
-    eg_calender = 1379809732612853771,
-    eg_cautions = 1379809733703106682,
-    eg_channels = 1379809734961533030,
-    eg_cloud = 1379809736014434396,
-    eg_clouddownload = 1379809737767518258,
-    eg_cross = 1379809739214557205,
-    eg_developers = 1379809740632231977,
-    eg_discovery = 1379809741835862026,
-    eg_downarrow = 1379809743056408728,
-    eg_emojis = 1379809744549576815,
-    eg_excl = 1379809745841422397,
-    eg_female = 1379809746923683861,
-    eg_files = 1379809748270186640,
-    eg_fire = 1379809749972815982,
-    eg_gift = 1379809751210262568,
-    eg_globe = 1379809752556765246,
-    eg_hammer = 1379809753861066763,
-    eg_heart = 1379809754930483242,
-    eg_home = 1379809756411068539,
-    eg_hourclock = 1379809757644460042,
-    eg_inbox = 1379809758499962964,
-    eg_link = 1379809760286609480,
-    eg_lock = 1379809761553551433,
-    eg_mail = 1379809762753122397,
-    eg_male = 1379809764497817744,
-    eg_member = 1379809765718229043,
-    eg_message = 1379809766553161739,
-    eg_modadmin = 1379809768071499806,
-    eg_monitor = 1379809769438842980,
-    eg_music = 1379809770500001866,
-    eg_netual = 1379809772341297183,
-    eg_notification = 1379809773196673088,
-    eg_openpage = 1379809774446837772,
-    eg_pins = 1379809776355246090,
-    eg_premium = 1379809777533718528,
-    eg_question = 1379809778720575689,
-    eg_refresh = 1379809780289372271,
-    eg_right = 1379809781614772255,
-    eg_setting = 1379809782889975859,
-    eg_shield = 1379809784479485953,
-    eg_star = 1379809786182238259,
-    eg_stop = 1379809787772145705,
-    eg_study = 1379809789231763456,
-    eg_support = 1379809790724673586,
-    eg_thumbdown = 1379809792436211743,
-    eg_thumbup = 1379809793807613952,
-    eg_ticket = 1379809795057651754,
-    eg_tools = 1379809796320137238,
-    eg_trans = 1379809798144659527,
-    eg_unlock = 1379809799549616138,
-    eg_uparrow = 1379809801504166108,
-    eg_upleft = 1379809802779234456,
-    eg_upload = 1379809803865428070,
-    eg_upright = 1379809805820235910,
-    eg_video = 1379809807137243137,
-    eg_wave = 1379809808932147313,
-    eg_wrench = 1379809810203152607,
-    eg_wrong = 1379809811725549628,
-    eye = 1374026482971574362,
-    eye_off = 1374026481541320728,
-    file = 1374026493751201812,
-    file_archive = 1374026484351635557,
-    file_check = 1374026485618311188,
-    file_cog = 1374026486427811913,
-    file_files = 1374026487958732872,
-    file_minus = 1374026489082937465,
-    file_plus = 1374026490936692757,
-    file_x = 1374026492073480390,
-    folder = 1374026502194200676,
-    folder_archive = 1374026494560567339,
-    folder_check = 1374026496062001284,
-    folder_folders = 1374026497073090583,
-    folder_minus = 1374026498591293531,
-    folder_plus = 1374026499795062975,
-    folder_x = 1374026500801826907,
-    github = 1374031196987723868,
-    hammer = 1374026437345935483,
-    headphone = 1374026517834629171,
-    headphone_off = 1374026516564021389,
-    home = 1374026541440438392,
-    icons_0 = 1379810298667466874,
-    icons_1 = 1379810141280538845,
-    icons_10 = 1379810302769631315,
-    icons_18 = 1379810375431753759,
-    icons_2 = 1379810304111939604,
-    icons_3 = 1379810305374290031,
-    icons_4 = 1379810306636910702,
-    icons_5 = 1379810308507308247,
-    icons_6 = 1379810309849612309,
-    icons_7 = 1379810311506362438,
-    icons_8 = 1379810312739487765,
-    icons_9 = 1379810314366877798,
-    icons_a = 1379810315507601633,
-    icons_activedevbadge = 1379809814108049449,
-    icons_activities = 1379809815475388498,
-    icons_addreactions = 1379810142572253299,
-    icons_adventcalendar = 1379809816859643997,
-    icons_aka = 1379810143813894178,
-    icons_amogus = 1379810317319536660,
-    icons_announce = 1379809818289897523,
-    icons_archive = 1379809820055699456,
-    icons_audiodisable = 1379809821246623867,
-    icons_audioenable = 1379809822496784384,
-    icons_award = 1379809823780245655,
-    icons_awardcup = 1379809824921096346,
-    icons_b = 1379810319139868683,
-    icons_backforward = 1379809826175193161,
-    icons_badping = 1379809827621965926,
-    icons_ban = 1379809828473405482,
-    icons_bank = 1379809830096605285,
-    icons_banmembers = 1379810224873017374,
-    icons_bday = 1379810320251621469,
-    icons_behance = 1379810145672101978,
-    icons_beta = 1379810153016066128,
-    icons_beta1 = 1379809831132725349,
-    icons_beta1a = 1379809832772567081,
-    icons_beta2 = 1379809833993113620,
-    icons_beta2a = 1379809835163451502,
-    icons_bigender = 1379810377105277049,
-    icons_birdman = 1379809836472078427,
-    icons_book = 1379810322071814244,
-    icons_bookmark = 1379810056823902320,
-    icons_bots = 1379810154513698836,
-    icons_box = 1379809837742952530,
-    icons_bright = 1379809839051440139,
-    icons_bugs = 1379809840754593822,
-    icons_bulb = 1379809842138578985,
-    icons_busy = 1379810058262679604,
-    icons_c = 1379810323229442050,
-    icons_calendar1 = 1379809843862306996,
-    icons_calender = 1379810378350854236,
-    icons_calenderdate = 1379810380074713088,
-    icons_callconnect = 1379809845406072852,
-    icons_calldecline = 1379809846768963737,
-    icons_calldisconnect = 1379809848136302673,
-    icons_camera = 1379810059676028988,
-    icons_channel = 1379809849755435141,
-    icons_channelfollowed = 1379810226118852669,
-    icons_clean = 1379810155797024869,
-    icons_clock = 1379809850992885831,
-    icons_clouddown = 1379810062687801394,
-    icons_cmd = 1379810381563695104,
-    icons_code = 1379810063991963739,
-    icons_coin = 1379809852339261502,
-    icons_colorboostnitro = 1379809853345890315,
-    icons_colornitro = 1379809855216554054,
-    icons_colorserverpartner = 1379809856420053064,
-    icons_colorserververified = 1379809857296662550,
-    icons_colorstaff = 1379809858819194962,
-    icons_connect = 1379809861122129931,
-    icons_control = 1379810065145663488,
-    icons_correct = 1379809862275567668,
-    icons_createcategory = 1379810228106956871,
-    icons_createchannel = 1379810229482426458,
-    icons_createchannels = 1379810230698905782,
-    icons_createemoji = 1379810232619896955,
-    icons_createintegration = 1379810234109005864,
-    icons_createrole = 1379810235144732695,
-    icons_createsticker = 1379810236747218964,
-    icons_createthread = 1379810237615439943,
-    icons_createwebhook = 1379810239280451768,
-    icons_creditcard = 1379809863739379753,
-    icons_customstaff = 1379809865433616384,
-    icons_d = 1379810324554711137,
-    icons_dac = 1379809866880647240,
-    icons_dblurple = 1379809868981997598,
-    icons_defaultperms = 1379810157042602014,
-    icons_delete = 1379809870210928660,
-    icons_deletechannel = 1379810240635338835,
-    icons_deleteemoji = 1379810242568917002,
-    icons_deleteevent = 1379810243923415050,
-    icons_deleteintegration = 1379810245265588285,
-    icons_deleterole = 1379810246796644505,
-    icons_deletesticker = 1379810248159793232,
-    icons_deletethread = 1379810250000961567,
-    icons_deletewebhook = 1379810250894348421,
-    icons_dfuchsia = 1379809870936670273,
-    icons_dgreen = 1379809872568258700,
-    icons_disable = 1379810252857540649,
-    icons_discord = 1379810254946304030,
-    icons_discordbotdev = 1379810158548619275,
-    icons_discordbughunter = 1379810159836266586,
-    icons_discordhypesquard = 1379810161320923239,
-    icons_discordjs = 1379810382910062743,
-    icons_discordmod = 1379810165121089557,
-    icons_discordnitro = 1379810166685433876,
-    icons_discordpartner = 1379810168270753803,
-    icons_discordstaff = 1379810170972143657,
-    icons_discover = 1379809873784606750,
-    icons_dislike = 1379810172863774801,
-    icons_djoin = 1379809874992435210,
-    icons_dleave = 1379809876209041418,
-    icons_dollar = 1379809877085388902,
-    icons_downarrow = 1379810066605150309,
-    icons_download = 1379809878427701311,
-    icons_downvote = 1379809879816011879,
-    icons_dred = 1379809881187684353,
-    icons_dwhite = 1379809882378735756,
-    icons_dyellow = 1379809883527974962,
-    icons_e = 1379810326559592468,
-    icons_earlysupporter = 1379810174033854598,
-    icons_edit = 1379809884878540911,
-    icons_education = 1379810067989401662,
-    icons_emojiguardian = 1379809885969190943,
-    icons_enable = 1379810256296738957,
-    icons_endstage = 1379810257974460436,
-    icons_envelope = 1379810259719295006,
-    icons_eventcolour = 1379809887520817273,
-    icons_exclamation = 1379809888594694365,
-    icons_f = 1379810327843180574,
-    icons_fb = 1379810175489413273,
-    icons_female = 1379810384185266268,
-    icons_figma = 1379810177057820743,
-    icons_file = 1379809890125479946,
-    icons_files = 1379810178819559545,
-    icons_fingerprint = 1379810329130700880,
-    icons_fire = 1379809891677634700,
-    icons_flag = 1379810069276921876,
-    icons_folder = 1379810070623158322,
-    icons_forum = 1379809892960833680,
-    icons_forumlocked = 1379809894978551828,
-    icons_forumnfsw = 1379809896387706901,
-    icons_friends = 1379810179964604558,
-    icons_frontforward = 1379809897553596476,
-    icons_fword = 1379810072393285693,
-    icons_g = 1379810330682589254,
-    icons_games = 1379810074058424481,
-    icons_gay = 1379810385481170945,
-    icons_gender = 1379810386756243486,
-    icons_generalinfo = 1379810261057146972,
-    icons_gif = 1379810075165851649,
-    icons_gift = 1379810076709228687,
-    icons_gitbranch = 1379809900611371099,
-    icons_gitcommit = 1379809901819465831,
-    icons_github = 1379810181474422836,
-    icons_gitmerge = 1379809903367028766,
-    icons_gitpullrequest = 1379809904335786087,
-    icons_globe = 1379809905589882942,
-    icons_goodping = 1379809907733299200,
-    icons_growth = 1379810262051196940,
-    icons_guardian = 1379810332322566225,
-    icons_h = 1379810333723594814,
-    icons_hammer = 1379809909176008897,
-    icons_he_him = 1379810334868504577,
-    icons_headphone = 1379809910552002590,
-    icons_headphonedeafen = 1379809912023945317,
-    icons_heart = 1379810077946544229,
-    icons_hetero = 1379810387880316949,
-    icons_hi = 1379810079351771246,
-    icons_hoursglass = 1379810183328436388,
-    icons_hsbalance = 1379810184775598150,
-    icons_hsbravery = 1379810186419638302,
-    icons_hsbrilliance = 1379810187900354592,
-    icons_hyphen = 1379809913609523250,
-    icons_i = 1379810336420663396,
-    icons_id = 1379810080769445898,
-    icons_idelping = 1379809914490454139,
-    icons_idle = 1379810082316881930,
-    icons_illustrator = 1379809915790692445,
-    icons_image = 1379810083453534299,
-    icons_info = 1379809917309030460,
-    icons_instagram = 1379810189645185154,
-    icons_invite = 1379809918990811287,
-    icons_j = 1379810338257506315,
-    icons_join = 1379809920391712768,
-    icons_jpg = 1379810389822406788,
-    icons_js = 1379810392112496671,
-    icons_k = 1379810340035891340,
-    icons_kick = 1379809921758920804,
-    icons_kicking = 1379810191033503805,
-    icons_kofi = 1379810192518156318,
-    icons_l = 1379810340992323727,
-    icons_leave = 1379809924082569326,
-    icons_leftarrow = 1379810086158991475,
-    icons_lesbian = 1379810393660326009,
-    icons_library = 1379810342757990410,
-    icons_like = 1379810193948540979,
-    icons_link = 1379809925340991599,
-    icons_linkadd = 1379810263896952902,
-    icons_linked = 1379809927979339896,
-    icons_linkrevoke = 1379810265180409926,
-    icons_linkupdate = 1379810266807533669,
-    icons_list = 1379810088100823091,
-    icons_live = 1379809929635958947,
-    icons_loading = 1379809931032526939,
-    icons_loadingerror = 1379810089518628906,
-    icons_locked = 1379810195282333716,
-    icons_loop = 1379810196896878705,
-    icons_m = 1379810343886393509,
-    icons_magicwand = 1379809934438301706,
-    icons_male = 1379810395182858373,
-    icons_mashroomman = 1379809935713632409,
-    icons_mentalhealth = 1379809937248489554,
-    icons_menu = 1379810198155427961,
-    icons_message = 1379810090701426691,
-    icons_mic = 1379809939106697327,
-    icons_micmute = 1379809940348076044,
-    icons_moderationhig = 1379810397372158083,
-    icons_moderationhighest = 1379810398932308068,
-    icons_moderationlow = 1379810400438190161,
-    icons_moderationmedium = 1379810402304655531,
-    icons_moderationnone = 1379810403793506414,
-    icons_monitor = 1379809941673738271,
-    icons_msvisualcode = 1379810199417917511,
-    icons_music = 1379810092026953768,
-    icons_musicstop = 1379809943166648362,
-    icons_n = 1379810346629337180,
-    icons_new = 1379810202055999619,
-    icons_new1 = 1379809949491789905,
-    icons_new1a = 1379809950833971352,
-    icons_new2 = 1379809952465555657,
-    icons_new2a = 1379809953522515979,
-    icons_newmembers = 1379809954977939567,
-    icons_news1 = 1379809956722905250,
-    icons_news2 = 1379809958111219732,
-    icons_night = 1379809959352598558,
-    icons_nitro = 1379809960770404422,
-    icons_nitroboost = 1379809962435547287,
-    icons_nodejs = 1379810405181816872,
-    icons_notificationsettings = 1379810268313292870,
-    icons_notify = 1379810093494964335,
-    icons_o = 1379810348009259070,
-    icons_oauth2 = 1379810269546418216,
-    icons_off = 1379810100251721770,
-    icons_offline = 1379810101849882685,
-    icons_on = 1379810106966933635,
-    icons_online = 1379810108690796695,
-    icons_outage = 1379810111517884568,
-    icons_owner = 1379809963907481700,
-    icons_p = 1379810350186365029,
-    icons_paintpadbrush = 1379809965010845729,
-    icons_partner = 1379810203477737543,
-    icons_patreon = 1379810205357051937,
-    icons_pause = 1379809966189314050,
-    icons_paypal = 1379809968253046880,
-    icons_pen = 1379809969620389938,
-    icons_people = 1379809971197444116,
-    icons_person = 1379809972426117180,
-    icons_photoshop = 1379809973655048265,
-    icons_pin = 1379809975450210405,
-    icons_ping = 1379809976939319338,
-    icons_pings = 1379810207600738476,
-    icons_plant = 1379809978323566694,
-    icons_play = 1379809979086803097,
-    icons_plus = 1379809980672381020,
-    icons_png = 1379810406767263754,
-    icons_podcast = 1379809981934866613,
-    icons_premium = 1379810112868188211,
-    icons_premiumchannel = 1379809983113461851,
-    icons_q = 1379810351411101829,
-    icons_question = 1379810114583662663,
-    icons_queue = 1379810210125975564,
-    icons_quotes = 1379810116743860316,
-    icons_r = 1379810352501489675,
-    icons_radmins = 1379810408214302750,
-    icons_rartists = 1379810409401548913,
-    icons_rboosters = 1379810410894725190,
-    icons_rbots = 1379810412345688136,
-    icons_rcamera = 1379810416137474108,
-    icons_rdevelopers = 1379810417693560993,
-    icons_reddit = 1379810211774206053,
-    icons_reminder = 1379809984715690126,
-    icons_repeat = 1379809986695397507,
-    icons_repeatonce = 1379809987748171827,
-    icons_reply = 1379809989715296288,
-    icons_revents = 1379810419333664808,
-    icons_rfire = 1379810420587630592,
-    icons_rguardians = 1379810422722658424,
-    icons_rhelpers = 1379810424404312127,
-    icons_richpresence = 1379810118182371378,
-    icons_rightarrow = 1379809993632780358,
-    icons_rmembers = 1379810425868390472,
-    icons_rmods = 1379810427760017418,
-    icons_roles = 1379810271262015591,
-    icons_rowner = 1379810429311651840,
-    icons_rpodcast = 1379810430515548292,
-    icons_rsdonator = 1379810432411504670,
-    icons_rspartner = 1379810433661145160,
-    icons_rsstaffs = 1379810435288793161,
-    icons_rstaff = 1379810436844879985,
-    icons_rules = 1379810119352844411,
-    icons_rverification = 1379810438224810186,
-    icons_rverified = 1379810440007127050,
-    icons_rvip = 1379810441722859723,
-    icons_s = 1379810354086940772,
-    icons_saturn = 1379809994748334203,
-    icons_scheduleevent = 1379810272482431046,
-    icons_screenshare = 1379809996199690342,
-    icons_search = 1379809997369639136,
-    icons_sentry = 1379809998745636985,
-    icons_serverinsight = 1379810273845841960,
-    icons_servermute = 1379810000503046144,
-    icons_serverpartner = 1379810213569499156,
-    icons_serververified = 1379810215125319780,
-    icons_settings = 1379810001693970482,
-    icons_share = 1379810002704928809,
-    icons_she_her = 1379810355433443359,
-    icons_shine1 = 1379810004558680209,
-    icons_shine2 = 1379810005837942834,
-    icons_shine3 = 1379810006920331419,
-    icons_shuffle = 1379810008426086400,
-    icons_slashcmd = 1379810120560676944,
-    icons_snapchat = 1379810216484405278,
-    icons_snowflake = 1379810443119431690,
-    icons_spark = 1379810121982410763,
-    icons_speaker = 1379810123299426376,
-    icons_speakerlock = 1379810124461379604,
-    icons_speakerlow = 1379810125640110184,
-    icons_speakermute = 1379810127036678234,
-    icons_splash = 1379810009952686192,
-    icons_spotify = 1379810011521486900,
-    icons_stageleave = 1379810012670595153,
-    icons_stagelocked = 1379810014277009428,
-    icons_stagemoderator = 1379810015581311088,
-    icons_stagemoveaudience = 1379810016881807460,
-    icons_stagemovespeaker = 1379810018198818866,
-    icons_stagerequesttospeak = 1379810019633270825,
-    icons_stagerequesttospeaklist = 1379810020799152160,
-    icons_star = 1379810022451576884,
-    icons_startstage = 1379810275208855672,
-    icons_statsdown = 1379810357173817414,
-    icons_stickers = 1379810128806674524,
-    icons_store = 1379810023772917851,
-    icons_stream = 1379810130270486571,
-    icons_supportscommandsbadge = 1379810025446314094,
-    icons_supportteam = 1379810217755410584,
-    icons_swardx = 1379810276869804102,
-    icons_t = 1379810358423982080,
-    icons_tada = 1379810359904440330,
-    icons_text1 = 1379810026591354972,
-    icons_text2 = 1379810033914744953,
-    icons_text3 = 1379810035387076608,
-    icons_text4 = 1379810036666335272,
-    icons_text5 = 1379810037991608381,
-    icons_text6 = 1379810040034365522,
-    icons_they_them = 1379810361376768043,
-    icons_threadchannel = 1379810278337810452,
-    icons_ticket = 1379810131805474826,
-    icons_tiktok = 1379810444667261050,
-    icons_tilde = 1379810133072416958,
-    icons_timeout = 1379810041946833056,
-    icons_todolist = 1379810134309605507,
-    icons_topgg = 1379810043251265596,
-    icons_transferownership = 1379810044559753258,
-    icons_transgender = 1379810446432800838,
-    icons_translate = 1379810362882396190,
-    icons_twitch = 1379810447821115452,
-    icons_twitter = 1379810219370217513,
-    icons_u = 1379810364434284715,
-    icons_unbanmember = 1379810280254607440,
-    icons_unlock = 1379810221815496788,
-    icons_uparrow = 1379810135563833374,
-    icons_update = 1379810136977178694,
-    icons_update1 = 1379810045805723699,
-    icons_update2 = 1379810046854303847,
-    icons_updatechannel = 1379810281383006299,
-    icons_updateemoji = 1379810283035300063,
-    icons_updateevent = 1379810284696375368,
-    icons_updateintegration = 1379810286147473408,
-    icons_updatemember = 1379810288039362650,
-    icons_updaterole = 1379810289725341716,
-    icons_updateserver = 1379810291201736704,
-    icons_updatestage = 1379810292636319937,
-    icons_updatesticker = 1379810294041149502,
-    icons_updatethread = 1379810295601430700,
-    icons_updatewebhook = 1379810297329746110,
-    icons_upvote = 1379810048611717281,
-    icons_v = 1379810366288171008,
-    icons_verified = 1379810049849036890,
-    icons_video = 1379810051140878378,
-    icons_view = 1379810138327875695,
-    icons_vip = 1379810139632308246,
-    icons_vklogo = 1379810448693788795,
-    icons_vpn = 1379810367890260051,
-    icons_w = 1379810369555402782,
-    icons_warning = 1379810450447007764,
-    icons_wave = 1379810452128796704,
-    icons_webp = 1379810453726957608,
-    icons_wrong = 1379810052432592969,
-    icons_wumpus = 1379810053741215864,
-    icons_x = 1379810371342176276,
-    icons_xmarkwhite = 1379810055574126602,
-    icons_y = 1379810372705456249,
-    icons_youtube = 1379810223308406946,
-    icons_z = 1379810374211076116,
-    iconslogo = 1379809812963131532,
-    id = 1374026544065810497,
-    identity = 1370872595355926621,
-    image = 1374026526219309136,
-    image_download = 1374026519344709743,
-    image_minus = 1374026520481370286,
-    image_off = 1374026522259886130,
-    image_plus = 1374026523144622173,
-    image_upload = 1374026524730200238,
-    instagram = 1374031198543806495,
-    linkedin = 1374031199294460006,
-    list = 1374026546280403055,
-    lock = 1374026529884995614,
-    lock_unlock = 1374026527314022551,
-    mail = 1374026536415526992,
-    mail_check = 1374026531344486420,
-    mail_minus = 1374026532384935958,
-    mail_plus = 1374026533869715527,
-    mail_x = 1374026535224213615,
-    mic = 1374026538860937242,
-    mic_off = 1374026537283620887,
-    minus = 1374026439828967444,
-    next = 1374026407277101067,
-    other_brush = 1374026549577121832,
-    other_cable = 1374026551133343875,
-    other_crown = 1374026552609734799,
-    other_dollar = 1374026553700384883,
-    other_earth = 1374026555042431130,
-    other_gauge = 1374026556183150637,
-    other_gear = 1374026557776990208,
-    other_graduation = 1374026558959784077,
-    other_heart = 1374026560146898964,
-    other_home = 1374026561304530965,
-    other_save = 1374026563846275135,
-    other_save_off = 1374026562734653470,
-    other_text = 1374026564827877458,
-    other_translate = 1374026565926522963,
-    other_trash = 1374026567604371617,
-    other_truck = 1374026568812331028,
-    pause = 1374026575837921342,
-    phone = 1374026573287653440,
-    phone_off = 1374026572440404173,
-    ram = 1374026506891821177,
-    refresh = 1374026571245027390,
-    resume = 1374026577637015654,
-    shield = 1374026591570493620,
-    shield_check = 1374026584150900789,
-    shield_minus = 1374026585946066965,
-    shield_off = 1374026586919014462,
-    shield_plus = 1374026588303261817,
-    shield_x = 1374026589645307975,
-    ssd = 1374026512864514068,
-    stop = 1374026580510245004,
-    tag = 1374026594028617809,
-    tag_tags = 1374026592510283903,
-    ticket = 1374026602005921886,
-    ticket_check = 1374026595374727168,
-    ticket_minus = 1374026596536553612,
-    ticket_plus = 1374026598017405030,
-    ticket_tickets = 1374026599480950936,
-    ticket_x = 1374026600991031316,
-    timer = 1374026606145831035,
-    timer_off = 1374026603293708319,
-    timer_reset = 1374026605021626388,
-    user = 1374026615226630294,
-    user_check = 1374026607697858710,
-    user_cog = 1374026608645636108,
-    user_minus = 1374026610298323106,
-    user_plus = 1374026611594363013,
-    user_users = 1374026612823162920,
-    user_x = 1374026613829800068,
-    view = 1374026582728904787,
-    wifi = 1374026514663997603,
-    youtube = 1374031201790201887,
+// Example code that deserializes and serializes the model.
+// extern crate serde;
+// #[macro_use]
+// extern crate serde_derive;
+// extern crate serde_json;
+//
+// use generated_module::Emojis;
+//
+// fn main() {
+//     let json = r#"{"answer": 42}"#;
+//     let model: Emojis = serde_json::from_str(&json).unwrap();
+// }
+
+use serde::{Serialize, Deserialize};
+
+#[derive(Clone, Serialize, Deserialize)]
+pub struct Emojis {
+    #[serde(rename = "static")]
+    pub emojis_static: Static,
+
+    pub animated: Animated,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[repr(u64)]
-pub enum EAnimated {
-    boost = 1374026379531915264,
-    icons_logo = 1379809932672766035,
+#[derive(Clone, Serialize, Deserialize)]
+pub struct Animated {
+    pub boost: String,
+
+    pub icons_logo: String,
+}
+
+#[derive(Clone, Serialize, Deserialize)]
+pub struct Static {
+    pub identity: String,
+
+    pub action_check: String,
+
+    pub action_help: String,
+
+    pub action_info: String,
+
+    pub action_warning: String,
+
+    pub action_x: String,
+
+    pub check: String,
+
+    pub close: String,
+
+    pub arrow_down: String,
+
+    pub arrow_left: String,
+
+    pub arrow_refresh: String,
+
+    pub arrow_right: String,
+
+    pub arrow_up: String,
+
+    pub back: String,
+
+    pub next: String,
+
+    pub book_check: String,
+
+    pub book_minus: String,
+
+    pub book_plus: String,
+
+    pub book_x: String,
+
+    pub book: String,
+
+    pub bell_dot: String,
+
+    pub bell_minus: String,
+
+    pub bell_off: String,
+
+    pub bell_plus: String,
+
+    pub bell: String,
+
+    pub calendar_check: String,
+
+    pub calendar_cog: String,
+
+    pub calendar_days: String,
+
+    pub calendar_minus: String,
+
+    pub calendar_plus: String,
+
+    pub calendar_x: String,
+
+    pub camera_off: String,
+
+    pub camera: String,
+
+    pub add: String,
+
+    pub hammer: String,
+
+    pub minus: String,
+
+    pub clipboard_check: String,
+
+    pub clipboard_minus: String,
+
+    pub clipboard_plus: String,
+
+    pub clipboard_x: String,
+
+    pub clipboard: String,
+
+    pub clock_check: String,
+
+    pub clock_minus: String,
+
+    pub clock_off: String,
+
+    pub clock_plus: String,
+
+    pub clock: String,
+
+    pub cloud_cog: String,
+
+    pub cloud_download: String,
+
+    pub cloud_upload: String,
+
+    pub cloud: String,
+
+    pub code_braces: String,
+
+    pub code_brackets: String,
+
+    pub code_bug: String,
+
+    pub code_file_binary: String,
+
+    pub code_parentheses: String,
+
+    pub code_server_cog: String,
+
+    pub code_server_off: String,
+
+    pub code_server: String,
+
+    pub code_terminal: String,
+
+    pub code_window: String,
+
+    pub code_wrench: String,
+
+    pub database_backup: String,
+
+    pub database: String,
+
+    pub device_laptop: String,
+
+    pub device_pc: String,
+
+    pub device_smartphone: String,
+
+    pub device_tablet: String,
+
+    pub eye_off: String,
+
+    pub eye: String,
+
+    pub file_archive: String,
+
+    pub file_check: String,
+
+    pub file_cog: String,
+
+    pub file_files: String,
+
+    pub file_minus: String,
+
+    pub file_plus: String,
+
+    pub file_x: String,
+
+    pub file: String,
+
+    pub folder_archive: String,
+
+    pub folder_check: String,
+
+    pub folder_folders: String,
+
+    pub folder_minus: String,
+
+    pub folder_plus: String,
+
+    pub folder_x: String,
+
+    pub folder: String,
+
+    pub cpu: String,
+
+    pub ram: String,
+
+    pub ssd: String,
+
+    pub wifi: String,
+
+    pub headphone_off: String,
+
+    pub headphone: String,
+
+    pub image_download: String,
+
+    pub image_minus: String,
+
+    pub image_off: String,
+
+    pub image_plus: String,
+
+    pub image_upload: String,
+
+    pub image: String,
+
+    pub lock_unlock: String,
+
+    pub lock: String,
+
+    pub mail_check: String,
+
+    pub mail_minus: String,
+
+    pub mail_plus: String,
+
+    pub mail_x: String,
+
+    pub mail: String,
+
+    pub mic_off: String,
+
+    pub mic: String,
+
+    pub home: String,
+
+    pub id: String,
+
+    pub list: String,
+
+    pub other_brush: String,
+
+    pub other_cable: String,
+
+    pub other_crown: String,
+
+    pub other_dollar: String,
+
+    pub other_earth: String,
+
+    pub other_gauge: String,
+
+    pub other_gear: String,
+
+    pub other_graduation: String,
+
+    pub other_heart: String,
+
+    pub other_home: String,
+
+    pub other_save_off: String,
+
+    pub other_save: String,
+
+    pub other_text: String,
+
+    pub other_translate: String,
+
+    pub other_trash: String,
+
+    pub other_truck: String,
+
+    pub refresh: String,
+
+    pub phone_off: String,
+
+    pub phone: String,
+
+    pub pause: String,
+
+    pub resume: String,
+
+    pub stop: String,
+
+    pub view: String,
+
+    pub shield_check: String,
+
+    pub shield_minus: String,
+
+    pub shield_off: String,
+
+    pub shield_plus: String,
+
+    pub shield_x: String,
+
+    pub shield: String,
+
+    pub tag_tags: String,
+
+    pub tag: String,
+
+    pub ticket_check: String,
+
+    pub ticket_minus: String,
+
+    pub ticket_plus: String,
+
+    pub ticket_tickets: String,
+
+    pub ticket_x: String,
+
+    pub ticket: String,
+
+    pub timer_off: String,
+
+    pub timer_reset: String,
+
+    pub timer: String,
+
+    pub user_check: String,
+
+    pub user_cog: String,
+
+    pub user_minus: String,
+
+    pub user_plus: String,
+
+    pub user_users: String,
+
+    pub user_x: String,
+
+    pub user: String,
+
+    pub github: String,
+
+    pub instagram: String,
+
+    pub linkedin: String,
+
+    pub youtube: String,
+
+    pub eg_addemoji: String,
+
+    pub eg_addfile: String,
+
+    pub eg_addons: String,
+
+    pub eg_announcement: String,
+
+    pub eg_art: String,
+
+    pub eg_ask: String,
+
+    pub eg_ban: String,
+
+    pub eg_book: String,
+
+    pub eg_bot: String,
+
+    pub eg_calender: String,
+
+    pub eg_cautions: String,
+
+    pub eg_channels: String,
+
+    pub eg_cloud: String,
+
+    pub eg_clouddownload: String,
+
+    pub eg_cross: String,
+
+    pub eg_developers: String,
+
+    pub eg_discovery: String,
+
+    pub eg_downarrow: String,
+
+    pub eg_emojis: String,
+
+    pub eg_excl: String,
+
+    pub eg_female: String,
+
+    pub eg_files: String,
+
+    pub eg_fire: String,
+
+    pub eg_gift: String,
+
+    pub eg_globe: String,
+
+    pub eg_hammer: String,
+
+    pub eg_heart: String,
+
+    pub eg_home: String,
+
+    pub eg_hourclock: String,
+
+    pub eg_inbox: String,
+
+    pub eg_link: String,
+
+    pub eg_lock: String,
+
+    pub eg_mail: String,
+
+    pub eg_male: String,
+
+    pub eg_member: String,
+
+    pub eg_message: String,
+
+    pub eg_modadmin: String,
+
+    pub eg_monitor: String,
+
+    pub eg_music: String,
+
+    pub eg_netual: String,
+
+    pub eg_notification: String,
+
+    pub eg_openpage: String,
+
+    pub eg_pins: String,
+
+    pub eg_premium: String,
+
+    pub eg_question: String,
+
+    pub eg_refresh: String,
+
+    pub eg_right: String,
+
+    pub eg_setting: String,
+
+    pub eg_shield: String,
+
+    pub eg_star: String,
+
+    pub eg_stop: String,
+
+    pub eg_study: String,
+
+    pub eg_support: String,
+
+    pub eg_thumbdown: String,
+
+    pub eg_thumbup: String,
+
+    pub eg_ticket: String,
+
+    pub eg_tools: String,
+
+    pub eg_trans: String,
+
+    pub eg_unlock: String,
+
+    pub eg_uparrow: String,
+
+    pub eg_upleft: String,
+
+    pub eg_upload: String,
+
+    pub eg_upright: String,
+
+    pub eg_video: String,
+
+    pub eg_wave: String,
+
+    pub eg_wrench: String,
+
+    pub eg_wrong: String,
+
+    pub iconslogo: String,
+
+    pub icons_activedevbadge: String,
+
+    pub icons_activities: String,
+
+    pub icons_adventcalendar: String,
+
+    pub icons_announce: String,
+
+    pub icons_archive: String,
+
+    pub icons_audiodisable: String,
+
+    pub icons_audioenable: String,
+
+    pub icons_award: String,
+
+    pub icons_awardcup: String,
+
+    pub icons_backforward: String,
+
+    pub icons_badping: String,
+
+    pub icons_ban: String,
+
+    pub icons_bank: String,
+
+    pub icons_beta1: String,
+
+    #[serde(rename = "icons_beta1a")]
+    pub icons_beta1_a: String,
+
+    pub icons_beta2: String,
+
+    #[serde(rename = "icons_beta2a")]
+    pub icons_beta2_a: String,
+
+    pub icons_birdman: String,
+
+    pub icons_box: String,
+
+    pub icons_bright: String,
+
+    pub icons_bugs: String,
+
+    pub icons_bulb: String,
+
+    pub icons_calendar1: String,
+
+    pub icons_callconnect: String,
+
+    pub icons_calldecline: String,
+
+    pub icons_calldisconnect: String,
+
+    pub icons_channel: String,
+
+    pub icons_clock: String,
+
+    pub icons_coin: String,
+
+    pub icons_colorboostnitro: String,
+
+    pub icons_colornitro: String,
+
+    pub icons_colorserverpartner: String,
+
+    pub icons_colorserververified: String,
+
+    pub icons_colorstaff: String,
+
+    pub icons_connect: String,
+
+    pub icons_correct: String,
+
+    pub icons_creditcard: String,
+
+    pub icons_customstaff: String,
+
+    pub icons_dac: String,
+
+    pub icons_dblurple: String,
+
+    pub icons_delete: String,
+
+    pub icons_dfuchsia: String,
+
+    pub icons_dgreen: String,
+
+    pub icons_discover: String,
+
+    pub icons_djoin: String,
+
+    pub icons_dleave: String,
+
+    pub icons_dollar: String,
+
+    pub icons_download: String,
+
+    pub icons_downvote: String,
+
+    pub icons_dred: String,
+
+    pub icons_dwhite: String,
+
+    pub icons_dyellow: String,
+
+    pub icons_edit: String,
+
+    pub icons_emojiguardian: String,
+
+    pub icons_eventcolour: String,
+
+    pub icons_exclamation: String,
+
+    pub icons_file: String,
+
+    pub icons_fire: String,
+
+    pub icons_forum: String,
+
+    pub icons_forumlocked: String,
+
+    pub icons_forumnfsw: String,
+
+    pub icons_frontforward: String,
+
+    pub icons_gitbranch: String,
+
+    pub icons_gitcommit: String,
+
+    pub icons_gitmerge: String,
+
+    pub icons_gitpullrequest: String,
+
+    pub icons_globe: String,
+
+    pub icons_goodping: String,
+
+    pub icons_hammer: String,
+
+    pub icons_headphone: String,
+
+    pub icons_headphonedeafen: String,
+
+    pub icons_hyphen: String,
+
+    pub icons_idelping: String,
+
+    pub icons_illustrator: String,
+
+    pub icons_info: String,
+
+    pub icons_invite: String,
+
+    pub icons_join: String,
+
+    pub icons_kick: String,
+
+    pub icons_leave: String,
+
+    pub icons_link: String,
+
+    pub icons_linked: String,
+
+    pub icons_live: String,
+
+    pub icons_loading: String,
+
+    pub icons_magicwand: String,
+
+    pub icons_mashroomman: String,
+
+    pub icons_mentalhealth: String,
+
+    pub icons_mic: String,
+
+    pub icons_micmute: String,
+
+    pub icons_monitor: String,
+
+    pub icons_musicstop: String,
+
+    pub icons_new1: String,
+
+    #[serde(rename = "icons_new1a")]
+    pub icons_new1_a: String,
+
+    pub icons_new2: String,
+
+    #[serde(rename = "icons_new2a")]
+    pub icons_new2_a: String,
+
+    pub icons_newmembers: String,
+
+    pub icons_news1: String,
+
+    pub icons_news2: String,
+
+    pub icons_night: String,
+
+    pub icons_nitro: String,
+
+    pub icons_nitroboost: String,
+
+    pub icons_owner: String,
+
+    pub icons_paintpadbrush: String,
+
+    pub icons_pause: String,
+
+    pub icons_paypal: String,
+
+    pub icons_pen: String,
+
+    pub icons_people: String,
+
+    pub icons_person: String,
+
+    pub icons_photoshop: String,
+
+    pub icons_pin: String,
+
+    pub icons_ping: String,
+
+    pub icons_plant: String,
+
+    pub icons_play: String,
+
+    pub icons_plus: String,
+
+    pub icons_podcast: String,
+
+    pub icons_premiumchannel: String,
+
+    pub icons_reminder: String,
+
+    pub icons_repeat: String,
+
+    pub icons_repeatonce: String,
+
+    pub icons_reply: String,
+
+    pub icons_rightarrow: String,
+
+    pub icons_saturn: String,
+
+    pub icons_screenshare: String,
+
+    pub icons_search: String,
+
+    pub icons_sentry: String,
+
+    pub icons_servermute: String,
+
+    pub icons_settings: String,
+
+    pub icons_share: String,
+
+    pub icons_shine1: String,
+
+    pub icons_shine2: String,
+
+    pub icons_shine3: String,
+
+    pub icons_shuffle: String,
+
+    pub icons_splash: String,
+
+    pub icons_spotify: String,
+
+    pub icons_stageleave: String,
+
+    pub icons_stagelocked: String,
+
+    pub icons_stagemoderator: String,
+
+    pub icons_stagemoveaudience: String,
+
+    pub icons_stagemovespeaker: String,
+
+    pub icons_stagerequesttospeak: String,
+
+    pub icons_stagerequesttospeaklist: String,
+
+    pub icons_star: String,
+
+    pub icons_store: String,
+
+    pub icons_supportscommandsbadge: String,
+
+    pub icons_text1: String,
+
+    pub icons_text2: String,
+
+    pub icons_text3: String,
+
+    pub icons_text4: String,
+
+    pub icons_text5: String,
+
+    pub icons_text6: String,
+
+    pub icons_timeout: String,
+
+    pub icons_topgg: String,
+
+    pub icons_transferownership: String,
+
+    pub icons_update1: String,
+
+    pub icons_update2: String,
+
+    pub icons_upvote: String,
+
+    pub icons_verified: String,
+
+    pub icons_video: String,
+
+    pub icons_wrong: String,
+
+    pub icons_wumpus: String,
+
+    pub icons_xmarkwhite: String,
+
+    pub icons_bookmark: String,
+
+    pub icons_busy: String,
+
+    pub icons_camera: String,
+
+    pub icons_clouddown: String,
+
+    pub icons_code: String,
+
+    pub icons_control: String,
+
+    pub icons_downarrow: String,
+
+    pub icons_education: String,
+
+    pub icons_flag: String,
+
+    pub icons_folder: String,
+
+    pub icons_fword: String,
+
+    pub icons_games: String,
+
+    pub icons_gif: String,
+
+    pub icons_gift: String,
+
+    pub icons_heart: String,
+
+    pub icons_hi: String,
+
+    pub icons_id: String,
+
+    pub icons_idle: String,
+
+    pub icons_image: String,
+
+    pub icons_leftarrow: String,
+
+    pub icons_list: String,
+
+    pub icons_loadingerror: String,
+
+    pub icons_message: String,
+
+    pub icons_music: String,
+
+    pub icons_notify: String,
+
+    pub icons_off: String,
+
+    pub icons_offline: String,
+
+    pub icons_on: String,
+
+    pub icons_online: String,
+
+    pub icons_outage: String,
+
+    pub icons_premium: String,
+
+    pub icons_question: String,
+
+    pub icons_quotes: String,
+
+    pub icons_richpresence: String,
+
+    pub icons_rules: String,
+
+    pub icons_slashcmd: String,
+
+    pub icons_spark: String,
+
+    pub icons_speaker: String,
+
+    pub icons_speakerlock: String,
+
+    pub icons_speakerlow: String,
+
+    pub icons_speakermute: String,
+
+    pub icons_stickers: String,
+
+    pub icons_stream: String,
+
+    pub icons_ticket: String,
+
+    pub icons_tilde: String,
+
+    pub icons_todolist: String,
+
+    pub icons_uparrow: String,
+
+    pub icons_update: String,
+
+    pub icons_view: String,
+
+    pub icons_vip: String,
+
+    pub icons_1: String,
+
+    pub icons_addreactions: String,
+
+    pub icons_aka: String,
+
+    pub icons_behance: String,
+
+    pub icons_beta: String,
+
+    pub icons_bots: String,
+
+    pub icons_clean: String,
+
+    pub icons_defaultperms: String,
+
+    pub icons_discordbotdev: String,
+
+    pub icons_discordbughunter: String,
+
+    pub icons_discordhypesquard: String,
+
+    pub icons_discordmod: String,
+
+    pub icons_discordnitro: String,
+
+    pub icons_discordpartner: String,
+
+    pub icons_discordstaff: String,
+
+    pub icons_dislike: String,
+
+    pub icons_earlysupporter: String,
+
+    pub icons_fb: String,
+
+    pub icons_figma: String,
+
+    pub icons_files: String,
+
+    pub icons_friends: String,
+
+    pub icons_github: String,
+
+    pub icons_hoursglass: String,
+
+    pub icons_hsbalance: String,
+
+    pub icons_hsbravery: String,
+
+    pub icons_hsbrilliance: String,
+
+    pub icons_instagram: String,
+
+    pub icons_kicking: String,
+
+    pub icons_kofi: String,
+
+    pub icons_like: String,
+
+    pub icons_locked: String,
+
+    pub icons_loop: String,
+
+    pub icons_menu: String,
+
+    pub icons_msvisualcode: String,
+
+    pub icons_new: String,
+
+    pub icons_partner: String,
+
+    pub icons_patreon: String,
+
+    pub icons_pings: String,
+
+    pub icons_queue: String,
+
+    pub icons_reddit: String,
+
+    pub icons_serverpartner: String,
+
+    pub icons_serververified: String,
+
+    pub icons_snapchat: String,
+
+    pub icons_supportteam: String,
+
+    pub icons_twitter: String,
+
+    pub icons_unlock: String,
+
+    pub icons_youtube: String,
+
+    pub icons_banmembers: String,
+
+    pub icons_channelfollowed: String,
+
+    pub icons_createcategory: String,
+
+    pub icons_createchannel: String,
+
+    pub icons_createchannels: String,
+
+    pub icons_createemoji: String,
+
+    pub icons_createintegration: String,
+
+    pub icons_createrole: String,
+
+    pub icons_createsticker: String,
+
+    pub icons_createthread: String,
+
+    pub icons_createwebhook: String,
+
+    pub icons_deletechannel: String,
+
+    pub icons_deleteemoji: String,
+
+    pub icons_deleteevent: String,
+
+    pub icons_deleteintegration: String,
+
+    pub icons_deleterole: String,
+
+    pub icons_deletesticker: String,
+
+    pub icons_deletethread: String,
+
+    pub icons_deletewebhook: String,
+
+    pub icons_disable: String,
+
+    pub icons_discord: String,
+
+    pub icons_enable: String,
+
+    pub icons_endstage: String,
+
+    pub icons_envelope: String,
+
+    pub icons_generalinfo: String,
+
+    pub icons_growth: String,
+
+    pub icons_linkadd: String,
+
+    pub icons_linkrevoke: String,
+
+    pub icons_linkupdate: String,
+
+    pub icons_notificationsettings: String,
+
+    pub icons_oauth2: String,
+
+    pub icons_roles: String,
+
+    pub icons_scheduleevent: String,
+
+    pub icons_serverinsight: String,
+
+    pub icons_startstage: String,
+
+    pub icons_swardx: String,
+
+    pub icons_threadchannel: String,
+
+    pub icons_unbanmember: String,
+
+    pub icons_updatechannel: String,
+
+    pub icons_updateemoji: String,
+
+    pub icons_updateevent: String,
+
+    pub icons_updateintegration: String,
+
+    pub icons_updatemember: String,
+
+    pub icons_updaterole: String,
+
+    pub icons_updateserver: String,
+
+    pub icons_updatestage: String,
+
+    pub icons_updatesticker: String,
+
+    pub icons_updatethread: String,
+
+    pub icons_updatewebhook: String,
+
+    pub icons_0: String,
+
+    pub icons_10: String,
+
+    pub icons_2: String,
+
+    pub icons_3: String,
+
+    pub icons_4: String,
+
+    pub icons_5: String,
+
+    pub icons_6: String,
+
+    pub icons_7: String,
+
+    pub icons_8: String,
+
+    pub icons_9: String,
+
+    pub icons_a: String,
+
+    pub icons_amogus: String,
+
+    pub icons_b: String,
+
+    pub icons_bday: String,
+
+    pub icons_book: String,
+
+    pub icons_c: String,
+
+    pub icons_d: String,
+
+    pub icons_e: String,
+
+    pub icons_f: String,
+
+    pub icons_fingerprint: String,
+
+    pub icons_g: String,
+
+    pub icons_guardian: String,
+
+    pub icons_h: String,
+
+    pub icons_he_him: String,
+
+    pub icons_i: String,
+
+    pub icons_j: String,
+
+    pub icons_k: String,
+
+    pub icons_l: String,
+
+    pub icons_library: String,
+
+    pub icons_m: String,
+
+    pub icons_n: String,
+
+    pub icons_o: String,
+
+    pub icons_p: String,
+
+    pub icons_q: String,
+
+    pub icons_r: String,
+
+    pub icons_s: String,
+
+    pub icons_she_her: String,
+
+    pub icons_statsdown: String,
+
+    pub icons_t: String,
+
+    pub icons_tada: String,
+
+    pub icons_they_them: String,
+
+    pub icons_translate: String,
+
+    pub icons_u: String,
+
+    pub icons_v: String,
+
+    pub icons_vpn: String,
+
+    pub icons_w: String,
+
+    pub icons_x: String,
+
+    pub icons_y: String,
+
+    pub icons_z: String,
+
+    pub icons_18: String,
+
+    pub icons_bigender: String,
+
+    pub icons_calender: String,
+
+    pub icons_calenderdate: String,
+
+    pub icons_cmd: String,
+
+    pub icons_discordjs: String,
+
+    pub icons_female: String,
+
+    pub icons_gay: String,
+
+    pub icons_gender: String,
+
+    pub icons_hetero: String,
+
+    pub icons_jpg: String,
+
+    pub icons_js: String,
+
+    pub icons_lesbian: String,
+
+    pub icons_male: String,
+
+    pub icons_moderationhig: String,
+
+    pub icons_moderationhighest: String,
+
+    pub icons_moderationlow: String,
+
+    pub icons_moderationmedium: String,
+
+    pub icons_moderationnone: String,
+
+    pub icons_nodejs: String,
+
+    pub icons_png: String,
+
+    pub icons_radmins: String,
+
+    pub icons_rartists: String,
+
+    pub icons_rboosters: String,
+
+    pub icons_rbots: String,
+
+    pub icons_rcamera: String,
+
+    pub icons_rdevelopers: String,
+
+    pub icons_revents: String,
+
+    pub icons_rfire: String,
+
+    pub icons_rguardians: String,
+
+    pub icons_rhelpers: String,
+
+    pub icons_rmembers: String,
+
+    pub icons_rmods: String,
+
+    pub icons_rowner: String,
+
+    pub icons_rpodcast: String,
+
+    pub icons_rsdonator: String,
+
+    pub icons_rspartner: String,
+
+    pub icons_rsstaffs: String,
+
+    pub icons_rstaff: String,
+
+    pub icons_rverification: String,
+
+    pub icons_rverified: String,
+
+    pub icons_rvip: String,
+
+    pub icons_snowflake: String,
+
+    pub icons_tiktok: String,
+
+    pub icons_transgender: String,
+
+    pub icons_twitch: String,
+
+    pub icons_vklogo: String,
+
+    pub icons_warning: String,
+
+    pub icons_wave: String,
+
+    pub icons_webp: String,
 }

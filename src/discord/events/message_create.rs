@@ -1,9 +1,11 @@
-use crate::discord::app::base::App;
-use crate::tools::automod::filter_message;
+use crate::discord::*;
+use crate::tools::*;
 use serenity::all::{Context, Message};
 
 pub async fn run(app: &App, ctx: &Context, message: &Message) {
-    if message.author.bot() { return }
+    if message.author.bot() {
+        return;
+    }
 
     filter_message(&ctx, &message).await;
 

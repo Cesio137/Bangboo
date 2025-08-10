@@ -1,4 +1,4 @@
-use crate::data::settings::EColors;
+use crate::data::*;
 use serenity::all::{
     ButtonStyle, CreateActionRow, CreateButton, CreateComponent, CreateEmbed, CreateEmbedAuthor,
     CreateSelectMenu, CreateSelectMenuKind, User, UserId,
@@ -13,7 +13,7 @@ pub fn kick_menu<'a>(
         .icon_url(user.avatar_url().unwrap_or(user.default_avatar_url()));
 
     let embed = CreateEmbed::new()
-        .color(EColors::royal as u32)
+        .color(str_hex_to_u32(&CONSTANTS.colors.royal))
         .author(embed_author)
         .title("**Officer Cui's panel**")
         .thumbnail("https://raw.githubusercontent.com/Cesio137/Bangboo/refs/heads/rust/assets/avatar/Officer.png")

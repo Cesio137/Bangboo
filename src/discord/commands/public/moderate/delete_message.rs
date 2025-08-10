@@ -1,9 +1,7 @@
-use crate::data::settings::EColors;
-use crate::menus::moderate::close::close_menu;
-use crate::menus::moderate::message_delete::message_delete_menu;
-use crate::settings::logger::error;
-use crate::utils::components::update_component;
-use crate::utils::interaction::{edit, reply, ReplyPayload};
+use crate::discord::*;
+use crate::data::*;
+use crate::menus::*;
+use crate::utils::*;
 use serenity::all::{
     CacheHttp, CommandInteraction, ComponentInteraction, ComponentInteractionCollector,
     ComponentInteractionDataKind, Context, CreateEmbed, CreateEmbedAuthor, Member, MessageFlags,
@@ -44,7 +42,7 @@ pub async fn delete_message_action(
                     .icon_url(user.avatar_url().unwrap_or(user.default_avatar_url()));
 
             let embed = CreateEmbed::new()
-                .color(EColors::royal as u32)
+                .color(str_hex_to_u32(&CONSTANTS.colors.royal))
                 .author(embed_author)
                 .title("**Officer Cui's panel**")
                 .thumbnail("https://raw.githubusercontent.com/Cesio137/Bangboo/refs/heads/rust/assets/avatar/Officer.png")
@@ -87,7 +85,7 @@ pub async fn delete_message_action(
         .icon_url(user.avatar_url().unwrap_or(user.default_avatar_url()));
 
     let embed = CreateEmbed::new()
-        .color(EColors::royal as u32)
+        .color(str_hex_to_u32(&CONSTANTS.colors.royal))
         .author(embed_author)
         .title("**Officer Cui's panel**")
         .thumbnail("https://raw.githubusercontent.com/Cesio137/Bangboo/refs/heads/rust/assets/avatar/Officer.png")

@@ -1,9 +1,9 @@
-use crate::settings::logger::error;
 use serenity::all::{
     CacheHttp, ComponentInteraction, Context, CreateInputText, CreateInteractionResponse,
     CreateQuickModal, InputTextStyle, QuickModal,
 };
 use std::time::{Duration, SystemTime};
+use crate::discord::base::error;
 
 pub async fn show_modal(
     ctx: &Context,

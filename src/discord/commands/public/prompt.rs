@@ -1,15 +1,13 @@
-use crate::data::settings::EColors;
-use crate::discord::app::base::App;
-use crate::discord::app::creators::SlashCommandHandler;
-use crate::settings::logger::error;
-use crate::tools::gemini::get_text;
-use crate::utils::interaction::{followup, followup_with_embed, ReplyPayload};
+use crate::discord::*;
+use crate::tools::*;
+use crate::utils::*;
 use serenity::all::{
     CacheHttp, CommandInteraction, CommandOptionType, CommandType, Context, CreateCommand,
     CreateCommandOption, CreateEmbed, InteractionContext, MessageFlags,
 };
 use serenity::async_trait;
 use std::collections::VecDeque;
+use crate::data::{str_hex_to_u32, CONSTANTS};
 
 pub struct Prompt;
 
@@ -38,7 +36,7 @@ impl SlashCommandHandler for Prompt {
                     ctx,
                     interaction,
                     MessageFlags::EPHEMERAL,
-                    EColors::danger,
+                    str_hex_to_u32(&CONSTANTS.colors.danger),
                     "Failed to get gemini response.",
                 )
                 .await;
@@ -58,7 +56,7 @@ impl SlashCommandHandler for Prompt {
         }
 
         let embed = CreateEmbed::new()
-            .color(EColors::green as u32)
+            .color(str_hex_to_u32(&CONSTANTS.colors.green))
             .description(texts.pop_front().unwrap_or_default());
         let payload = ReplyPayload {
             embeds: Some(vec![embed]),
@@ -68,7 +66,7 @@ impl SlashCommandHandler for Prompt {
 
         while texts.len() > 0 {
             let embed = CreateEmbed::new()
-                .color(EColors::green as u32)
+                .color(str_hex_to_u32(&CONSTANTS.colors.green))
                 .description(texts.pop_front().unwrap_or_default());
             let payload = ReplyPayload {
                 embeds: Some(vec![embed]),

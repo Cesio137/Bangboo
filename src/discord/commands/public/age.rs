@@ -1,13 +1,8 @@
-use crate::data::settings::EColors;
-use crate::discord::app::base::App;
-use crate::discord::app::creators::SlashCommandHandler;
-use crate::utils::interaction::reply_with_embed;
+use crate::data::*;
+use crate::discord::*;
+use crate::utils::*;
 use async_trait::async_trait;
-use serenity::all::{
-    CommandInteraction, CommandOptionType, CommandType, Context, CreateCommand, InteractionContext,
-    MessageFlags,
-};
-use serenity::builder::CreateCommandOption;
+use serenity::all::{CommandInteraction, CommandOptionType, CommandType, Context, CreateCommand, CreateCommandOption, InteractionContext, MessageFlags};
 
 pub struct Age;
 
@@ -38,7 +33,7 @@ impl SlashCommandHandler for Age {
                     &ctx,
                     &interaction,
                     MessageFlags::empty(),
-                    EColors::danger,
+                    str_hex_to_u32(&CONSTANTS.colors.danger),
                     "Guild id not found.",
                 )
                 .await;
@@ -51,7 +46,7 @@ impl SlashCommandHandler for Age {
                 &ctx,
                 &interaction,
                 MessageFlags::empty(),
-                EColors::danger,
+                str_hex_to_u32(&CONSTANTS.colors.danger),
                 "Failed to fetch guild data.",
             )
             .await;
@@ -85,7 +80,7 @@ impl SlashCommandHandler for Age {
             &ctx,
             &interaction,
             MessageFlags::empty(),
-            EColors::green,
+            str_hex_to_u32(&CONSTANTS.colors.green),
             &age,
         )
         .await;

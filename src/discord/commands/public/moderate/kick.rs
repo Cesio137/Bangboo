@@ -1,12 +1,7 @@
-use crate::data::settings::EColors;
-use crate::discord::commands::public::moderate::filter::filter_users;
-use crate::discord::commands::public::moderate::modal::show_modal;
-use crate::menus::moderate::close::close_menu;
-use crate::menus::moderate::kick::kick_menu;
-use crate::menus::moderate::load::load_menu;
-use crate::settings::logger::error;
-use crate::utils::components::{edit_component, update_component};
-use crate::utils::interaction::{edit, reply, reply_with_embed, ReplyPayload};
+use crate::discord::*;
+use crate::data::*;
+use crate::menus::*;
+use crate::utils::*;
 use serenity::all::{
     CacheHttp, CommandInteraction, ComponentInteraction, ComponentInteractionCollector,
     ComponentInteractionDataKind, Context, CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter,
@@ -14,6 +9,8 @@ use serenity::all::{
 };
 use serenity::futures::StreamExt;
 use std::time::{Duration, SystemTime};
+use crate::discord::public::moderate::filter::filter_users;
+use crate::discord::public::moderate::modal::show_modal;
 
 pub async fn kick_action(
     ctx: &Context,
@@ -55,7 +52,7 @@ pub async fn kick_action(
     let embed_footer = CreateEmbedFooter::new(footer);
 
     let embed = CreateEmbed::new()
-        .color(EColors::royal as u32)
+        .color(str_hex_to_u32(&CONSTANTS.colors.royal))
         .author(embed_author)
         .title("**Officer Cui's panel**")
         .thumbnail("https://raw.githubusercontent.com/Cesio137/Bangboo/refs/heads/rust/assets/avatar/Officer.png")
@@ -78,7 +75,7 @@ pub async fn kick_collector(ctx: &Context, interaction: &CommandInteraction, mem
                 &ctx,
                 &interaction,
                 MessageFlags::EPHEMERAL,
-                EColors::danger,
+                str_hex_to_u32(&CONSTANTS.colors.danger),
                 "Guild id is none.",
             )
             .await;
@@ -102,7 +99,7 @@ pub async fn kick_collector(ctx: &Context, interaction: &CommandInteraction, mem
                 ctx,
                 interaction,
                 MessageFlags::EPHEMERAL,
-                EColors::danger,
+                str_hex_to_u32(&CONSTANTS.colors.danger),
                 "No message ID.",
             )
             .await;

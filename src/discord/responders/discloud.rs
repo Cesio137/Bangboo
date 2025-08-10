@@ -1,13 +1,13 @@
-use crate::data::emojis::EStatic;
-use crate::data::settings::EColors;
-use crate::discord::app::creators::ResponderHandler;
-use crate::menus::components::discloud::{logs_component, status_component};
-use crate::settings::logger::error;
-use crate::tools::discloud::{APPID, ASCII_REGEX, DISCLOUD};
-use crate::utils::components::{edit_component, update_component};
-use crate::utils::interaction::ReplyPayload;
+use crate::discord::*;
+use crate::data::*;
+use crate::menus::*;
+use crate::tools::*;
+use crate::utils::*;
 use async_trait::async_trait;
-use serenity::all::{CacheHttp, Colour, ComponentInteraction, Context, CreateEmbed, EmojiId, MessageFlags, Timestamp};
+use serenity::all::{
+    CacheHttp, Colour, ComponentInteraction, Context, CreateEmbed, MessageFlags, Timestamp,
+};
+
 
 pub struct Status;
 
@@ -24,15 +24,15 @@ impl ResponderHandler for Status {
             Ok(apps) => apps.clone(),
             Err(err) => {
                 let embed = CreateEmbed::new()
-                    .color(Colour::new(EColors::danger as u32))
-                    .description("Failed to fetch app.");
+                    .color(Colour::new(str_hex_to_u32(&CONSTANTS.colors.danger)))
+                    .description("Failed to fetch base.");
                 let payload = ReplyPayload {
                     embeds: Some(vec![embed]),
                     components: Some(vec![]),
                     ..Default::default()
                 };
                 update_component(ctx, interaction, MessageFlags::EPHEMERAL, &payload).await;
-                error(&format!("Failed to fetch app.\n└ {:?}", err));
+                error(&format!("Failed to fetch base.\n└ {:?}", err));
                 return;
             }
         };
@@ -41,45 +41,47 @@ impl ResponderHandler for Status {
             Ok(status) => status,
             Err(err) => {
                 let embed = CreateEmbed::new()
-                    .color(Colour::new(EColors::danger as u32))
-                    .description("Failed to fetch app status.");
+                    .color(Colour::new(str_hex_to_u32(&CONSTANTS.colors.danger)))
+                    .description("Failed to fetch base status.");
                 let payload = ReplyPayload {
                     embeds: Some(vec![embed]),
                     components: Some(vec![]),
                     ..Default::default()
                 };
                 edit_component(ctx, interaction, MessageFlags::EPHEMERAL, &payload).await;
-                error(&format!("Failed to fetch app status.\n└ {:?}", err));
+                error(&format!("Failed to fetch base status.\n└ {:?}", err));
                 return;
             }
         };
         let mut infos = Vec::new();
         infos.push(format!(
-            "<:icons_id:{}>`Nome(ID):` **{}({})**",
-            EmojiId::from(EStatic::icons_id as u64),
+            "<:id:{}>`Nome(ID):` **{}({})**",
+            &EMOJIS.emojis_static.id,
             app.name,
             app.id
         ));
         infos.push(format!(
             "<:cpu:{}>`CPU:` **{}**",
-            EmojiId::from(EStatic::cpu as u64).to_string(),
+            &EMOJIS.emojis_static.cpu,
             status.cpu
         ));
         infos.push(format!(
             "<:ram:{}>`RAM:` **{}**",
-            EmojiId::from(EStatic::ram as u64).to_string(),
+            &EMOJIS.emojis_static.ram,
             status.memory
         ));
         infos.push(format!(
             "<:wifi:{}>`Network:`  `⬆`**{}** `⬇`**{}**",
-            EmojiId::from(EStatic::wifi as u64).to_string(),
+            &EMOJIS.emojis_static.wifi,
             status.net_io.up,
             status.net_io.down
         ));
         infos.push(format!(
             "<:refresh:{}>`Latest restart:` **<t:{}:R>**",
-            EmojiId::from(EStatic::refresh as u64).to_string(),
-            Timestamp::parse(&status.started_at).unwrap_or_default().timestamp()
+            &EMOJIS.emojis_static.refresh,
+            Timestamp::parse(&status.started_at)
+                .unwrap_or_default()
+                .timestamp()
         ));
 
         let component = status_component(infos);
@@ -113,15 +115,15 @@ impl ResponderHandler for Logs {
             Ok(apps) => apps.clone(),
             Err(err) => {
                 let embed = CreateEmbed::new()
-                    .color(Colour::new(EColors::danger as u32))
-                    .description("Failed to fetch app logs.");
+                    .color(Colour::new(str_hex_to_u32(&CONSTANTS.colors.danger)))
+                    .description("Failed to fetch base logs.");
                 let payload = ReplyPayload {
                     embeds: Some(vec![embed]),
                     components: Some(vec![]),
                     ..Default::default()
                 };
                 edit_component(ctx, interaction, MessageFlags::EPHEMERAL, &payload).await;
-                error(&format!("Failed to fetch app logs.\n└ {:?}", err));
+                error(&format!("Failed to fetch base logs.\n└ {:?}", err));
                 return;
             }
         };

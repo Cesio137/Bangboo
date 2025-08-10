@@ -1,13 +1,13 @@
-use crate::data::emojis::EStatic;
-use crate::data::settings::EColors;
-use crate::discord::app::base::App;
-use crate::discord::app::creators::SlashCommandHandler;
-use crate::menus::components::discloud::{logs_component, status_component};
-use crate::settings::logger::error;
-use crate::tools::discloud::{APPID, ASCII_REGEX, DISCLOUD};
-use crate::utils::interaction::{followup, followup_with_embed, ReplyPayload};
+use crate::discord::*;
+use crate::menus::*;
+use crate::tools::*;
+use crate::utils::*;
 use async_trait::async_trait;
-use serenity::all::{CacheHttp, CommandInteraction, CommandOptionType, CommandType, Context, CreateCommand, CreateCommandOption, EmojiId, InteractionContext, MessageFlags, Timestamp};
+use serenity::all::{
+    CacheHttp, CommandInteraction, CommandOptionType, CommandType, Context, CreateCommand,
+    CreateCommandOption, EmojiId, InteractionContext, MessageFlags, Timestamp,
+};
+use crate::data::{str_hex_to_u32, str_to_u64, CONSTANTS, EMOJIS};
 
 pub struct Discloud;
 
@@ -49,11 +49,11 @@ async fn status(ctx: &Context, interaction: &CommandInteraction) {
                 ctx,
                 interaction,
                 MessageFlags::EPHEMERAL,
-                EColors::danger,
-                "Failed to fetch app.",
+                str_hex_to_u32(&CONSTANTS.colors.danger),
+                "Failed to fetch base.",
             )
             .await;
-            error(&format!("Failed to fetch app.\n└ {:?}", err));
+            error(&format!("Failed to fetch base.\n└ {:?}", err));
             return;
         }
     };
@@ -65,41 +65,43 @@ async fn status(ctx: &Context, interaction: &CommandInteraction) {
                 ctx,
                 interaction,
                 MessageFlags::EPHEMERAL,
-                EColors::danger,
-                "Failed to fetch app status.",
+                str_hex_to_u32(&CONSTANTS.colors.danger),
+                "Failed to fetch base status.",
             )
             .await;
-            error(&format!("Failed to fetch app status.\n└ {:?}", err));
+            error(&format!("Failed to fetch base status.\n└ {:?}", err));
             return;
         }
     };
     let mut infos = Vec::new();
     infos.push(format!(
-        "<:icons_id:{}>`Nome(ID):` **{}({})**",
-        EmojiId::from(EStatic::icons_id as u64),
+        "<:id:{}>`Nome(ID):` **{}({})**",
+        &EMOJIS.emojis_static.id,
         app.name,
         app.id
     ));
     infos.push(format!(
         "<:cpu:{}>`CPU:` **{}**",
-        EmojiId::from(EStatic::cpu as u64).to_string(),
+        &EMOJIS.emojis_static.cpu,
         status.cpu
     ));
     infos.push(format!(
         "<:ram:{}>`RAM:` **{}**",
-        EmojiId::from(EStatic::ram as u64).to_string(),
+        &EMOJIS.emojis_static.ram,
         status.memory
     ));
     infos.push(format!(
         "<:wifi:{}>`Network:`  `⬆`**{}** `⬇`**{}**",
-        EmojiId::from(EStatic::wifi as u64).to_string(),
+        &EMOJIS.emojis_static.wifi,
         status.net_io.up,
         status.net_io.down
     ));
     infos.push(format!(
         "<:refresh:{}>`Latest restart:` **<t:{}:R>**",
-        EmojiId::from(EStatic::refresh as u64).to_string(),
-        Timestamp::parse(&status.started_at).unwrap_or_default().timestamp()
+        &EMOJIS.emojis_static.refresh,
+        Timestamp::parse(&status.started_at)
+            .unwrap_or_default()
+            .timestamp()
     ));
 
     let component = status_component(infos);
@@ -124,11 +126,11 @@ async fn logs(ctx: &Context, interaction: &CommandInteraction) {
                 ctx,
                 interaction,
                 MessageFlags::EPHEMERAL,
-                EColors::danger,
-                "Failed to fetch app.",
+                str_hex_to_u32(&CONSTANTS.colors.danger),
+                "Failed to fetch base.",
             )
             .await;
-            error(&format!("Failed to fetch app.\n└ {:?}", err));
+            error(&format!("Failed to fetch base.\n└ {:?}", err));
             return;
         }
     };
@@ -140,11 +142,11 @@ async fn logs(ctx: &Context, interaction: &CommandInteraction) {
                 ctx,
                 interaction,
                 MessageFlags::EPHEMERAL,
-                EColors::danger,
-                "Failed to fetch app logs.",
+                str_hex_to_u32(&CONSTANTS.colors.danger),
+                "Failed to fetch base logs.",
             )
             .await;
-            error(&format!("Failed to fetch app logs.\n└ {:?}", err));
+            error(&format!("Failed to fetch base logs.\n└ {:?}", err));
             return;
         }
     };

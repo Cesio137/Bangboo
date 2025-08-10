@@ -1,36 +1,34 @@
-#[derive(Debug)]
-pub struct ProductInfo {
-    pub product_name: &'static str,
-    pub product_desc: &'static str,
-    pub thumb_link: &'static str,
-    pub product_url: &'static str,
-    pub doc_url: &'static str,
+// Example code that deserializes and serializes the model.
+// extern crate serde;
+// #[macro_use]
+// extern crate serde_derive;
+// extern crate serde_json;
+//
+// use generated_module::fab;
+//
+// fn main() {
+//     let json = r#"{"answer": 42}"#;
+//     let model: fab = serde_json::from_str(&json).unwrap();
+// }
+
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize)]
+pub struct Fab {
+    pub engine_user_setings: ProductInfos,
+
+    pub internet_protocol: ProductInfos,
 }
 
+#[derive(Serialize, Deserialize)]
+pub struct ProductInfos {
+    pub product_name: String,
 
-#[derive(Debug)]
-pub enum EProduct {
-    engine_user_setings,
-    internet_protocol,
-}
+    pub product_desc: String,
 
-impl EProduct {
-    pub fn info(&self) -> ProductInfo {
-        match self {
-            EProduct::engine_user_setings => ProductInfo {
-                product_name: "Engine User Settings",
-                product_desc: "A plugin for Unreal Engine that allows you to customize various settings and features of the engine in game/runtime.",
-                thumb_link: "https://media.fab.com/image_previews/gallery_images/a919656d-4343-4901-880b-2367c5950e5c/37810b03-f4af-461b-9767-5fa0d284390c.jpg",
-                product_url: "https://www.fab.com/listings/a3e48cd3-8b06-4121-8e97-0d17b60aca05",
-                doc_url: "https://engine-user-settings-documentation.vercel.app/",
-            },
-            EProduct::internet_protocol => ProductInfo {
-                product_name: "Internet Protocol",
-                product_desc: "A plugin that exposes UDP, TCP, HTTP, Websocket, and Json modules to the blueprint.",
-                thumb_link: "https://media.fab.com/image_previews/gallery_images/3cfc2dd1-9f7f-415d-b497-c61dc4f4da31/ca7b3fd8-b3ce-4300-89d3-7ff22f99fced.jpg",
-                product_url: "https://www.fab.com/listings/4eb6260b-19ea-4629-a653-250ea1777b8d",
-                doc_url: "https://internet-protocol-documentation.vercel.app/",
-            },
-        }
-    }
+    pub thumb_link: String,
+
+    pub product_url: String,
+
+    pub doc_url: String,
 }

@@ -1,13 +1,37 @@
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[repr(u64)]
-pub enum EChannels {
-    announcement = 1273056464705032304,
+// Example code that deserializes and serializes the model.
+// extern crate serde;
+// #[macro_use]
+// extern crate serde_derive;
+// extern crate serde_json;
+//
+// use generated_module::guild;
+//
+// fn main() {
+//     let json = r#"{"answer": 42}"#;
+//     let model: guild = serde_json::from_str(&json).unwrap();
+// }
+
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize)]
+pub struct Guild {
+    pub channels: Channels,
+
+    pub roles: Roles,
 }
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[repr(u64)]
-pub enum ERoles {
-    apps = 1287814349372653660,
-    boosters = 1370417775465467924,
-    kernel = 1254151838287138887,
-    stf = 1254154469428691035,
+
+#[derive(Serialize, Deserialize)]
+pub struct Channels {
+    pub announcement: String,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct Roles {
+    pub apps: String,
+
+    pub kernel: String,
+
+    pub stf: String,
+
+    pub boosters: String,
 }

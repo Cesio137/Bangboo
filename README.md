@@ -6,6 +6,32 @@ Hi, I’m @NathanMiguel, and I’m developing a bot to help me moderate my commu
 
 This project is currently for my personal use, but I hope to monetize it in the future. 😄
 
+## Download and Install
+
+---
+
+- [Git](https://git-scm.com)
+
+- [Rust](https://www.rust-lang.org/)
+
+- [NodeJS LTS (optional for quicktype)](https://nodejs.org/pt/download)
+
+- Windows only
+    - Build With Visual Studio 2022
+        - [Visual Studio 2022](https://visualstudio.microsoft.com/downloads/)
+        - 👇 Install the following workloads:
+        - Game Development with C++
+        - MSVC v142 or above | x64/x86
+        - C++ 2015/2022 redistributable update
+
+- Linux only
+    - Build With GNU ```install with package manager```
+        - GCC and G++ 9.x or above
+        - make
+        - m4
+        - autoconf
+        - automake
+
 ## Scripts
 
 - `cargo run`: running bot

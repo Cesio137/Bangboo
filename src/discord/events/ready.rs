@@ -1,8 +1,7 @@
-use crate::discord::app::base::App;
+use crate::discord::*;
 use colored::Colorize;
 use serenity::all::{ActivityData, Context, Ready};
 use serenity::model::application::Command;
-use crate::settings::logger::{colored_log, error};
 
 pub async fn run(app: &App, ctx: &Context, ready: &Ready) {
     colored_log(format!("● {} online ✓", ready.user.name.underline()).bright_green());
@@ -11,16 +10,33 @@ pub async fn run(app: &App, ctx: &Context, ready: &Ready) {
     match result {
         Ok(commands) => {
             commands_len = commands.len();
-            colored_log(format!("└ {} command(s) successfully registered globally!", commands_len).bright_green());
+            colored_log(
+                format!(
+                    "└ {} command(s) successfully registered globally!",
+                    commands_len
+                )
+                .bright_green(),
+            );
             for command in commands {
-                colored_log(format!("{{/}} Slash command > {} ✓", command.name.bright_blue()).bright_green());
+                colored_log(
+                    format!("{{/}} Slash command > {} ✓", command.name.bright_blue())
+                        .bright_green(),
+                );
             }
         }
         Err(err) => {
-            colored_log(format!("└ {} command(s) successfully registered globally!", commands_len).bright_red());
+            colored_log(
+                format!(
+                    "└ {} command(s) successfully registered globally!",
+                    commands_len
+                )
+                .bright_red(),
+            );
             error(&format!("{:?}", err));
         }
     }
 
-    ctx.set_activity(Some(ActivityData::custom("Rust-powered app. Memory safety without sacrifice. Performance without compromise.")));
+    ctx.set_activity(Some(ActivityData::custom(
+        "Rust-powered base. Memory safety without sacrifice. Performance without compromise.",
+    )));
 }

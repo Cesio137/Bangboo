@@ -1,10 +1,9 @@
-use crate::data::settings::EColors;
-use crate::settings::logger::error;
 use serenity::all::{
     CacheHttp, CommandInteraction, Context, CreateAttachment, CreateComponent, CreateEmbed,
     CreateInteractionResponse, CreateInteractionResponseFollowup, CreateInteractionResponseMessage,
     EditAttachments, EditInteractionResponse, MessageFlags,
 };
+use crate::discord::*;
 
 #[derive(Debug, Clone)]
 pub struct ReplyPayload<'a> {
@@ -186,10 +185,10 @@ pub async fn reply_with_embed(
     ctx: &Context,
     interaction: &CommandInteraction,
     flags: MessageFlags,
-    color: EColors,
+    color: u32,
     content: &str,
 ) -> bool {
-    let embed = CreateEmbed::new().color(color as u32).description(content);
+    let embed = CreateEmbed::new().color(color).description(content);
 
     let res_message = CreateInteractionResponseMessage::new()
         .embed(embed)
@@ -214,10 +213,10 @@ pub async fn update_with_embed(
     ctx: &Context,
     interaction: &CommandInteraction,
     flags: MessageFlags,
-    color: EColors,
+    color: u32,
     content: &str,
 ) -> bool {
-    let embed = CreateEmbed::new().color(color as u32).description(content);
+    let embed = CreateEmbed::new().color(color).description(content);
 
     let res_message = CreateInteractionResponseMessage::new()
         .embed(embed)
@@ -246,10 +245,10 @@ pub async fn followup_with_embed(
     ctx: &Context,
     interaction: &CommandInteraction,
     flags: MessageFlags,
-    color: EColors,
+    color: u32,
     content: &str,
 ) -> bool {
-    let embed = CreateEmbed::new().color(color as u32).description(content);
+    let embed = CreateEmbed::new().color(color).description(content);
 
     let res_followup = CreateInteractionResponseFollowup::new()
         .embed(embed)

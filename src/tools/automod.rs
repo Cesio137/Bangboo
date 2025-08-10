@@ -1,5 +1,5 @@
-use crate::data::settings::EColors;
-use crate::settings::logger::error;
+use crate::discord::*;
+use crate::data::*;
 use once_cell::sync::Lazy;
 use regex::Regex;
 use serenity::all::{CacheHttp, Context, CreateEmbed, CreateMessage, Message};
@@ -25,7 +25,7 @@ pub async fn filter_message(ctx: &Context, message: &Message) -> bool {
     );
 
     let server_embed = CreateEmbed::new()
-        .color(EColors::warning as u32)
+        .color(str_hex_to_u32(&CONSTANTS.colors.warning))
         .description(warning);
     if let Err(err) = channel_id
         .send_message(ctx.http(), CreateMessage::new().embed(server_embed))
@@ -65,7 +65,8 @@ pub async fn filter_message(ctx: &Context, message: &Message) -> bool {
             message.author.id,
             Some("Sent a message that was flagged as a scam."),
         )
-        .await.is_err()
+        .await
+        .is_err()
     {
         error("Failed to kick the owner of the scam message.");
         return true;
@@ -81,7 +82,7 @@ pub async fn filter_message(ctx: &Context, message: &Message) -> bool {
 
     let dm_warning = "It look like you probably got hacked and sent a message that was flagged as scam containing ***[text](hyperlink)***. You were just kicked from the server, but feel free to come back as soon as you resolve the issue with your account.";
     let dm_embed = CreateEmbed::new()
-        .color(EColors::warning as u32)
+        .color(str_hex_to_u32(&CONSTANTS.colors.warning))
         .description(dm_warning);
 
     if let Err(err) = private_channel

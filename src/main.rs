@@ -1,16 +1,17 @@
-mod data;
-mod discord;
+pub mod discord;
 mod menus;
 mod settings;
 mod tools;
 mod utils;
-
+mod env;
+mod assets;
+mod data;
 
 #[cfg(target_env = "gnu")]
 use settings::malloc::malloc::configure_malloc;
 
 use serenity::{all::GatewayIntents};
-use crate::discord::app::bootstrap;
+use crate::discord::base::bootstrap;
 
 #[tokio::main]
 async fn main() {

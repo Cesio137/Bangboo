@@ -1,6 +1,6 @@
 mod discloud;
 
-use crate::discord::app::creators::ResponderHandler;
+use crate::discord::base::creators::ResponderHandler;
 
 pub fn responders() -> Vec<Box<dyn ResponderHandler + Send + Sync>> {
     let responders: Vec<Box<dyn ResponderHandler + Send + Sync>> =

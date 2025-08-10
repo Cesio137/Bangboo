@@ -1,4 +1,4 @@
-use crate::data::guild::ERoles;
+use crate::data::*;
 use serenity::all::{CacheHttp, Context, GuildId, RoleId, UserId};
 
 pub async fn filter_users(ctx: &Context, guild_id: &GuildId, ids: Vec<UserId>) -> Vec<UserId> {
@@ -9,8 +9,8 @@ pub async fn filter_users(ctx: &Context, guild_id: &GuildId, ids: Vec<UserId>) -
             if member.user.bot() {
                 continue;
             }
-            if member.roles.contains(&RoleId::new(ERoles::stf as u64))
-                || member.roles.contains(&RoleId::new(ERoles::kernel as u64))
+            if member.roles.contains(&RoleId::new(str_to_u64(&GUILD.roles.stf)))
+                || member.roles.contains(&RoleId::new(str_to_u64(&GUILD.roles.kernel)))
             {
                 continue;
             }

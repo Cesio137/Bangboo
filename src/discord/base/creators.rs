@@ -1,4 +1,4 @@
-use crate::discord::app::base::App;
+use crate::discord::base::*;
 use async_trait::async_trait;
 use serenity::all::{CommandInteraction, ComponentInteraction, Context, Message};
 use serenity::builder::CreateCommand;

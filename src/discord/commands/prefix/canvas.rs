@@ -1,8 +1,7 @@
+use crate::discord::*;
+use crate::utils::*;
 use async_trait::async_trait;
 use serenity::all::{Context, Message};
-use crate::discord::app::base::App;
-use crate::discord::app::creators::PrefixCommandHandler;
-use crate::utils::global::{global_message, EventType};
 
 pub struct Canvas;
 
@@ -15,6 +14,13 @@ impl PrefixCommandHandler for Canvas {
     async fn run(&self, app: &App, ctx: &Context, message: &Message) {
         let member = message.member(&ctx.http).await.unwrap();
         let user = member.user.clone();
-        global_message(&ctx, &message.channel_id.expect_channel(), EventType::MemberAdd, Some(&member), &user).await;
+        global_message(
+            &ctx,
+            &message.channel_id.expect_channel(),
+            EventType::MemberAdd,
+            Some(&member),
+            &user,
+        )
+        .await;
     }
 }

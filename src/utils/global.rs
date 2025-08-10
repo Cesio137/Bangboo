@@ -1,13 +1,7 @@
-use super::skia::{draw_circle, draw_text_with_font, resize_image};
-use crate::data::emojis::EAnimated;
-use crate::data::guild::{EChannels, ERoles};
-use crate::data::settings::EColors;
-use crate::settings::assets::{
-    CARD_BACK, CARD_LEFT, CARD_MOD, CARD_NEW, FONT_FREDOKA, FONT_ROBOTO, IMG_DEFAULT_AVATAR,
-};
-use crate::settings::logger::error;
-use crate::utils::cdn::display_avatar_url;
-use crate::utils::skia::load_image_from_bytes;
+use crate::discord::*;
+use crate::utils::*;
+use crate::data::*;
+use crate::assets::*;
 use serenity::all::{
     CacheHttp, ChannelId, Colour, Context, CreateAttachment, CreateEmbed, CreateEmbedAuthor,
     CreateMessage, GuildId, Member, User,
@@ -48,15 +42,19 @@ pub async fn global_message(
 
     let background = match event {
         EventType::MemberAdd => {
-            let now = SystemTime::now();
-            let duration = now
-                .duration_since(UNIX_EPOCH)
-                .expect("Time went backwards!");
-            let joined_at = member.unwrap().joined_at.unwrap().timestamp_millis();
-            let account_age =
-                duration.as_millis() - user.id.created_at().timestamp_millis() as u128;
-            const TIME_LIMIT: u16 = 60 * 1000;
-            if joined_at < TIME_LIMIT as i64 && account_age > TIME_LIMIT as u128 {
+            let date = match SystemTime::now().duration_since(UNIX_EPOCH) {
+                Ok(duration) => duration.as_millis(),
+                Err(_) => 0,
+            };
+            let join_age = match member.unwrap().joined_at {
+                Some(joined_at) => date - joined_at.timestamp_millis() as u128,
+                None => 0,
+            };
+            let account_age = date - user.id.created_at().timestamp_millis() as u128;
+            const TIME_LIMIT: u128 = 300 * 1000;
+            if join_age < TIME_LIMIT {
+                CARD_NEW
+            } else if account_age < TIME_LIMIT {
                 CARD_NEW
             } else {
                 CARD_BACK
@@ -156,14 +154,12 @@ pub async fn global_message(
 }
 
 pub async fn global_boost(ctx: &Context, user: &User, guild_id: &GuildId) {
-    let color = Colour::new(EColors::nitro as u32);
+    let color = Colour::new(str_hex_to_u32(&CONSTANTS.colors.nitro));
     let avatar_url = user.avatar_url().unwrap_or_default();
     let username = user.global_name.clone().unwrap_or(user.name.clone());
     let description = format!(
         "**<a:boost:{}> <@${}> became a <@&${}>**\n\n🚀 Thanks for boosting the server!",
-        EAnimated::boost as u64,
-        user.id,
-        ERoles::boosters as u64
+        &EMOJIS.animated.boost, user.id, &GUILD.roles.boosters
     );
 
     let author = CreateEmbedAuthor::new(username.as_str()).icon_url(&avatar_url);
@@ -175,7 +171,7 @@ pub async fn global_boost(ctx: &Context, user: &User, guild_id: &GuildId) {
 
     let channel = match guild_id.channels(ctx.http()).await {
         Ok(channels) => {
-            let id = ChannelId::new(EChannels::announcement as u64);
+            let id = ChannelId::new(str_to_u64(&GUILD.channels.announcement));
             if let Some(channel) = channels.get(&id).cloned() {
                 channel
             } else {

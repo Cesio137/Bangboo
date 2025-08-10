@@ -1,4 +1,6 @@
-use crate::{data::guild::ERoles, settings::logger::error, utils::global::global_boost};
+use crate::discord::*;
+use crate::data::*;
+use crate::utils::*;
 use serenity::all::{CacheHttp, Context, GuildMemberUpdateEvent, Member, RoleId};
 
 pub async fn run(
@@ -23,7 +25,7 @@ pub async fn run(
     };
 
     let member = new.as_ref().unwrap().clone();
-    let role_id = RoleId::new(ERoles::boosters as u64);
+    let role_id = RoleId::new(str_to_u64(&GUILD.roles.boosters));
     if !old_was_premium && new_was_premium {
         if let Err(err) = member
             .add_role(ctx.http(), role_id, Some("Became a booster!"))

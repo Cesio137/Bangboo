@@ -1,11 +1,12 @@
-use crate::discord::app::base::App;
-use crate::settings::logger::error;
-use crate::utils::global::{global_message, EventType};
+use crate::discord::*;
+use crate::utils::*;
 use serenity::all::{Context, Member};
 
 pub async fn run(app: &App, ctx: &Context, member_added: &Member) {
-    if member_added.user.bot() { return }
-    
+    if member_added.user.bot() {
+        return;
+    }
+
     let guild = match member_added.guild_id.to_guild_cached(&ctx.cache) {
         Some(guild) => guild.clone(),
         None => {
@@ -23,7 +24,7 @@ pub async fn run(app: &App, ctx: &Context, member_added: &Member) {
     };
 
     let user = member_added.user.clone();
-    
+
     global_message(
         &ctx,
         &system_channel_id,

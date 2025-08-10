@@ -1,9 +1,12 @@
 pub mod base;
 pub mod creators;
+pub mod loggers;
 
-use crate::discord::app::base::App;
-use crate::settings::env::ENV_SCHEMA;
-use crate::settings::logger::error;
+pub use base::*;
+pub use creators::*;
+pub use loggers::*;
+
+use crate::env::ENV;
 use serenity::all::{GatewayIntents, Token};
 use serenity::Client;
 use std::str::FromStr;
@@ -11,7 +14,7 @@ use std::str::FromStr;
 pub async fn bootstrap(intents: GatewayIntents) {
     let app = App::new();
 
-    let token = match Token::from_str(&ENV_SCHEMA.bot_token) {
+    let token = match Token::from_str(&ENV.BOT_TOKEN) {
         Ok(token) => token,
         Err(err) => {
             error(&format!("Token error.\n{:?}", err));
