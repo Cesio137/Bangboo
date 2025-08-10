@@ -19,11 +19,14 @@ export async function globalMessage( event: Events, member: GuildMember | Partia
         const { joinedTimestamp } = member;
         const accountAge = Date.now() - user.createdTimestamp;
         const joinAge = Date.now() - (joinedTimestamp || 0);
-        const timeLimit = 60 * 1000;
-        bgpath =
-            joinAge < timeLimit && accountAge > timeLimit
-                ? join(bgpath, "card-new-member.png")
-                : join(bgpath, "card-back-to-server.png");
+        const timeLimit = 300 * 1000;
+        if (joinAge < timeLimit) {
+            bgpath = join(bgpath, "card-new-member.png");
+        } else if (accountAge < timeLimit) {
+            bgpath = join(bgpath, "card-new-member.png");
+        } else {
+            bgpath = join(bgpath, "card-back-to-server.png");
+        }
     } else {
         bgpath = join(bgpath, event === Events.GuildMemberRemove ? "card-left.png" : "card-mod.png");
     }
