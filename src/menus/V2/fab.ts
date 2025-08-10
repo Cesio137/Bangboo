@@ -1,11 +1,9 @@
-import { icon, products } from "#functions";
-import { settings } from "#settings";
 import { createContainer, createLinkButton, createRow, createSeparator, createTextDisplay } from "@magicyan/discord";
 import { ContainerBuilder, MessageActionRowComponentBuilder } from "discord.js";
 
 export function fabComponent(): ContainerBuilder {
     return createContainer({
-        accentColor: settings.colors.green,
+        accentColor: constants.colors.green,
         components: [
             createTextDisplay("### CHECK OUT MY FAB PRODUCTS", 0),
             createSeparator(false, true),
@@ -13,33 +11,33 @@ export function fabComponent(): ContainerBuilder {
                 [
                     createLinkButton({
                         label: "Engine User Settings",
-                        emoji: icon.icons_f,
-                        url: products["engine-user-setings"]["product-url"]
+                        emoji: emojis.static.icons_f,
+                        url: fab.engine_user_setings.product_url
                     }),
                     createLinkButton({
                         label: "Documentation",
-                        emoji: icon.icons_d,
-                        url: products["engine-user-setings"]["doc-url"]
+                        emoji: emojis.static.icons_d,
+                        url: fab.engine_user_setings.doc_url
                     })
                 ]
             ),
-            createTextDisplay(`${products["engine-user-setings"]["product-desc"]}`, 0),
+            createTextDisplay(`${fab.engine_user_setings.product_desc}`, 0),
             createSeparator(false, true),
             createRow<MessageActionRowComponentBuilder>().addComponents(
                 [
                     createLinkButton({
                         label: "Internet Protocol",
-                        emoji: icon.icons_f,
-                        url: products["internet-protocol"]["product-url"]
+                        emoji: emojis.static.icons_f,
+                        url: fab.internet_protocol.product_url
                     }),
                     createLinkButton({
                         label: "Documentation",
-                        emoji: icon.icons_d,
-                        url: products["internet-protocol"]["doc-url"]
+                        emoji: emojis.static.icons_d,
+                        url: fab.internet_protocol.doc_url
                     })
                 ]
             ),
-            createTextDisplay(`${products["internet-protocol"]["product-desc"]}`, 0),
+            createTextDisplay(`${fab.internet_protocol.product_desc}`, 0),
         ]
     })
 }

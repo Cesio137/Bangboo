@@ -1,4 +1,3 @@
-import { roles } from "#functions";
 import { Guild } from "discord.js";
 
 
@@ -8,7 +7,7 @@ export function filterUsers(ids: string[], guild: Guild): string[] {
     for (const id of ids) {
         const member = guild.members.cache.get(id);
         if (!member) {continue}
-        if (!member.user.bot && !member.permissions.has("Administrator") && !member.roles.cache.has(roles.stf)) {
+        if (!member.user.bot && !member.permissions.has("Administrator") && !member.roles.cache.has(guildData.roles.stf)) {
             users.push(member.id);
         }
     }

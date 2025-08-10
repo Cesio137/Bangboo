@@ -1,4 +1,4 @@
-import { logger } from "#settings";
+import { logger } from "#base";
 import { createEmbed } from "@magicyan/discord";
 import { Message, OmitPartialGroupDMChannel } from "discord.js";
 

@@ -1,4 +1,4 @@
-import { env } from "#settings";
+import { env } from "#env";
 import { discloud } from "discloud.app";
 
 export const appID = "1754339178532";

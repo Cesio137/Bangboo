@@ -1,11 +1,9 @@
-import { icon } from "#functions";
-import { settings } from "#settings";
 import { createContainer, createLinkButton, createRow, createSeparator, createTextDisplay } from "@magicyan/discord";
 import { ContainerBuilder, MessageActionRowComponentBuilder } from "discord.js";
 
 export function socialComponent(): ContainerBuilder {
     return createContainer({
-        accentColor: settings.colors.green,
+        accentColor: constants.colors.green,
         components: [
             createTextDisplay("**FOLLOW ME ON SOCIAL MEDIA**", 0),
             createSeparator(false, false),
@@ -13,27 +11,27 @@ export function socialComponent(): ContainerBuilder {
                 [
                     createLinkButton({
                         label: "Portifolio",
-                        emoji: icon.icons_p,
+                        emoji: emojis.static.icons_p,
                         url: "https://nathan-miguel.vercel.app/"
                     }),
                     createLinkButton({
                         label: "Youtube",
-                        emoji: icon.icons_youtube,
+                        emoji: emojis.static.icons_youtube,
                         url: "https://www.youtube.com/@NathanMiguel1"
                     }),
                     createLinkButton({
                         label: "Instagram",
-                        emoji: icon.icons_instagram,
+                        emoji: emojis.static.icons_instagram,
                         url: "https://www.instagram.com/nathan_cmiguel/"
                     }),
                     createLinkButton({
                         label: "Github",
-                        emoji: icon.icons_github,
+                        emoji: emojis.static.icons_github,
                         url: "https://github.com/Cesio137"
                     }),
                     createLinkButton({
                         label: "X/Twitter",
-                        emoji: icon.icons_x,
+                        emoji: emojis.static.icons_x,
                         url: "https://x.com/NathanCmig"
                     }),
                 ]
@@ -43,7 +41,7 @@ export function socialComponent(): ContainerBuilder {
             createSeparator(false, false),
             createLinkButton({
                 label: "Fab",
-                emoji: icon.icons_f,
+                emoji: emojis.static.icons_f,
                 url: "https://www.fab.com/sellers/Nathan%20Miguel"
             }),
         ]

@@ -1,6 +1,4 @@
 import { createCommand } from "#base";
-import { icon } from "#functions";
-import { settings } from "#settings";
 import { gemini } from "#tools";
 import { createEmbed } from "@magicyan/discord";
 import { ApplicationCommandOptionType, ApplicationCommandType } from "discord.js";
@@ -28,8 +26,8 @@ createCommand({
 
         if (!result.success || !result.text) {
             const embed = createEmbed({
-                color: settings.colors.danger,
-                description: `${icon.close} An unspected error happen!`,
+                color: constants.colors.danger,
+                description: `${emojis.static.close} An unspected error happen!`,
             });
             interaction.editReply({ embeds: [embed] });
             return;
@@ -43,7 +41,7 @@ createCommand({
         }
 
         const embed = createEmbed({
-            color: settings.colors.success,
+            color: constants.colors.success,
             description: texts.shift(),
         });
 
@@ -54,7 +52,7 @@ createCommand({
             const description = texts.shift();
             if (typeof description === "undefined") break;
             const embed = createEmbed({
-                color: settings.colors.success,
+                color: constants.colors.success,
                 description,
             });
 

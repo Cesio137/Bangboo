@@ -1,4 +1,4 @@
-import { env } from "#settings";
+import { env } from "#env";
 import {
     EnhancedGenerateContentResponse,
     GoogleGenerativeAI,

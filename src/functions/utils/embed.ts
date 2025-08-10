@@ -1,13 +1,12 @@
-import { settings } from "#settings";
 import { createEmbed, EmbedPlusData } from "@magicyan/discord";
 
-type SettingsColor = typeof settings.colors;
+type SettingsColor = typeof constants.colors;
 type ResFunction = <O>(text: string, options?: O & EmbedPlusData) => Exclude<O, EmbedPlusData>;
 type Res = Record<keyof SettingsColor, ResFunction>;
 
 export const res: Res = Object.create(
     {},
-    Object.entries(settings.colors).reduce(
+    Object.entries(constants.colors).reduce(
         (obj, [name, color]) =>
             Object.assign(obj, {
                 [name]: {

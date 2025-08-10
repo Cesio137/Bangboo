@@ -1,5 +1,4 @@
 import { createCommand } from "#base";
-import { icon } from "#functions";
 import { appID, user } from "#tools";
 import { ApplicationCommandOptionType, ApplicationCommandType, ChatInputCommandInteraction } from "discord.js";
 import { logsComponent, statusComponent } from "#menus";
@@ -40,12 +39,12 @@ async function status(interaction: ChatInputCommandInteraction<"cached">) {
     const app = await user.apps.fetch(appID);
     const appStatus = await user.apps.status(appID);
     const infos = [
-        `${icon.id}\`Nome(ID):\` **${app.name}(${app.id})**`,
-        `${icon.cpu}\`CPU:\` **${appStatus.cpu}**`,
-        `${icon.ram}\`RAM:\` **${appStatus.memory}**`,
-        `${icon.ssd}\`SSD:\` **${appStatus.ssd}**`,
-        `${icon.wifi}\`Network:\` \`⬆\`**${appStatus.netIO.up} \`⬇\`${appStatus.netIO.down}**`,
-        `${icon.refresh}\`Latest restart:\` **<t:${Math.floor(appStatus.startedAtTimestamp / 1000)}:R>**`,
+        `${emojis.static.id}\`Nome(ID):\` **${app.name}(${app.id})**`,
+        `${emojis.static.cpu}\`CPU:\` **${appStatus.cpu}**`,
+        `${emojis.static.ram}\`RAM:\` **${appStatus.memory}**`,
+        `${emojis.static.ssd}\`SSD:\` **${appStatus.ssd}**`,
+        `${emojis.static.wifi}\`Network:\` \`⬆\`**${appStatus.netIO.up} \`⬇\`${appStatus.netIO.down}**`,
+        `${emojis.static.refresh}\`Latest restart:\` **<t:${Math.floor(appStatus.startedAtTimestamp / 1000)}:R>**`,
     ];
 
     const component = statusComponent(infos);

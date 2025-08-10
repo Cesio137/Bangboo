@@ -1,5 +1,5 @@
 import { createResponder, ResponderType } from "#base";
-import { res, icon } from "#functions";
+import { res } from "#functions";
 import { logsComponent, statusComponent } from "#menus";
 import { user } from "#tools";
 
@@ -18,12 +18,12 @@ createResponder({
         const app = await user.apps.fetch(id);
         const appStatus = await user.apps.status(id);
         const infos = [
-            `${icon.id}\`Nome(ID):\` **${app.name}(${app.id})**`,
-            `${icon.cpu}\`CPU:\` **${appStatus.cpu}**`,
-            `${icon.ram}\`RAM:\` **${appStatus.memory}**`,
-            `${icon.ssd}\`SSD:\` **${appStatus.ssd}**`,
-            `${icon.wifi}\`Network:\` \`⬆\`**${appStatus.netIO.up} \`⬇\`${appStatus.netIO.down}**`,
-            `${icon.refresh}\`Latest restart:\` **<t:${Math.floor(appStatus.startedAtTimestamp / 1000)}:R>**`,
+            `${emojis.static.id}\`Nome(ID):\` **${app.name}(${app.id})**`,
+            `${emojis.static.cpu}\`CPU:\` **${appStatus.cpu}**`,
+            `${emojis.static.ram}\`RAM:\` **${appStatus.memory}**`,
+            `${emojis.static.ssd}\`SSD:\` **${appStatus.ssd}**`,
+            `${emojis.static.wifi}\`Network:\` \`⬆\`**${appStatus.netIO.up} \`⬇\`${appStatus.netIO.down}**`,
+            `${emojis.static.refresh}\`Latest restart:\` **<t:${Math.floor(appStatus.startedAtTimestamp / 1000)}:R>**`,
         ];
         const component = statusComponent(infos);
         interaction.editReply({ flags: ["IsComponentsV2"], components: [component] })

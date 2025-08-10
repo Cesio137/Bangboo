@@ -9,14 +9,12 @@ import {
     User,
 } from "discord.js";
 import { join } from "path";
-import { channels, icon, roles } from "#functions";
-import { settings } from "#settings";
 
 export async function globalMessage( event: Events, member: GuildMember | PartialGuildMember | undefined, user: User, channel: TextChannel) {
     const canvas = new Canvas(2800, 560);
     const context = canvas.getContext("2d");
     
-    let bgpath = join(__rootname, "assets/canvas/");
+    let bgpath = join(__dirname, "assets/canvas/");
     if (event === Events.GuildMemberAdd && typeof member !== "undefined") {
         const { joinedTimestamp } = member;
         const accountAge = Date.now() - user.createdTimestamp;
@@ -79,16 +77,16 @@ export async function globalMessage( event: Events, member: GuildMember | Partia
 export async function globalBoost(member: GuildMember) {
     const { guild, id, user } = member;
     const { globalName, username } = user;
-    const guild_channel = await guild.channels.fetch(channels.announcement);
+    const guild_channel = await guild.channels.fetch(guildData.channels.announcement);
     if (!guild_channel) return;
     const avatarURL = user.avatarURL({size: 256});
     const embed = createEmbed({
-        color: settings.colors.nitro,
+        color: constants.colors.nitro,
         author: {
             name: globalName || username,
             iconURL: avatarURL || undefined
         },
-        description: `**${icon.boost} <@${id}> became a <@&${roles.boosters}>**\n\n🚀 Thanks for boosting the server!`,
+        description: `**${emojis.animated.boost} <@${id}> became a <@&${guildData.roles.boosters}>**\n\n🚀 Thanks for boosting the server!`,
         thumbnail: avatarURL || undefined
     });
     const channel = await guild_channel.fetch();

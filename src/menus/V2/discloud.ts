@@ -1,10 +1,9 @@
-import { settings } from "#settings";
 import { createContainer, createTextDisplay, createSeparator, createRow } from "@magicyan/discord";
 import { ButtonBuilder, ButtonStyle, ContainerBuilder, MessageActionRowComponentBuilder } from "discord.js";
 
 export function statusComponent(infos: string[]): ContainerBuilder {
     return createContainer({
-        accentColor: settings.colors.green,
+        accentColor: constants.colors.green,
         components: [
             createTextDisplay("### BANGBOO'S STATUS", 0),
             createSeparator(false, true),
@@ -24,7 +23,7 @@ export function statusComponent(infos: string[]): ContainerBuilder {
 
 export function logsComponent(logs: string): ContainerBuilder {
     return createContainer({
-        accentColor: settings.colors.green,
+        accentColor: constants.colors.green,
         components: [
             createTextDisplay("### BANGBOO'S LOGS", 0),
             createSeparator(false, true),
