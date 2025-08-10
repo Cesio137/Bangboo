@@ -5,7 +5,7 @@ createEvent({
     name: "Message Create",
     event: "messageCreate",
     async run(message) {
-        if (message.author.bot || !message.guild) {return}
+        if (message.author.bot || !message.guild) return;
         filterMessage(message);
     },
 });

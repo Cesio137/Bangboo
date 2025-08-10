@@ -14,7 +14,7 @@ export async function globalMessage( event: Events, member: GuildMember | Partia
     const canvas = new Canvas(2800, 560);
     const context = canvas.getContext("2d");
     
-    let bgpath = join(__dirname, "assets/canvas/");
+    let bgpath = "./assets/canvas";
     if (event === Events.GuildMemberAdd && typeof member !== "undefined") {
         const { joinedTimestamp } = member;
         const accountAge = Date.now() - user.createdTimestamp;
