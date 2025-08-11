@@ -14,7 +14,7 @@ use timeout::timeout_collector;
 use delete_message::delete_message_collector;
 use serenity::all::{
     CommandInteraction, CommandOptionType, CommandType, Context, CreateCommand,
-    CreateCommandOption, InteractionContext, MessageFlags,
+    CreateCommandOption, InteractionContext, MessageFlags, RoleId
 };
 use async_trait::async_trait;
 
@@ -54,32 +54,19 @@ impl SlashCommandHandler for Moderate {
             }
         };
 
-        _ = match member.permissions.as_ref() {
-            Some(permissions) => {
-                if !permissions.administrator() {
-                    reply_with_embed(
-                        &ctx,
-                        &interaction,
-                        MessageFlags::empty(),
-                        str_hex_to_u32(&CONSTANTS.colors.danger),
-                        "You don't have **ADMINISTRATOR** permission.",
-                    )
-                    .await;
-                    return;
-                }
-            }
-            None => {
-                reply_with_embed(
-                    &ctx,
-                    &interaction,
-                    MessageFlags::empty(),
-                    str_hex_to_u32(&CONSTANTS.colors.danger),
-                    "Interaction member has no permission.",
-                )
-                .await;
-                return;
-            }
-        };
+        let stf_role = RoleId::new(str_to_u64(&GUILD.roles.stf));
+        let kernel_role = RoleId::new(str_to_u64(&GUILD.roles.kernel));
+        if !member.roles.iter().any(|r| r == &stf_role || r == &kernel_role) {
+            reply_with_embed(
+                &ctx,
+                &interaction,
+                MessageFlags::empty(),
+                str_hex_to_u32(&CONSTANTS.colors.danger),
+                "You are not a mod or the owner of the guild.",
+            )
+            .await;
+            return;
+        }
 
         let action = interaction.data.options[0].value.as_str().unwrap();
 
