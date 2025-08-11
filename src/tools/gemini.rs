@@ -7,9 +7,6 @@ const MODEL_GEMINI: &str = "gemini-2.5-flash";
 pub static GEMINI: Lazy<Client> = Lazy::new(|| Client::default());
 
 pub async fn get_text(prompt: String) -> anyhow::Result<String> {
-    //let target = GEMINI.resolve_service_target(MODEL_GEMINI).await?;
-    //let adapter_kind = target.model.adapter_kind;
-
     _ = GEMINI.resolve_service_target(MODEL_GEMINI).await?;
 
     let chat_req = ChatRequest::new(vec![
