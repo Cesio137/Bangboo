@@ -14,8 +14,6 @@ This project is currently for my personal use, but I hope to monetize it in the 
 
 - [Rust](https://www.rust-lang.org/)
 
-- [NodeJS LTS (optional for quicktype)](https://nodejs.org/pt/download)
-
 - Windows only
     - Build With Visual Studio 2022
         - [Visual Studio 2022](https://visualstudio.microsoft.com/downloads/)
@@ -39,7 +37,6 @@ This project is currently for my personal use, but I hope to monetize it in the 
 
 ## Thirdparty Libraries
 
-- [Rust](https://www.rust-lang.org/)
 - [Serenity](https://crates.io/crates/serenity)
 - [Skia Safe](https://crates.io/crates/skia-safe)
 

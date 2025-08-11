@@ -4,10 +4,17 @@ version = "0.4.1"
 edition = "2024"
 
 [profile.release]
-opt-level = 3
-lto = true
+opt-level = "z"
+debug = false
+split-debuginfo = "packed"
+strip = "none"
+debug-assertions = false
+overflow-checks = false
+lto = "thin"
+panic = 'unwind'
+incremental = false
 codegen-units = 1
-panic = "abort"
+rpath = false
 
 [dependencies]
 serenity = { git = "https://github.com/serenity-rs/serenity.git", branch = "next", features = ["collector", "model"] }
@@ -23,7 +30,5 @@ reqwest = { version = "0.12" }
 serde = { version = "1.0" }
 serde_json = { version = "1.0" }
 skia-safe = { version = "0.87", features = ["textlayout"] }
-#tracing-subscriber = { version = "0.3" }
-#tracing = { version = "0.1" }
 tokio = { version = "1.47", features = ["rt-multi-thread", "signal"] }
 chrono = { version = "0.4" }
