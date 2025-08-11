@@ -4,7 +4,7 @@ version = "0.4.1"
 edition = "2024"
 
 [profile.release]
-opt-level = "z"
+opt-level = 0
 debug = false
 split-debuginfo = "packed"
 strip = "none"
