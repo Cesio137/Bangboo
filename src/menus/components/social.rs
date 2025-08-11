@@ -28,7 +28,7 @@ pub fn social_component<'a>() -> CreateComponent<'a> {
         CreateButton::new_link("https://www.instagram.com/nathan_cmiguel/")
             .label("Instagram")
             .emoji(ReactionType::Custom {
-                id: EmojiId::from(str_to_u64(&EMOJIS.emojis_static.instagram)),
+                id: EmojiId::from(str_to_u64(&EMOJIS.emojis_static.icons_instagram)),
                 name: None,
                 animated: false,
             }),
