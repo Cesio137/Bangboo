@@ -24,9 +24,9 @@ createCommand({
     ],
     async run(interaction) {
         const { member, options } = interaction;
-        if (!member.permissions.has("Administrator")) {
+        if (!member.roles.cache.some(role => role.id === guildData.roles.kernel || role.id === guildData.roles.stf)) {
             interaction.reply(
-                res.danger("You don't have **ADMINISTRATOR** permission.")
+                res.danger("You are not a mod or the owner of the guild.")
             )
         }
         
