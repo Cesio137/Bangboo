@@ -26,7 +26,7 @@ pub async fn run(app: &App, ctx: &Context, guild_id: &GuildId, banned_user: &Use
     global_message(
         &ctx,
         &system_channel_id,
-        EventType::MemberAdd,
+        EventType::BanAdded,
         None,
         &banned_user,
     )

@@ -17,7 +17,7 @@ impl PrefixCommandHandler for Canvas {
         global_message(
             &ctx,
             &message.channel_id.expect_channel(),
-            EventType::MemberAdd,
+            EventType::MemberAdded,
             Some(&member),
             &user,
         )

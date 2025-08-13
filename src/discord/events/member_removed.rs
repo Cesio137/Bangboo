@@ -23,5 +23,5 @@ pub async fn run(app: &App, ctx: &Context, guild_id: &GuildId, user: &User) {
         }
     };
 
-    global_message(&ctx, &system_channel_id, EventType::MemberAdd, None, &user).await;
+    global_message(&ctx, &system_channel_id, EventType::MemberRemoved, None, &user).await;
 }

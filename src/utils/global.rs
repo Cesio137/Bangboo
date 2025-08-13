@@ -11,9 +11,9 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 #[derive(Eq, PartialEq)]
 pub enum EventType {
-    MemberAdd,
-    MemberRemove,
-    BanAdd,
+    MemberAdded,
+    MemberRemoved,
+    BanAdded,
 }
 
 pub async fn global_message(
@@ -41,7 +41,7 @@ pub async fn global_message(
     }
 
     let background = match event {
-        EventType::MemberAdd => {
+        EventType::MemberAdded => {
             let date = match SystemTime::now().duration_since(UNIX_EPOCH) {
                 Ok(duration) => duration.as_millis(),
                 Err(_) => 0,
@@ -60,8 +60,8 @@ pub async fn global_message(
                 CARD_BACK
             }
         }
-        EventType::MemberRemove => CARD_LEFT,
-        EventType::BanAdd => CARD_MOD,
+        EventType::MemberRemoved => CARD_LEFT,
+        EventType::BanAdded => CARD_MOD,
     };
 
     let mut data = vec![];
@@ -136,7 +136,7 @@ pub async fn global_message(
     }
 
     let mut utc = String::new();
-    if event == EventType::MemberAdd {
+    if event == EventType::MemberAdded {
         let joined_at = member.unwrap().joined_at.unwrap_or_default().timestamp();
         utc.push_str(&format!("<t:{}:F>", joined_at));
     }

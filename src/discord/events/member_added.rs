@@ -28,7 +28,7 @@ pub async fn run(app: &App, ctx: &Context, member_added: &Member) {
     global_message(
         &ctx,
         &system_channel_id,
-        EventType::MemberAdd,
+        EventType::MemberAdded,
         Some(&member_added),
         &user,
     )
