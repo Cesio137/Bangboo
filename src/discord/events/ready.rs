@@ -37,6 +37,6 @@ pub async fn run(app: &App, ctx: &Context, ready: &Ready) {
     }
 
     ctx.set_activity(Some(ActivityData::custom(
-        "Rust-powered base. Memory safety without sacrifice. Performance without compromise.",
+        "Rust-powered base.\nHosted by discloud.\nJoin in: .gg/DBNATxA6Jx",
     )));
 }
