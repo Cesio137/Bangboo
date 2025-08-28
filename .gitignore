@@ -1,23 +1,15 @@
 # Folders
-/build
-/dist
+/.vscode
+/.idea
 /discloud
-/deprecated
-/node_modules
+/target
 
 # Files
-/.env
-/.env.dev
-/.env.development
-/package-lock.json
+.env
+Cargo.lock
 
-# Config files
-/firebase.json
+# Added by cargo
+#
+# already existing elements were commented out
 
-# Extensions
-*.zip
-*.sqlite
-*.sql
-*.exe
-*.db
-*.development.json
+#/target
