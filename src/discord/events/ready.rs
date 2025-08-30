@@ -37,6 +37,6 @@ pub async fn run(app: &App, ctx: &Context, ready: &Ready) {
     }
 
     ctx.set_activity(Some(ActivityData::custom(
-        "Rust-powered base.\nHosted by discloud.\nJoin in: .gg/DBNATxA6Jx",
+        "Rust-powered bot.\nHosted by discloud.\nJoin in: .gg/DBNATxA6Jx",
     )));
 }
