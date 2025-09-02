@@ -3,7 +3,7 @@ use once_cell::sync::Lazy;
 use regex::Regex;
 use crate::env::ENV;
 
-pub const APPID: &str = "1754872127464";
+pub const APPID: &str = "1756823806687";
 
 pub static ASCII_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"\x1b\[[0-9;]*m").unwrap());
 

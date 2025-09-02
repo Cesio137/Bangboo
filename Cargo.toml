@@ -29,6 +29,6 @@ regex = { version = "1.11" }
 reqwest = { version = "0.12" }
 serde = { version = "1.0" }
 serde_json = { version = "1.0" }
-skia-safe = { version = "0.87", features = ["textlayout"] }
+skia-safe = { version = "0.87", features = ["textlayout", "gl"] }
 tokio = { version = "1.47", features = ["rt-multi-thread", "signal"] }
 chrono = { version = "0.4" }
