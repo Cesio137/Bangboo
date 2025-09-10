@@ -101,7 +101,7 @@ async fn status(ctx: &Context, interaction: &CommandInteraction) {
         &EMOJIS.emojis_static.refresh,
         Timestamp::parse(&status.started_at)
             .unwrap_or_default()
-            .timestamp()
+            .timestamp_millis()
     ));
 
     let component = status_component(infos);
