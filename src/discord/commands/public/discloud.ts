@@ -39,12 +39,12 @@ async function status(interaction: ChatInputCommandInteraction<"cached">) {
     const app = await user.apps.fetch(appID);
     const appStatus = await user.apps.status(appID);
     const infos = [
-        `${emojis.static.id}\`Nome(ID):\` **${app.name}(${app.id})**`,
-        `${emojis.static.cpu}\`CPU:\` **${appStatus.cpu}**`,
-        `${emojis.static.ram}\`RAM:\` **${appStatus.memory}**`,
-        `${emojis.static.ssd}\`SSD:\` **${appStatus.ssd}**`,
-        `${emojis.static.wifi}\`Network:\` \`⬆\`**${appStatus.netIO.up} \`⬇\`${appStatus.netIO.down}**`,
-        `${emojis.static.refresh}\`Latest restart:\` **<t:${Math.floor(appStatus.startedAtTimestamp / 1000)}:R>**`,
+        `<:id:${emojis.static.id}>\`Nome(ID):\` **${app.name}(${app.id})**`,
+        `<:cpu:${emojis.static.cpu}>\`CPU:\` **${appStatus.cpu}**`,
+        `<:ram:${emojis.static.ram}>\`RAM:\` **${appStatus.memory}**`,
+        `<:ssd:${emojis.static.ssd}>\`SSD:\` **${appStatus.ssd}**`,
+        `<:wifi:${emojis.static.wifi}>\`Network:\` \`⬆\`**${appStatus.netIO.up} \`⬇\`${appStatus.netIO.down}**`,
+        `<:resfresh:${emojis.static.refresh}>\`Latest restart:\` **<t:${Math.floor(appStatus.startedAtTimestamp / 1000)}:R>**`,
     ];
 
     const component = statusComponent(infos);
@@ -57,7 +57,7 @@ async function logs(interaction: ChatInputCommandInteraction<"cached">) {
 
     const appLogs = await user.apps.terminal(appID);
     let logs = appLogs.small.length > 3000 ? appLogs.small.slice(0, 3000) : appLogs.small; 
-    logs = logs.replace(/\[[0-9;]+m/g, '');
+    logs = logs.replace(/\x1b\[[0-9;]*m/g, '');
 
     const component = logsComponent(logs);
 
