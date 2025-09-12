@@ -3,7 +3,7 @@ import ck from "chalk";
 import { ApplicationCommand, AutocompleteInteraction, Client, Collection, CommandInteraction } from "discord.js";
 import { Constatic } from "../app.js";
 import { logger } from "../base.logger.js";
-import { CommandType } from "./types.js";
+import { CommandType, RunBlockError } from "./types.js";
 
 export abstract class BaseCommandHandlers {
     public static async autocomplete(interaction: AutocompleteInteraction) {
@@ -53,9 +53,15 @@ export abstract class BaseCommandHandlers {
         try {
             let result;
             for (const run of handler.filter(isDefined)) {
-                result = await run(interaction, result)
+                result = await run.call({
+                    block() {
+                        throw new RunBlockError();
+                    }
+                }, interaction, result);
+
             }
         } catch (err) {
+            if (err instanceof RunBlockError) return;
             if (onError) {
                 onError(err, interaction);
                 return;
@@ -105,24 +111,27 @@ export abstract class BaseCommandHandlers {
             const globalCommands = commands.filter(c => c.global);
             const guildCommands = commands.filter(c => !c.global);
 
-            await client.application.commands.set(globalCommands)
-                .then(commands => {
-                    if (!commands.size) return;
-                    logRegistration(commands, "globally")
-                });
-            for (const guild of targetGuilds.values()) {
-                const commands = await guild.commands.set(guildCommands);
-                logRegistration(commands, `in ${ck.underline(guild.name)} guild`);
-            }
+            await Promise.all([
+                client.application.commands.set(globalCommands)
+                    .then(commands => {
+                        if (!commands.size) return;
+                        logRegistration(commands, "globally")
+                    }
+                ),
+                ...targetGuilds.map(async (guild) => {
+                    const commands = await guild.commands.set(guildCommands);
+                    logRegistration(commands, `in ${ck.underline(guild.name)} guild`);
+                })
+            ]);
         } else {
-            await Promise.all(client.guilds.cache
-                .map(guild => guild.commands.set([]))
-            );
-
             await client.application.commands.set(commands)
                 .then(commands =>
                     logRegistration(commands, "globally")
                 );
+            
+            client.guilds.cache.forEach(g => g.commands
+                .set([]).catch(() => null)
+            );
         }
 
         app.commands.clear();

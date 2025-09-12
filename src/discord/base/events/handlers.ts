@@ -39,14 +39,14 @@ export abstract class BaseEventHandlers {
     public static register(client: Client) {
         const app = Constatic.getInstance();
         const collection = app.events.collection.filter(
-            (_, key) => key !== "ready"
+            (_, key) => key !== "clientReady"
         );
 
         for (const [key, events] of collection.entries()) {
             client.on(key, (...args) => {
-                Promise.all(Array.from(events.values().map(data =>
+                Promise.all(Array.from(events.values()).map(data =>
                     BaseEventHandlers.handler(data, args)
-                )))
+                ))
             });
         }
     }

@@ -29,7 +29,7 @@ export async function bootstrap(options: BootstrapOptions){
 
     const app = Constatic.getInstance();
 
-    client.once("ready", async (client) => {
+    client.once("clientReady", async (client) => {
         registerErrorHandlers(client);
         await client.guilds
             .fetch()
@@ -39,10 +39,8 @@ export async function bootstrap(options: BootstrapOptions){
         
         await BaseCommandHandlers.register(client);
 
-        Promise.all(Array.from(
-            app.events.getEvents("ready").values().map(data => 
-                BaseEventHandlers.handler(data, [client])
-            ))
+        await Promise.all(Array.from(app.events.getEvents("clientReady").values())
+            .map(data => BaseEventHandlers.handler(data, [client]))
         );
     });
 
