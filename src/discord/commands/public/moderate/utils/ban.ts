@@ -5,21 +5,15 @@ import { User, Guild, InteractionReplyOptions, ChatInputCommandInteraction, Comp
 import { filterUsers, showModal } from "./index.js";
 
 
-function banAction<R>(user: User, ids: string[], reason: string, guild: Guild): R {
-    let sucess: string[] = [];
+async function banAction<R>(user: User, ids: string[], reason: string, guild: Guild): Promise<R> {
+    let success: string[] = [];
     let failed: string[] = [];
 
-    for (const id of ids) {
-        const member = guild.members.cache.get(id);
-        if (!member) {
-            failed.push(id);
-            continue;
-        }
-        member.ban({reason});
-        sucess.push(id);
-    }
+    const bulkBanRes = await guild.bans.bulkCreate(ids, { reason });
+    success = bulkBanRes.bannedUsers.values().toArray();
+    failed = bulkBanRes.failedUsers.values().toArray();
 
-    let description = `**Banned users:**\n${sucess.map(id => `<@${id}>`).join("\n")}`;
+    let description = `**Banned users:**\n${success.map(id => `<@${id}>`).join("\n")}`;
     if (failed.length > 0) {
         description = `${description}\n`
         description = `**Failed to ban user(s):**\n${failed.map(id => `<@${id}>`).join("\n")}`
@@ -104,7 +98,7 @@ export async function banCollector(interaction: ChatInputCommandInteraction<"cac
             case "mod/btn-confirm":
                 const res = await showModal(i, time);
                 if (res.isOk) {
-                    i.editReply(banAction(user, ids, res.reason, guild));
+                    i.editReply(await banAction(user, ids, res.reason, guild));
                     timeout = false;
                     isOk = true;
                     userCollector.stop(); btnCollector.stop();

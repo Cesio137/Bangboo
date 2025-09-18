@@ -5,8 +5,8 @@ import { User, Guild, InteractionReplyOptions, ChatInputCommandInteraction, Comp
 import { filterUsers, showModal } from "./index.js";
 
 
-function kickAction<R>(user: User, ids: string[], reason: string, guild: Guild): R {
-    let sucess: string[] = [];
+async function kickAction<R>(user: User, ids: string[], reason: string, guild: Guild): Promise<R> {
+    let success: string[] = [];
     let failed: string[] = [];
 
     for (const id of ids) {
@@ -15,11 +15,11 @@ function kickAction<R>(user: User, ids: string[], reason: string, guild: Guild):
             failed.push(id);
             continue;
         }
-        member.kick(reason);
-        sucess.push(id);
+        await member.kick(reason);
+        success.push(id);
     }
 
-    let description = `**Kicked users:**\n${sucess.map(id => `<@${id}>`).join("\n")}`;
+    let description = `**Kicked users:**\n${success.map(id => `<@${id}>`).join("\n")}`;
     if (failed.length > 0) {
         description = `${description}\n`
         description = `**Failed to kick user(s):**\n${failed.map(id => `<@${id}>`).join("\n")}`
@@ -104,7 +104,7 @@ export async function kickCollector(interaction: ChatInputCommandInteraction<"ca
             case "mod/btn-confirm":
                 const res = await showModal(i, time);
                 if (res.isOk) {
-                    i.editReply(kickAction(user, ids, res.reason, guild));
+                    i.editReply(await kickAction(user, ids, res.reason, guild));
                     timeout = false;
                     isOk = true;
                     userCollector.stop(); btnCollector.stop();

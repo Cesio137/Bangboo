@@ -5,9 +5,10 @@ import { User, Guild, InteractionReplyOptions, ChatInputCommandInteraction, Comp
 import { filterUsers, showModal } from "./index.js";
 
 
-function timeoutAction<R>(user: User, ids: string[], duration: string, reason: string, guild: Guild): R {
-    let sucess: string[] = [];
+async function timeoutAction<R>(user: User, ids: string[], duration: string, reason: string, guild: Guild): Promise<R> {
+    let success: string[] = [];
     let failed: string[] = [];
+
 
     for (const id of ids) {
         const member = guild.members.cache.get(id);
@@ -15,11 +16,11 @@ function timeoutAction<R>(user: User, ids: string[], duration: string, reason: s
             failed.push(id);
             continue;
         }
-        member.timeout(parseInt(duration) * 1000, reason);
-        sucess.push(id);
+        await member.timeout(parseInt(duration) * 1000, reason);
+        success.push(id);
     }
 
-    let description = `**Timeouted users:**\n${sucess.map(id => `<@${id}>`).join("\n")}`;
+    let description = `**Timeouted users:**\n${success.map(id => `<@${id}>`).join("\n")}`;
     if (failed.length > 0) {
         description = `${description}\n`
         description = `**Failed to timeout user(s):**\n${failed.map(id => `<@${id}>`).join("\n")}`
@@ -123,7 +124,7 @@ export async function timeoutCollector(interaction: ChatInputCommandInteraction<
             case "mod/btn-confirm":
                 const res = await showModal(i, time);
                 if (res.isOk) {
-                    i.editReply(timeoutAction(user, ids, duration, res.reason, guild));
+                    i.editReply(await timeoutAction(user, ids, duration, res.reason, guild));
                     timeout = false;
                     isOk = true;
                     userCollector.stop(); durationCollector.stop(); btnCollector.stop();
