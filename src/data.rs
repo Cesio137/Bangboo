@@ -1,4 +1,5 @@
 use std::str::FromStr;
+use config::{Config, File, FileFormat};
 use once_cell::sync::Lazy;
 use crate::data::constants::Constants;
 use crate::data::emojis::Emojis;
@@ -13,6 +14,17 @@ pub mod emojis;
 const CONSTANTSJSON: &str = include_str!("../data/constants.json");
 pub static CONSTANTS: Lazy<Constants> = Lazy::new(|| {
     serde_json::from_str(&CONSTANTSJSON).unwrap()
+});
+
+const DISCLOUDCONFIG: &str = include_str!("../discloud.config");
+pub static APPID: Lazy<String> = Lazy::new(|| {
+    let discloud = match Config::builder()
+    .add_source(File::from_str(DISCLOUDCONFIG, FileFormat::Ini))
+    .build() {
+        Ok(config) => config,
+        Err(_) => return String::new(),
+    };
+    discloud.get("ID").unwrap_or_default()
 });
 
 const EMOJISJSON: &str = include_str!("../data/emojis.json");

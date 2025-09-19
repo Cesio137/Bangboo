@@ -20,7 +20,7 @@ impl ResponderHandler for Status {
     async fn run(&self, ctx: &Context, interaction: &ComponentInteraction) {
         _ = interaction.defer(ctx.http()).await;
 
-        let app = match DISCLOUD.get_app(APPID).await {
+        let app = match DISCLOUD.get_app(&APPID).await {
             Ok(apps) => apps.clone(),
             Err(err) => {
                 let embed = CreateEmbed::new()
@@ -111,7 +111,7 @@ impl ResponderHandler for Logs {
     async fn run(&self, ctx: &Context, interaction: &ComponentInteraction) {
         _ = interaction.defer(ctx.http()).await;
 
-        let app_logs = match DISCLOUD.get_app_logs(APPID).await {
+        let app_logs = match DISCLOUD.get_app_logs(&APPID).await {
             Ok(apps) => apps.clone(),
             Err(err) => {
                 let embed = CreateEmbed::new()

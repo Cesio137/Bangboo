@@ -1,3 +1,4 @@
+use crate::data::*;
 use crate::discord::*;
 use crate::menus::*;
 use crate::tools::*;
@@ -5,7 +6,7 @@ use crate::utils::*;
 use async_trait::async_trait;
 use serenity::all::{
     CacheHttp, CommandInteraction, CommandOptionType, CommandType, Context, CreateCommand,
-    CreateCommandOption, EmojiId, InteractionContext, MessageFlags, Timestamp,
+    CreateCommandOption, InteractionContext, MessageFlags, Timestamp,
 };
 use crate::data::{str_hex_to_u32, str_to_u64, CONSTANTS, EMOJIS};
 
@@ -42,7 +43,7 @@ impl SlashCommandHandler for Discloud {
 }
 
 async fn status(ctx: &Context, interaction: &CommandInteraction) {
-    let app = match DISCLOUD.get_app(APPID).await {
+    let app = match DISCLOUD.get_app(&APPID).await {
         Ok(apps) => apps.clone(),
         Err(err) => {
             followup_with_embed(
@@ -119,7 +120,7 @@ async fn status(ctx: &Context, interaction: &CommandInteraction) {
 }
 
 async fn logs(ctx: &Context, interaction: &CommandInteraction) {
-    let app = match DISCLOUD.get_app(APPID).await {
+    let app = match DISCLOUD.get_app(&APPID).await {
         Ok(apps) => apps.clone(),
         Err(err) => {
             followup_with_embed(
