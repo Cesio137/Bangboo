@@ -8,7 +8,7 @@ use serenity::all::{
     CacheHttp, CommandInteraction, CommandOptionType, CommandType, Context, CreateCommand,
     CreateCommandOption, InteractionContext, MessageFlags, Timestamp,
 };
-use crate::data::{str_hex_to_u32, str_to_u64, CONSTANTS, EMOJIS};
+use crate::data::{str_hex_to_u32, CONSTANTS, EMOJIS};
 
 pub struct Discloud;
 
@@ -97,11 +97,20 @@ async fn status(ctx: &Context, interaction: &CommandInteraction) {
         status.net_io.up,
         status.net_io.down
     ));
-    infos.push(format!(
-        "<:refresh:{}>`Latest restart:` **{}**",
-        &EMOJIS.emojis_static.refresh,
-        status.last_restart
-    ));
+    if let Ok(timestamp) = Timestamp::parse(&status.started_at) {
+        infos.push(format!(
+            "<:refresh:{}>`Latest restart:` **<t:{}:R>**",
+            &EMOJIS.emojis_static.refresh,
+            timestamp.timestamp_millis()
+        ));
+    } else {
+        infos.push(format!(
+            "<:refresh:{}>`Latest restart:` **{}**",
+            &EMOJIS.emojis_static.refresh,
+            &status.last_restart
+        ));
+    }
+    
 
     let component = status_component(infos);
     let payload = ReplyPayload {

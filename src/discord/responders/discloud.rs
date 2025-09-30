@@ -76,13 +76,19 @@ impl ResponderHandler for Status {
             status.net_io.up,
             status.net_io.down
         ));
-        infos.push(format!(
-            "<:refresh:{}>`Latest restart:` **<t:{}:R>**",
-            &EMOJIS.emojis_static.refresh,
-            Timestamp::parse(&status.started_at)
-                .unwrap_or_default()
-                .timestamp()
-        ));
+        if let Ok(timestamp) = Timestamp::parse(&status.started_at) {
+            infos.push(format!(
+                "<:refresh:{}>`Latest restart:` **<t:{}:R>**",
+                &EMOJIS.emojis_static.refresh,
+                timestamp.timestamp_millis()
+            ));
+        } else {
+            infos.push(format!(
+                "<:refresh:{}>`Latest restart:` **{}**",
+                &EMOJIS.emojis_static.refresh,
+                &status.last_restart
+            ));
+        }
 
         let component = status_component(infos);
         let payload = ReplyPayload {
