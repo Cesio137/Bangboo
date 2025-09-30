@@ -101,7 +101,7 @@ async fn status(ctx: &Context, interaction: &CommandInteraction) {
         infos.push(format!(
             "<:refresh:{}>`Latest restart:` **<t:{}:R>**",
             &EMOJIS.emojis_static.refresh,
-            timestamp.timestamp_millis()
+            timestamp.timestamp()
         ));
     } else {
         infos.push(format!(
