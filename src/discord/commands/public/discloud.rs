@@ -98,11 +98,9 @@ async fn status(ctx: &Context, interaction: &CommandInteraction) {
         status.net_io.down
     ));
     infos.push(format!(
-        "<:refresh:{}>`Latest restart:` **<t:{}:R>**",
+        "<:refresh:{}>`Latest restart:` **{}**",
         &EMOJIS.emojis_static.refresh,
-        Timestamp::parse(&status.started_at)
-            .unwrap_or_default()
-            .timestamp_millis()
+        status.last_restart
     ));
 
     let component = status_component(infos);
