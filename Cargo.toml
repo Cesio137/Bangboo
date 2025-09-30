@@ -1,6 +1,6 @@
 [package]
 name = "Bangboo"
-version = "0.4.2"
+version = "0.4.3"
 edition = "2024"
 
 [profile.release]
@@ -22,9 +22,9 @@ async-trait = { version = "0.1" }
 anyhow = { version = "1.0" }
 colored = { version = "3" }
 config = { version = "0.15" }
-discloud-rs = { git = "https://github.com/Cesio137/discloud-rs.git", branch = "main" }
+discloud-rs = { git = "https://github.com/Cesio137/discloud-rs.git", branch = "dev" }
 dotenvy = { version = "0.15" }
-genai = { version = "0.3.5"}
+genai = { version = "0.4"}
 once_cell = { version = "1.21" }
 regex = { version = "1.11" }
 reqwest = { version = "0.12" }
