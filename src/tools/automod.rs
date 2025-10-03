@@ -1,7 +1,9 @@
+use std::borrow::Cow;
 use crate::discord::*;
 use crate::data::*;
 use once_cell::sync::Lazy;
 use regex::Regex;
+use serde::Serialize;
 use serenity::all::{CacheHttp, Context, CreateEmbed, CreateMessage, Message};
 
 static REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"\[([^]]+)]\((https?://[^)]+)\)").unwrap());
@@ -27,8 +29,12 @@ pub async fn filter_message(ctx: &Context, message: &Message) -> bool {
     let server_embed = CreateEmbed::new()
         .color(str_hex_to_u32(&CONSTANTS.colors.warning))
         .description(warning);
+    let mut ref_msg = CreateMessage::new().embed(server_embed);
+    if let Some(ref_message) = message.message_reference.as_ref() {
+        ref_msg = ref_msg.reference_message(ref_message.clone());
+    }
     if let Err(err) = channel_id
-        .send_message(ctx.http(), CreateMessage::new().embed(server_embed))
+        .send_message(ctx.http(), ref_msg)
         .await
     {
         error(&format!("Failed to send warning message\nʟ {:?}", err));
@@ -80,7 +86,7 @@ pub async fn filter_message(ctx: &Context, message: &Message) -> bool {
         }
     };
 
-    let dm_warning = "It look like you probably got hacked and sent a message that was flagged as scam containing ***[text](hyperlink)***. You were just kicked from the server, but feel free to come back as soon as you resolve the issue with your account.";
+    let dm_warning = "It look like you probably got hacked and sent a message that was flagged as scam containing **[text](hyperlink)**. You were just kicked from the server, but feel free to come back as soon as you resolve the issue with your account.";
     let dm_embed = CreateEmbed::new()
         .color(str_hex_to_u32(&CONSTANTS.colors.warning))
         .description(dm_warning);
