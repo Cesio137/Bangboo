@@ -1,9 +1,7 @@
-use std::borrow::Cow;
 use crate::discord::*;
 use crate::data::*;
 use once_cell::sync::Lazy;
 use regex::Regex;
-use serde::Serialize;
 use serenity::all::{CacheHttp, Context, CreateEmbed, CreateMessage, Message};
 
 static REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"\[([^]]+)]\((https?://[^)]+)\)").unwrap());
