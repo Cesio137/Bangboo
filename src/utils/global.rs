@@ -6,7 +6,7 @@ use serenity::all::{
     CacheHttp, ChannelId, Colour, Context, CreateAttachment, CreateEmbed, CreateEmbedAuthor,
     CreateMessage, GuildId, Member, User,
 };
-use skia_safe::{EncodedImageFormat, ISize, Point};
+use skia_safe::{Data, EncodedImageFormat, ISize, Point};
 use std::time::{SystemTime, UNIX_EPOCH};
 
 #[derive(Eq, PartialEq)]
@@ -128,9 +128,13 @@ pub async fn global_message(
         }
 
         let image = surface.image_snapshot();
-        let encoded_data = image
-            .encode(None, EncodedImageFormat::PNG, Some(100))
-            .unwrap();
+        let encoded_data = match image.encode(None, EncodedImageFormat::PNG, Some(100)) {
+            Some(data) => data,
+            None => {
+                error("Failed to encode card image.");
+                return;
+            }
+        };
 
         data = encoded_data.to_vec();
     }
