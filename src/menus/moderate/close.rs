@@ -1,4 +1,4 @@
-use crate::data::*;
+use crate::helpers::*;
 use serenity::all::{CreateEmbed, CreateEmbedAuthor, User};
 
 pub fn close_menu(user: &User, timeout: bool) -> CreateEmbed {

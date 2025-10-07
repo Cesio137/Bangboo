@@ -6,7 +6,7 @@ mod modal;
 mod timeout;
 
 use crate::discord::*;
-use crate::data::*;
+use crate::helpers::*;
 use crate::utils::*;
 use ban::ban_collector;
 use kick::kick_collector;

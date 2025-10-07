@@ -1,4 +1,4 @@
-use crate::data::*;
+use crate::helpers::*;
 use serenity::all::{CacheHttp, Context, GuildId, RoleId, UserId};
 
 pub async fn filter_users(ctx: &Context, guild_id: &GuildId, ids: Vec<UserId>) -> Vec<UserId> {

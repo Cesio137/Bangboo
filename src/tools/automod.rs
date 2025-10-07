@@ -1,5 +1,5 @@
 use crate::discord::*;
-use crate::data::*;
+use crate::helpers::*;
 use once_cell::sync::Lazy;
 use regex::Regex;
 use serenity::all::{CacheHttp, Context, CreateEmbed, CreateMessage, Message};

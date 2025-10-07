@@ -1,11 +1,10 @@
-pub mod discord;
+mod discord;
+mod helpers;
 mod menus;
 mod settings;
 mod tools;
 mod utils;
 mod env;
-mod assets;
-mod data;
 
 #[cfg(target_env = "gnu")]
 use settings::malloc::malloc::configure_malloc;

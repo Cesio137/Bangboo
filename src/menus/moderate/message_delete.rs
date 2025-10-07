@@ -3,7 +3,7 @@ use serenity::all::{
     CreateSelectMenu, CreateSelectMenuKind, User, UserId,
 };
 use std::borrow::Cow;
-use crate::data::{str_hex_to_u32, CONSTANTS};
+use crate::helpers::*;
 
 pub fn message_delete_menu<'a>(
     user: &'a User,
