@@ -1,6 +1,6 @@
 import { createEvent } from "#base";
 import { Events } from "discord.js";
-import { globalMessage } from "#functions";
+import { globalMessage, logger } from "#functions";
 
 createEvent({
     name: "Member Added",
@@ -10,7 +10,7 @@ createEvent({
         const { guild, user } = member;
         const system_channel = guild.systemChannel;
         if (!system_channel) {
-            console.log("Channel not found");
+            logger.error("System channel not found");
             return;
         }
         globalMessage(Events.GuildMemberAdd, member, user, system_channel);

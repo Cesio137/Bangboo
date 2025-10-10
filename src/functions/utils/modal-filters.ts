@@ -1,6 +1,5 @@
 import { Guild } from "discord.js";
 
-
 export function filterUsers(ids: string[], guild: Guild): string[] {
     let users: string[] = [];
     if (ids.length < 1) { return users; }

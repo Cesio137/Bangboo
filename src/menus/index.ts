@@ -1,9 +1,7 @@
-export * from "./moderate/ban-menu.js"
-export * from "./moderate/close-menu.js"
-export * from "./moderate/delete-message-menu.js"
-export * from "./moderate/kick-menu.js"
-export * from "./moderate/load-menu.js"
-export * from "./moderate/timeout-menu.js"
+export * from "./modals/timeout.js"
+export * from "./modals/kick.js"
+export * from "./modals/ban.js"
+export * from "./modals/delete-message.js"
 
 export * from "./V2/fab.js"
 export * from "./V2/social.js"

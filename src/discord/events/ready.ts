@@ -3,7 +3,7 @@ import { ActivitiesOptions, ActivityType } from "discord.js";
 
 createEvent({
     name: "ready",
-    event: "ready",
+    event: "clientReady",
     async run(client) {
         const status: ActivitiesOptions[] = [
             { name: "Powered by discloud", type:ActivityType.Custom },

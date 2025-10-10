@@ -1,5 +1,5 @@
 import { createEvent } from "#base";
-import { globalMessage } from "#functions";
+import { globalMessage, logger } from "#functions";
 import { Events } from "discord.js";
 
 createEvent({
@@ -9,8 +9,8 @@ createEvent({
         const { guild, user } = ban;
         const system_channel = guild.systemChannel;
         if (!system_channel) {
-            console.log("Channel not found");
-             return;
+            logger.error("System channel not found");
+            return;
         }
         globalMessage(Events.GuildBanAdd, undefined, user, system_channel);
     }
