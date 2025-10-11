@@ -26,7 +26,7 @@ discloud-rs = { git = "https://github.com/Cesio137/discloud-rs.git", branch = "d
 dotenvy = { version = "0.15" }
 genai = { version = "0.4"}
 once_cell = { version = "1.21" }
-regex = { version = "1.11" }
+regex = { version = "1.12" }
 reqwest = { version = "0.12" }
 serde = { version = "1.0" }
 serde_json = { version = "1.0" }

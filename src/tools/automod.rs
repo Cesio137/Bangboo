@@ -4,7 +4,7 @@ use once_cell::sync::Lazy;
 use regex::Regex;
 use serenity::all::{CacheHttp, Context, CreateEmbed, CreateMessage, Message};
 
-static REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"\[([^]]+)]\((https?://[^)]+)\)").unwrap());
+static REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"\[\s*(?i:steam)[^\]]*]\((https?://[^)]+)\)").unwrap());
 
 pub async fn filter_message(ctx: &Context, message: &Message) -> bool {
     let content = &message.content;
