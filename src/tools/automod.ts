@@ -2,7 +2,7 @@ import { logger } from "#functions";
 import { createEmbed } from "@magicyan/discord";
 import { Message, OmitPartialGroupDMChannel } from "discord.js";
 
-const regex = new RegExp("\\[([^\\]]+)\\]\\((https?:\\/\\/[^\\)]+)\\)");
+const regex = new RegExp("\\[\\s*steam[^\\]]*]\\((https?:\\/\\/[^)]+)\\)", "gi");
 
 export async function filterMessage(
     message: OmitPartialGroupDMChannel<Message<boolean>>
