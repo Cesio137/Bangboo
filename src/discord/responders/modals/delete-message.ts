@@ -12,6 +12,7 @@ const schema = z.object({
 createResponder({
     customId: "modal/moderate/delete_message",
     types: [ResponderType.Modal],
+    cache: "cached",
     async run(interaction) {
         const modalFields = schema.safeParse(modalFieldsToRecord(interaction.fields));
         if (!modalFields.success) {
