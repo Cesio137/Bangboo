@@ -5,8 +5,8 @@ mod kick;
 mod modal;
 mod timeout;
 
+use crate::constants::*;
 use crate::discord::*;
-use crate::helpers::*;
 use crate::utils::*;
 use ban::ban_collector;
 use kick::kick_collector;
@@ -46,7 +46,7 @@ impl SlashCommandHandler for Moderate {
                     &ctx,
                     &interaction,
                     MessageFlags::EPHEMERAL,
-                    str_hex_to_u32(&CONSTANTS.colors.danger),
+                    COLORS.danger,
                     "Interaction member is none.",
                 )
                 .await;
@@ -54,14 +54,14 @@ impl SlashCommandHandler for Moderate {
             }
         };
 
-        let stf_role = RoleId::new(str_to_u64(&GUILD.roles.stf));
-        let kernel_role = RoleId::new(str_to_u64(&GUILD.roles.kernel));
+        let stf_role = RoleId::new(GUILD.roles.stf);
+        let kernel_role = RoleId::new(GUILD.roles.kernel);
         if !member.roles.iter().any(|r| r == &stf_role || r == &kernel_role) {
             reply_with_embed(
                 &ctx,
                 &interaction,
                 MessageFlags::empty(),
-                str_hex_to_u32(&CONSTANTS.colors.danger),
+                COLORS.danger,
                 "You are not a mod or the owner of the guild.",
             )
             .await;

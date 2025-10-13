@@ -1,5 +1,5 @@
+use crate::constants::*;
 use crate::discord::*;
-use crate::helpers::*;
 use crate::menus::*;
 use crate::utils::*;
 use serenity::all::{
@@ -52,7 +52,7 @@ pub async fn kick_action(
     let embed_footer = CreateEmbedFooter::new(footer);
 
     let embed = CreateEmbed::new()
-        .color(str_hex_to_u32(&CONSTANTS.colors.royal))
+        .color(COLORS.royal)
         .author(embed_author)
         .title("**Officer Cui's panel**")
         .thumbnail("https://raw.githubusercontent.com/Cesio137/Bangboo/refs/heads/rust/assets/avatar/Officer.png")
@@ -75,7 +75,7 @@ pub async fn kick_collector(ctx: &Context, interaction: &CommandInteraction, mem
                 &ctx,
                 &interaction,
                 MessageFlags::EPHEMERAL,
-                str_hex_to_u32(&CONSTANTS.colors.danger),
+                COLORS.danger,
                 "Guild id is none.",
             )
             .await;
@@ -99,7 +99,7 @@ pub async fn kick_collector(ctx: &Context, interaction: &CommandInteraction, mem
                 ctx,
                 interaction,
                 MessageFlags::EPHEMERAL,
-                str_hex_to_u32(&CONSTANTS.colors.danger),
+                COLORS.danger,
                 "No message ID.",
             )
             .await;

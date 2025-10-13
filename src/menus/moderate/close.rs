@@ -1,4 +1,4 @@
-use crate::helpers::*;
+use crate::constants::*;
 use serenity::all::{CreateEmbed, CreateEmbedAuthor, User};
 
 pub fn close_menu(user: &User, timeout: bool) -> CreateEmbed {
@@ -6,7 +6,7 @@ pub fn close_menu(user: &User, timeout: bool) -> CreateEmbed {
         .icon_url(user.avatar_url().unwrap_or(user.default_avatar_url()));
 
     CreateEmbed::new()
-        .color(str_hex_to_u32(&CONSTANTS.colors.royal))
+        .color(COLORS.royal)
         .author(embed_author)
         .title("**Officer Cui's panel**")
         .thumbnail("https://raw.githubusercontent.com/Cesio137/Bangboo/refs/heads/rust/assets/avatar/Officer.png")

@@ -1,3 +1,4 @@
+use crate::constants::*;
 use crate::discord::*;
 use crate::discord::commands::public::moderate::filter::filter_users;
 use crate::discord::commands::public::moderate::modal::show_modal;
@@ -10,7 +11,6 @@ use serenity::all::{
 };
 use serenity::futures::StreamExt;
 use std::time::{Duration, SystemTime};
-use crate::helpers::*;
 
 pub async fn timeout_action(
     ctx: &Context,
@@ -61,7 +61,7 @@ pub async fn timeout_action(
     let embed_footer = CreateEmbedFooter::new(footer);
 
     let embed = CreateEmbed::new()
-        .color(str_hex_to_u32(&CONSTANTS.colors.royal))
+        .color(COLORS.royal)
         .author(embed_author)
         .title("**Officer Cui's panel**")
         .thumbnail("https://raw.githubusercontent.com/Cesio137/Bangboo/refs/heads/rust/assets/avatar/Officer.png")
@@ -88,7 +88,7 @@ pub async fn timeout_collector(
                 &ctx,
                 &interaction,
                 MessageFlags::EPHEMERAL,
-                str_hex_to_u32(&CONSTANTS.colors.danger),
+                COLORS.danger,
                 "Guild id is none.",
             )
             .await;

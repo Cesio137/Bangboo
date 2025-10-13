@@ -1,4 +1,4 @@
-use crate::helpers::*;
+use crate::constants::*;
 use crate::discord::*;
 use crate::menus::*;
 use crate::tools::*;
@@ -49,7 +49,7 @@ async fn status(ctx: &Context, interaction: &CommandInteraction) {
                 ctx,
                 interaction,
                 MessageFlags::EPHEMERAL,
-                str_hex_to_u32(&CONSTANTS.colors.danger),
+                COLORS.danger,
                 "Failed to fetch base.",
             )
             .await;
@@ -65,7 +65,7 @@ async fn status(ctx: &Context, interaction: &CommandInteraction) {
                 ctx,
                 interaction,
                 MessageFlags::EPHEMERAL,
-                str_hex_to_u32(&CONSTANTS.colors.danger),
+                COLORS.danger,
                 "Failed to fetch base status.",
             )
             .await;
@@ -76,36 +76,36 @@ async fn status(ctx: &Context, interaction: &CommandInteraction) {
     let mut infos = Vec::new();
     infos.push(format!(
         "<:id:{}>`Nome(ID):` **{}({})**",
-        &EMOJIS.emojis_static.id,
+        EMOJIS.emojis_static.id,
         app.name,
         app.id
     ));
     infos.push(format!(
         "<:cpu:{}>`CPU:` **{}**",
-        &EMOJIS.emojis_static.cpu,
+        EMOJIS.emojis_static.cpu,
         status.cpu
     ));
     infos.push(format!(
         "<:ram:{}>`RAM:` **{}**",
-        &EMOJIS.emojis_static.ram,
+        EMOJIS.emojis_static.ram,
         status.memory
     ));
     infos.push(format!(
         "<:wifi:{}>`Network:`  `⬆`**{}** `⬇`**{}**",
-        &EMOJIS.emojis_static.wifi,
+        EMOJIS.emojis_static.wifi,
         status.net_io.up,
         status.net_io.down
     ));
     if let Ok(timestamp) = Timestamp::parse(&status.started_at) {
         infos.push(format!(
             "<:refresh:{}>`Latest restart:` **<t:{}:R>**",
-            &EMOJIS.emojis_static.refresh,
+            EMOJIS.emojis_static.refresh,
             timestamp.timestamp()
         ));
     } else {
         infos.push(format!(
             "<:refresh:{}>`Latest restart:` **{}**",
-            &EMOJIS.emojis_static.refresh,
+            EMOJIS.emojis_static.refresh,
             &status.last_restart
         ));
     }
@@ -133,7 +133,7 @@ async fn logs(ctx: &Context, interaction: &CommandInteraction) {
                 ctx,
                 interaction,
                 MessageFlags::EPHEMERAL,
-                str_hex_to_u32(&CONSTANTS.colors.danger),
+                COLORS.danger,
                 "Failed to fetch base.",
             )
             .await;
@@ -149,7 +149,7 @@ async fn logs(ctx: &Context, interaction: &CommandInteraction) {
                 ctx,
                 interaction,
                 MessageFlags::EPHEMERAL,
-                str_hex_to_u32(&CONSTANTS.colors.danger),
+                COLORS.danger,
                 "Failed to fetch base logs.",
             )
             .await;

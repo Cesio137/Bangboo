@@ -1,5 +1,5 @@
+use crate::constants::*;
 use crate::discord::*;
-use crate::helpers::*;
 use crate::menus::*;
 use crate::tools::*;
 use crate::utils::*;
@@ -24,7 +24,7 @@ impl ResponderHandler for Status {
             Ok(apps) => apps.clone(),
             Err(err) => {
                 let embed = CreateEmbed::new()
-                    .color(Colour::new(str_hex_to_u32(&CONSTANTS.colors.danger)))
+                    .color(Colour::new(COLORS.danger))
                     .description("Failed to fetch base.");
                 let payload = ReplyPayload {
                     embeds: Some(vec![embed]),
@@ -41,7 +41,7 @@ impl ResponderHandler for Status {
             Ok(status) => status,
             Err(err) => {
                 let embed = CreateEmbed::new()
-                    .color(Colour::new(str_hex_to_u32(&CONSTANTS.colors.danger)))
+                    .color(Colour::new(COLORS.danger))
                     .description("Failed to fetch base status.");
                 let payload = ReplyPayload {
                     embeds: Some(vec![embed]),
@@ -121,7 +121,7 @@ impl ResponderHandler for Logs {
             Ok(apps) => apps.clone(),
             Err(err) => {
                 let embed = CreateEmbed::new()
-                    .color(Colour::new(str_hex_to_u32(&CONSTANTS.colors.danger)))
+                    .color(Colour::new(COLORS.danger))
                     .description("Failed to fetch base logs.");
                 let payload = ReplyPayload {
                     embeds: Some(vec![embed]),

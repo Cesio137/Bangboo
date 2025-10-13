@@ -1,4 +1,4 @@
-use crate::helpers::*;
+use crate::constants::*;
 use crate::discord::*;
 use crate::utils::*;
 use async_trait::async_trait;
@@ -33,7 +33,7 @@ impl SlashCommandHandler for Age {
                     &ctx,
                     &interaction,
                     MessageFlags::empty(),
-                    str_hex_to_u32(&CONSTANTS.colors.danger),
+                    COLORS.danger,
                     "Guild id not found.",
                 )
                 .await;
@@ -46,7 +46,7 @@ impl SlashCommandHandler for Age {
                 &ctx,
                 &interaction,
                 MessageFlags::empty(),
-                str_hex_to_u32(&CONSTANTS.colors.danger),
+                COLORS.danger,
                 "Failed to fetch guild data.",
             )
             .await;
@@ -80,7 +80,7 @@ impl SlashCommandHandler for Age {
             &ctx,
             &interaction,
             MessageFlags::empty(),
-            str_hex_to_u32(&CONSTANTS.colors.green),
+            COLORS.green,
             &age,
         )
         .await;

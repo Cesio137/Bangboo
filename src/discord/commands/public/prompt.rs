@@ -1,5 +1,5 @@
+use crate::constants::*;
 use crate::discord::*;
-use crate::helpers::*;
 use crate::tools::*;
 use crate::utils::*;
 use serenity::all::{
@@ -36,7 +36,7 @@ impl SlashCommandHandler for Prompt {
                     ctx,
                     interaction,
                     MessageFlags::EPHEMERAL,
-                    str_hex_to_u32(&CONSTANTS.colors.danger),
+                    COLORS.danger,
                     "Failed to get gemini response.",
                 )
                 .await;
@@ -56,7 +56,7 @@ impl SlashCommandHandler for Prompt {
         }
 
         let embed = CreateEmbed::new()
-            .color(str_hex_to_u32(&CONSTANTS.colors.green))
+            .color(COLORS.green)
             .description(texts.pop_front().unwrap_or_default());
         let payload = ReplyPayload {
             embeds: Some(vec![embed]),
@@ -66,7 +66,7 @@ impl SlashCommandHandler for Prompt {
 
         while texts.len() > 0 {
             let embed = CreateEmbed::new()
-                .color(str_hex_to_u32(&CONSTANTS.colors.green))
+                .color(COLORS.green)
                 .description(texts.pop_front().unwrap_or_default());
             let payload = ReplyPayload {
                 embeds: Some(vec![embed]),

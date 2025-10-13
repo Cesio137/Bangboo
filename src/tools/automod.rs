@@ -1,5 +1,5 @@
+use crate::constants::*;
 use crate::discord::*;
-use crate::helpers::*;
 use once_cell::sync::Lazy;
 use regex::Regex;
 use serenity::all::{CacheHttp, Context, CreateEmbed, CreateMessage, Message};
@@ -25,7 +25,7 @@ pub async fn filter_message(ctx: &Context, message: &Message) -> bool {
     );
 
     let server_embed = CreateEmbed::new()
-        .color(str_hex_to_u32(&CONSTANTS.colors.warning))
+        .color(COLORS.warning)
         .description(warning);
     let mut ref_msg = CreateMessage::new().embed(server_embed);
     if let Some(ref_message) = message.message_reference.as_ref() {
@@ -86,7 +86,7 @@ pub async fn filter_message(ctx: &Context, message: &Message) -> bool {
 
     let dm_warning = "It look like you probably got hacked and sent a message that was flagged as scam containing **[text](hyperlink)**. You were just kicked from the server, but feel free to come back as soon as you resolve the issue with your account.";
     let dm_embed = CreateEmbed::new()
-        .color(str_hex_to_u32(&CONSTANTS.colors.warning))
+        .color(COLORS.warning)
         .description(dm_warning);
 
     if let Err(err) = private_channel

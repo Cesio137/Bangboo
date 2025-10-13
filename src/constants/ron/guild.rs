@@ -22,16 +22,16 @@ pub struct Guild {
 
 #[derive(Serialize, Deserialize)]
 pub struct Channels {
-    pub announcement: String,
+    pub announcement: u64,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct Roles {
-    pub apps: String,
+    pub apps: u64,
 
-    pub kernel: String,
+    pub kernel: u64,
 
-    pub stf: String,
+    pub stf: u64,
 
-    pub boosters: String,
+    pub boosters: u64,
 }

@@ -1,4 +1,4 @@
-use crate::helpers::*;
+use crate::constants::*;
 use serenity::all::{
     Colour, CreateActionRow, CreateButton, CreateComponent, CreateContainer, CreateSeparator,
     CreateTextDisplay, EmojiId, ReactionType, Spacing,
@@ -6,21 +6,21 @@ use serenity::all::{
 use std::borrow::Cow;
 
 pub fn fab_component<'a>() -> CreateComponent<'a> {
-    let accent_color = Colour::new(str_hex_to_u32(&CONSTANTS.colors.green));
+    let accent_color = Colour::new(COLORS.green);
     let text_display = CreateTextDisplay::new("**### CHECK OUT MY FAB PRODUCTS**");
     let separator = CreateSeparator::new(true).spacing(Spacing::Small);
     let eus_row = CreateActionRow::Buttons(Cow::Owned(vec![
         CreateButton::new_link(&FAB.engine_user_setings.product_url)
             .label("Engine User Settings")
             .emoji(ReactionType::Custom {
-                id: EmojiId::from(str_to_u64(&EMOJIS.emojis_static.icons_f)),
+                id: EmojiId::from(EMOJIS.emojis_static.icons_f),
                 name: None,
                 animated: false,
             }),
         CreateButton::new_link(&FAB.engine_user_setings.doc_url)
             .label("Documentation")
             .emoji(ReactionType::Custom {
-                id: EmojiId::from(str_to_u64(&EMOJIS.emojis_static.icons_d)),
+                id: EmojiId::from(EMOJIS.emojis_static.icons_d),
                 name: None,
                 animated: false,
             }),
@@ -31,14 +31,14 @@ pub fn fab_component<'a>() -> CreateComponent<'a> {
         CreateButton::new_link(&FAB.internet_protocol.product_url)
             .label("Internet Protocol")
             .emoji(ReactionType::Custom {
-                id: EmojiId::from(str_to_u64(&EMOJIS.emojis_static.icons_f)),
+                id: EmojiId::from(EMOJIS.emojis_static.icons_f),
                 name: None,
                 animated: false,
             }),
         CreateButton::new_link(&FAB.internet_protocol.doc_url)
             .label("Documentation")
             .emoji(ReactionType::Custom {
-                id: EmojiId::from(str_to_u64(&EMOJIS.emojis_static.icons_d)),
+                id: EmojiId::from(EMOJIS.emojis_static.icons_d),
                 name: None,
                 animated: false,
             }),

@@ -1,4 +1,4 @@
-use crate::helpers::*;
+use crate::constants::*;
 use serenity::all::{
     ButtonStyle, Colour, CreateActionRow, CreateButton, CreateComponent, CreateContainer,
     CreateSeparator, CreateTextDisplay, Spacing,
@@ -6,7 +6,7 @@ use serenity::all::{
 use std::borrow::Cow;
 
 pub fn status_component<'a>(infos: Vec<String>) -> CreateComponent<'a> {
-    let accent_color = Colour::new(str_hex_to_u32(&CONSTANTS.colors.green));
+    let accent_color = Colour::new(COLORS.green);
     let text_display = CreateTextDisplay::new("### BANGBOO'S STATUS");
     let separator = CreateSeparator::new(true).spacing(Spacing::Large);
     let info_display = CreateTextDisplay::new(infos.join("\n"));
@@ -29,7 +29,7 @@ pub fn status_component<'a>(infos: Vec<String>) -> CreateComponent<'a> {
 }
 
 pub fn logs_component<'a>(logs: &'a str) -> CreateComponent<'a> {
-    let accent_color = Colour::new(str_hex_to_u32(&CONSTANTS.colors.green));
+    let accent_color = Colour::new(COLORS.green);
     let text_display = CreateTextDisplay::new("### BANGBOO'S LOGS");
     let separator = CreateSeparator::new(true).spacing(Spacing::Large);
     let info_display = CreateTextDisplay::new(format!("```bash\n{logs}\n```"));

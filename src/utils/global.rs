@@ -1,6 +1,6 @@
+use crate::constants::*;
 use crate::discord::*;
 use crate::utils::*;
-use crate::helpers::*;
 use serenity::all::{
     CacheHttp, ChannelId, Colour, Context, CreateAttachment, CreateEmbed, CreateEmbedAuthor,
     CreateMessage, GuildId, Member, User,
@@ -157,7 +157,7 @@ pub async fn global_message(
 }
 
 pub async fn global_boost(ctx: &Context, user: &User, guild_id: &GuildId) {
-    let color = Colour::new(str_hex_to_u32(&CONSTANTS.colors.nitro));
+    let color = Colour::new(COLORS.nitro);
     let avatar_url = user.avatar_url().unwrap_or_default();
     let username = user.global_name.clone().unwrap_or(user.name.clone());
     let description = format!(
@@ -174,7 +174,7 @@ pub async fn global_boost(ctx: &Context, user: &User, guild_id: &GuildId) {
 
     let channel = match guild_id.channels(ctx.http()).await {
         Ok(channels) => {
-            let id = ChannelId::new(str_to_u64(&GUILD.channels.announcement));
+            let id = ChannelId::new(GUILD.channels.announcement);
             if let Some(channel) = channels.get(&id).cloned() {
                 channel
             } else {

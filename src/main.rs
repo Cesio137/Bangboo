@@ -1,5 +1,5 @@
+mod constants;
 mod discord;
-mod helpers;
 mod menus;
 mod settings;
 mod tools;
@@ -16,7 +16,7 @@ use crate::discord::base::bootstrap;
 async fn main() {
     #[cfg(target_env = "gnu")]
     configure_malloc();
-    
+
     let intents = GatewayIntents::GUILD_MESSAGES
         | GatewayIntents::GUILDS
         | GatewayIntents::DIRECT_MESSAGES
