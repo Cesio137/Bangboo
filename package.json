@@ -29,6 +29,9 @@
     "tsx": "^4.20.6",
     "typescript": "^5.9.3"
   },
+  "overrides": {
+    "source-map": "^0.7.6"
+  },
   "imports": {
     "#env": [
       "./build/env.js"
