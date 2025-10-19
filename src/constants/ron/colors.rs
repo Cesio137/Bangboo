@@ -1,6 +1,7 @@
 use serde::{Serialize, Deserialize};
 
 #[derive(Clone, Serialize, Deserialize)]
+#[serde(rename = "colors")]
 pub struct Colors {
     #[serde(rename = "default")]
     pub colors_default: u32,
