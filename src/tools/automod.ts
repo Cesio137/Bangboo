@@ -3,7 +3,7 @@ import { createEmbed } from "@magicyan/discord";
 import { Message, OmitPartialGroupDMChannel } from "discord.js";
 
 const regexSteam = new RegExp("\\[\\s*steam[^\\]]*]\\((https?:\\/\\/[^)]+)\\)", "gi");
-const attachmentPattern = '(https:\\/\\/media\\.discordapp\\.net\\/attachments\\/\\d+\\/\\d+\\/[^\\s]+\\.(?:png|jpg|jpeg|webp)(?:\\?[^\\s]*)?)';
+const attachmentPattern = new RegExp("(?:(?:https?:\\/\\/)?(?:cdn|media)\\.discordapp\\.(?:net|com)\\/attachments\\/\\d+\\/\\d+\\/[^\\s]+\\.(?:png|jpg|jpeg|webp)(?:\\?[^\\s]*)?\\s*){3,}", "g");
 
 export async function filterMessage(
     message: OmitPartialGroupDMChannel<Message<boolean>>
@@ -13,14 +13,12 @@ export async function filterMessage(
     if (!guild) return;
 
     const steamTest = regexSteam.test(content);
-
-    const attachmentMatch = content.match(attachmentPattern);
-    const attachmentTest = attachmentMatch ? attachmentMatch.length > 1 : false;
+    const attachmentTest = attachmentPattern.test(content);
 
     if (!steamTest && !attachmentTest) return;
     
     const username = author.globalName || author.username;
-    let warning_message = `**${username}** sent a message that was flagged as a scam. Messages containing **[steam...](hyperlink)** or **more than 1 image attachments** are strictly prohibited. Bangboo (me) will presume his/her account has been compromised, leading to a server kick!`;
+    let warning_message = `<@${author.id}> sent a message that was flagged as a scam. Messages containing **[steam...](hyperlink)** or **more than 2 image attachments** are strictly prohibited. Bangboo (me) will presume his/her account has been compromised, leading to a server kick!`;
     const embed = createEmbed({
         color: "Yellow",
         description: warning_message,
@@ -42,7 +40,7 @@ export async function filterMessage(
     const embed_dm = createEmbed({
         color: "Yellow",
         description:
-            "It look like you probably got hacked and sent a message that was flagged as scam containing **[steam...](hyperlink)** or **more than 1 image attachments**. You were just kicked from the server, but feel free to come back as soon as you resolve the issue with your account.",
+            "It look like you probably got hacked and sent a message that was flagged as scam containing **[steam...](hyperlink)** or **more than 2 image attachments**. You were just kicked from the server, but feel free to come back as soon as you resolve the issue with your account.",
     });
     await author.send({ embeds: [embed_dm] });
 }
