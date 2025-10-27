@@ -14,13 +14,14 @@
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
-    "@magicyan/discord": "^1.6.0",
-    "@napi-rs/canvas": "^0.1.80",
+    "@magicyan/discord": "^1.6.2",
+    "@napi-rs/canvas": "^0.1.81",
     "@reliverse/reglob": "^1.0.0",
     "chalk": "^5.6.2",
     "discloud.app": "^1.2.0",
-    "discord.js": "^14.23.2",
-    "rou3": "^0.7.8",
+    "discord.js": "^14.24.0",
+    "leven": "^4.1.0",
+    "rou3": "^0.7.9",
     "zod": "^4.1.12"
   },
   "devDependencies": {

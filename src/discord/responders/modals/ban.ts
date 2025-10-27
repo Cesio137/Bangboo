@@ -38,7 +38,7 @@ async function banAction<R>(user: User, ids: string[], reason: string | undefine
     let success: string[] = [];
     let failed: string[] = [];
 
-    const bulkBanRes = await guild.bans.bulkCreate(ids, { reason });
+    const bulkBanRes = await guild.bans.bulkCreate(ids, { reason, deleteMessageSeconds: 2_592_000 });
     success = bulkBanRes.bannedUsers.values().toArray();
     failed = bulkBanRes.failedUsers.values().toArray();
 

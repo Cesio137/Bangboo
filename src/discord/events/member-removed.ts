@@ -6,8 +6,9 @@ createEvent({
     name: "Member Removed",
     event: "guildMemberRemove",
     async run(member) {
-        if (member.user.bot) {return}
+        if (member.user.bot) return;
         const { guild, user } = member;
+        if (guild.bans.cache.has(user.id)) return;
         const system_channel = guild.systemChannel;
         if (!system_channel) {
             logger.error("System channel not found");
