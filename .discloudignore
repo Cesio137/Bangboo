@@ -11,6 +11,7 @@
 # Folders
 /.vscode
 /assets/avatar
+/assets/figma
 /assets/icons
 /src
 /deprecated
