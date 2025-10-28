@@ -7,7 +7,8 @@ export async function filterAttachment(message: OmitPartialGroupDMChannel<Messag
     const { attachments, author, guild, member } = message;
 
     if (!guild) return;
-    if (attachments.size == 0) return;
+    console.log(attachments.size);
+    if (attachments.size < 4) return;
 
     const urls = attachments.map(attachment => {
         const { contentType, size, url, width, height, } = attachment;
@@ -20,49 +21,50 @@ export async function filterAttachment(message: OmitPartialGroupDMChannel<Messag
         return undefined;
     }).filter(url => (typeof url !== "undefined"));
 
-    if (urls.length == 0) return;
+    console.log(urls.length);
+    if (urls.length < 4) return;
+
+    const url = urls.at(urls.length - 1);
+
+    if (typeof url === "undefined") return;
 
     try {
-        for (const url of urls) {
-            const res = await fetch(url);
-            const buf = await res.arrayBuffer();
+        const res = await fetch(url);
+        const buf = await res.arrayBuffer();
 
-            const phash = await getPhashFromImageBuffer(buf);
-            const match = closestMatch(phash, hashes.filters, { maxDistance: 1 });
-            if (typeof match === "string") {
-                let warning_message = `<@${author.id}> sent a image that was identified as a scam. Bangboo (me) will presume his/her account has been compromised, leading to a server kick!`;
-                const embed = createEmbed({
-                    color: "Yellow",
-                    description: warning_message,
-                });
-                await message.reply({ embeds: [embed] });
-                await message.delete();
+        const phash = await getPhashFromImageBuffer(buf);
+        const match = closestMatch(phash, hashes.filters, { maxDistance: 1 });
+        logger.log(phash);
+        if (typeof match === "string") {
+            let warning_message = `<@${author.id}> sent a image that was identified as a scam. Bangboo (me) will presume his/her account has been compromised, leading to a server kick!`;
+            const embed = createEmbed({
+                color: "Yellow",
+                description: warning_message,
+            });
+            await message.reply({ embeds: [embed] });
+            await message.delete();
 
-                if (guild.ownerId === author.id) {
-                    logger.error("Tried to kick the owner of the guild");
-                    return;
-                }
-
-                if (!member) {
-                    logger.error("Failed to fetch member.");
-                    return;
-                }
-
-                await member.kick(`${member.user.username} sent a scam image!`);
-                const embed_dm = createEmbed({
-                    color: "Yellow",
-                    description:
-                        "It look like you probably got hacked and sent a scam image. You were just kicked from the server, but feel free to come back as soon as you resolve the issue with your account.",
-                });
-                await author.send({ embeds: [embed_dm] });
-                break;
+            if (guild.ownerId === author.id) {
+                logger.error("Tried to kick the owner of the guild");
+                return;
             }
+
+            if (!member) {
+                logger.error("Failed to fetch member.");
+                return;
+            }
+
+            await member.kick(`${member.user.username} sent a scam image!`);
+            const embed_dm = createEmbed({
+                color: "Yellow",
+                description:
+                    "It look like you probably got hacked and sent a scam image. You were just kicked from the server, but feel free to come back as soon as you resolve the issue with your account.",
+            });
+            await author.send({ embeds: [embed_dm] });
         }
     } catch (e) {
         logger.error(e);
     }
-
-
 }
 
 /*
