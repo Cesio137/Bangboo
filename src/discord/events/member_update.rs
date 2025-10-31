@@ -1,6 +1,5 @@
 use crate::constants::*;
 use crate::discord::*;
-use crate::functions::*;
 use serenity::all::{CacheHttp, Context, GuildMemberUpdateEvent, Member, RoleId};
 
 pub async fn run(

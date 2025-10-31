@@ -24,11 +24,11 @@ pub async fn run(app: &App, ctx: &Context, guild_id: &GuildId, banned_user: &Use
     };
 
     global_message(
-        &ctx,
+        ctx,
         &system_channel_id,
         EventType::BanAdded,
         None,
-        &banned_user,
+        banned_user,
     )
     .await;
 }

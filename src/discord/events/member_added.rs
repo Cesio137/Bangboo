@@ -1,5 +1,4 @@
 use crate::discord::*;
-use crate::functions::*;
 use serenity::all::{Context, Member};
 
 pub async fn run(app: &App, ctx: &Context, member_added: &Member) {
@@ -26,11 +25,10 @@ pub async fn run(app: &App, ctx: &Context, member_added: &Member) {
     let user = member_added.user.clone();
 
     global_message(
-        &ctx,
+        ctx,
         &system_channel_id,
         EventType::MemberAdded,
-        Some(&member_added),
+        Some(member_added),
         &user,
-    )
-    .await;
+    ).await;
 }

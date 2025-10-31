@@ -1,5 +1,4 @@
 use crate::discord::*;
-use crate::functions::*;
 use serenity::all::{Context, GuildId, User};
 
 pub async fn run(app: &App, ctx: &Context, guild_id: &GuildId, user: &User) {
@@ -15,6 +14,10 @@ pub async fn run(app: &App, ctx: &Context, guild_id: &GuildId, user: &User) {
         }
     };
 
+    if guild_id.get_ban(ctx.http.clone(), user.id).await.is_ok() {
+        return;
+    }
+    user.id;
     let system_channel_id = match guild.system_channel_id {
         Some(channel_id) => channel_id,
         None => {
@@ -23,5 +26,5 @@ pub async fn run(app: &App, ctx: &Context, guild_id: &GuildId, user: &User) {
         }
     };
 
-    global_message(&ctx, &system_channel_id, EventType::MemberRemoved, None, &user).await;
+    global_message(ctx, &system_channel_id, EventType::MemberRemoved, None, user).await;
 }
