@@ -1,18 +1,33 @@
+use std::collections::HashMap;
 use once_cell::sync::Lazy;
 use std::env;
+use serde::Deserialize;
+use crate::discord::error;
 
-pub struct Env {
+#[derive(Deserialize)]
+pub struct EnvSchema {
     pub BOT_TOKEN: String,
     pub DISCLOUD_TOKEN: String,
     pub GEMINI_API_KEY: String,
 }
 
-pub static ENV: Lazy<Env> = Lazy::new(|| {
+pub static ENV: Lazy<EnvSchema> = Lazy::new(|| {
     _ = dotenvy::dotenv().expect("Failed to load .env file");
+    let env_vars = env::vars().collect::<HashMap<String, String>>();
 
-    Env {
-        BOT_TOKEN: env::var("BOT_TOKEN").expect("Discord Bot Token is required"),
-        DISCLOUD_TOKEN: env::var("DISCLOUD_TOKEN").expect("Discloud token is required"),
-        GEMINI_API_KEY: env::var("GEMINI_API_KEY").expect("Gemini API key is required"),
-    }
+    let env: EnvSchema = match serde_json::to_string(&env_vars) {
+        Ok(env_str) => match serde_json::from_str(&env_str) {
+            Ok(schema) => schema,
+            Err(err) => {
+                error(&format!("Failed to parse environment variables\n└{}", err));
+                panic!();
+            }
+        },
+        Err(err) => {
+            error(&format!("Failed to parse environment variables\n└{}", err));
+            panic!();
+        }
+    };
+
+    env
 });

@@ -1,7 +1,7 @@
 use crate::constants::*;
 use crate::discord::*;
+use crate::functions::*;
 use crate::tools::*;
-use crate::utils::*;
 use serenity::all::{
     CacheHttp, CommandInteraction, CommandOptionType, CommandType, Context, CreateCommand,
     CreateCommandOption, CreateEmbed, InteractionContext, MessageFlags,

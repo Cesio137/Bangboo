@@ -1,6 +1,6 @@
 use crate::constants::*;
 use crate::discord::*;
-use crate::utils::*;
+use crate::functions::*;
 use async_trait::async_trait;
 use serenity::all::{CommandInteraction, CommandOptionType, CommandType, Context, CreateCommand, CreateCommandOption, InteractionContext, MessageFlags};
 

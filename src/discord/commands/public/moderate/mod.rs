@@ -7,7 +7,7 @@ mod timeout;
 
 use crate::constants::*;
 use crate::discord::*;
-use crate::utils::*;
+use crate::functions::*;
 use ban::ban_collector;
 use kick::kick_collector;
 use timeout::timeout_collector;

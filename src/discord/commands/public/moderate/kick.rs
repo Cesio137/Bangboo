@@ -1,7 +1,7 @@
 use crate::constants::*;
 use crate::discord::*;
+use crate::functions::*;
 use crate::menus::*;
-use crate::utils::*;
 use serenity::all::{
     CacheHttp, CommandInteraction, ComponentInteraction, ComponentInteractionCollector,
     ComponentInteractionDataKind, Context, CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter,

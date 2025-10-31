@@ -1,11 +1,11 @@
 use crate::constants::*;
 use crate::discord::*;
-use crate::utils::*;
+use crate::functions::*;
 use serenity::all::{
     CacheHttp, ChannelId, Colour, Context, CreateAttachment, CreateEmbed, CreateEmbedAuthor,
     CreateMessage, GuildId, Member, User,
 };
-use skia_safe::{Data, EncodedImageFormat, ISize, Point};
+use skia_safe::{EncodedImageFormat, ISize, Point};
 use std::time::{SystemTime, UNIX_EPOCH};
 
 #[derive(Eq, PartialEq)]

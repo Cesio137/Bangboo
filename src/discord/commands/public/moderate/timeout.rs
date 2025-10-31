@@ -1,9 +1,9 @@
 use crate::constants::*;
 use crate::discord::*;
+use crate::functions::*;
 use crate::discord::commands::public::moderate::filter::filter_users;
 use crate::discord::commands::public::moderate::modal::show_modal;
 use crate::menus::*;
-use crate::utils::*;
 use serenity::all::{
     CacheHttp, CommandInteraction, ComponentInteraction, ComponentInteractionCollector,
     ComponentInteractionDataKind, Context, CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter,

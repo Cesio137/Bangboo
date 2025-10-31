@@ -1,5 +1,5 @@
 use crate::discord::*;
-use crate::utils::*;
+use crate::functions::*;
 use serenity::all::{Context, GuildId, User};
 
 pub async fn run(app: &App, ctx: &Context, guild_id: &GuildId, user: &User) {

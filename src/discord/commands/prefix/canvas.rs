@@ -1,5 +1,5 @@
 use crate::discord::*;
-use crate::utils::*;
+use crate::functions::*;
 use async_trait::async_trait;
 use serenity::all::{Context, Message};
 

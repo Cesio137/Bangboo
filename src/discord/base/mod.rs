@@ -1,10 +1,9 @@
 pub mod base;
 pub mod creators;
-pub mod loggers;
 
 pub use base::*;
 pub use creators::*;
-pub use loggers::*;
+pub use crate::functions::*;
 
 use crate::env::ENV;
 use serenity::all::{GatewayIntents, Token};

@@ -1,8 +1,8 @@
 use crate::constants::*;
 use crate::discord::*;
+use crate::functions::*;
 use crate::menus::*;
 use crate::tools::*;
-use crate::utils::*;
 use async_trait::async_trait;
 use serenity::all::{
     CacheHttp, Colour, ComponentInteraction, Context, CreateEmbed, MessageFlags, Timestamp,

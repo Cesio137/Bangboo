@@ -34,6 +34,6 @@ reqwest = { version = "0.12" }
 ron = { version = "0.11" }
 serde = { version = "1.0" }
 serde_json = { version = "1.0" }
-skia-safe = { version = "0.89", features = ["textlayout", "gl"] }
+skia-safe = { version = "0.90", features = ["textlayout", "gl"] }
 tokio = { version = "1.48", features = ["macros", "rt-multi-thread", "signal"] }
 chrono = { version = "0.4" }

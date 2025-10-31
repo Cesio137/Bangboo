@@ -1,5 +1,5 @@
 use crate::discord::*;
-use crate::utils::*;
+use crate::functions::*;
 use serenity::all::{
     CacheHttp, ComponentInteraction, Context, CreateInteractionResponse,
     CreateInteractionResponseFollowup, CreateInteractionResponseMessage, EditAttachments,

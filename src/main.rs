@@ -1,13 +1,12 @@
 mod constants;
 mod discord;
+mod functions;
 mod menus;
-mod settings;
 mod tools;
-mod utils;
 mod env;
 
 #[cfg(target_env = "gnu")]
-use settings::malloc::malloc::configure_malloc;
+use crate::functions::configure_malloc;
 
 use serenity::{all::GatewayIntents};
 use crate::discord::base::bootstrap;
