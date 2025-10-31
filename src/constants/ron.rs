@@ -3,10 +3,10 @@ pub mod emojis;
 pub mod fab;
 pub mod guild;
 
-use crate::constants::ron::colors::*;
-use crate::constants::ron::emojis::*;
-use crate::constants::ron::fab::*;
-use crate::constants::ron::guild::*;
+use colors::*;
+use emojis::*;
+use fab::*;
+use guild::*;
 use config::{Config, File, FileFormat};
 use once_cell::sync::Lazy;
 
